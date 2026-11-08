@@ -709,7 +709,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.14.37</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.15</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -836,6 +836,12 @@ var __EXPORT_SOURCE_DOCTYPE=document.doctype?'<!DOCTYPE '+document.doctype.name+
    v1.4.19 音频重构：① 删除背景音乐（含播放器/曲目下拉/音量条与全部 BGM 逻辑）；
            ② 新增人声播报——盘面结果、终局与特殊仙道杀招统一走 TTS 队列，操作栏「播报」可开关（记忆于 guVoice）；
            ③ 新增轮盘转动风声：WebAudio 连续「呼呼」声随转速变调，停盘时淡出，与拨动哒声叠加。
+   v1.15  炼天第二世人物与剧情扩充：补充黑楼兰、影无邪、紫山真君、紫薇仙子、冰塞川、秦鼎菱、
+           庙明神、沈从声、任修平、童画、曾落子、土头驮、陆畏因、沈伤、气绝魔仙、吴帅、毛六、琅琊地灵等人物的时代登记或剧情关联；
+           新增琅琊炼道、紫薇推算、劫运坛、影宗遗谋、黑楼兰、龙鲸乐土悔哭海、凤九歌命运歌等专属事件；
+           以第二世、前置标记、地域、修为与完成标记控制触发，补充疯魔窟尊者局势观察。
+   v1.14.40 炼天时代人物与剧情扩充：补入影宗、天庭、长生天、龙鲸乐土等人物线；
+           第二世专属剧情按义天山/修为/前置标记门控，第一世不触发第二世人物与宿命大战内容。
    v1.6.0  内容（原著向）：① 删除跨时代共用的「通用事件」表；
            ② 十一时代各自独立的凡人事件池（ERA_MORTAL_EVENTS），只抽当世见闻；
            ③ 炼天之世的青茅山见闻按熊家/白家/古月分家与方源世数细分；
@@ -938,9 +944,19 @@ var __EXPORT_SOURCE_DOCTYPE=document.doctype?'<!DOCTYPE '+document.doctype.name+
      巨阳 7 / 幽魂 8 / 乐土 9 / 炼天 10
      薄青 4 / 血海老祖 4 / 白相 5 / 万寿娘子 5 / 黑凡 5 /
      秦百胜 8 / 凤九歌 8 / 武庸 10 / 龙公 10 / 方源 10
+   离散出场：CHARACTER_ERA.eras=[时代索引...]，用于复活尊者、残念/真传跨时代出现；
+     如星宿[0,1,10]、巨阳[7,10]、幽魂[8,10]、乐土[9,10]，
+     不把中间时代误判为本人连续在世。
+   炼天第二世新增人物：黑楼兰、影无邪、紫山真君、紫薇仙子、秦鼎菱、冰塞川、
+     庙明神、沈从声、任修平、童画、曾落子、土头驮、陆畏因、沈伤、气绝魔仙、吴帅、毛六、琅琊地灵。
 
    数据表位置（搜「══ 03.5 DATA · 时代基准」）：
      ERA_TIMELINE / CHARACTER_ERA / SPEC_ERA / EVENT_ERA
+   页面加载后的只读导出入口（运行时提取）：
+     window.__TIMELINE = { eras, characters, specs, events, pools, _note, _frozen, _err }
+     pools.mortal / pools.birth：事件名、权重、是否存在 g() 门控；不导出函数本身。
+     注意：travPool / keyPool 仍需从源码读取，其时代分支与 g() 门控尚未纳入 pools。
+     仅供外部工具/AI 提取；运行期禁止修改导出视图。
    校验函数：
      eraAllowed / charEraAllowed / specEraAllowed / eventEraAllowed
    统一入口：
@@ -965,11 +981,17 @@ var $=function(id){
 };
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
-/* v1.14.37 版本号与更新日志（玩家可见）：升级时只改这里，标题、分享、导出全部跟着走 */
-var APP_VER='v1.14.37';
+/* v1.15 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
+var APP_VER='v1.15';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+ {v:'v1.15',items:[
+  ['new','炼天第二世人物与剧情扩充：补充黑楼兰、影无邪、紫山真君、紫薇仙子、冰塞川、秦鼎菱、庙明神、沈从声、任修平、童画、曾落子、土头驮、陆畏因、沈伤、气绝魔仙、吴帅、毛六、琅琊地灵等人物的时代登记或剧情关联。'],
+  ['new','新增炼天第二世专属游历与关键历练：琅琊·毛民炼道、紫薇仙子·星算追踪、冰塞川·劫运坛、影无邪·分魂残响、黑楼兰·霸仙之志、龙鲸乐土·悔哭海、紫山真君·影宗遗谋、凤九歌·命运歌。'],
+  ['fix','剧情门控按第二世、影宗前置标记、地域、修为和事件完成标记逐步开放；第一世不触发第二世专属人物线，人物事件完成后不重复刷取。'],
+  ['new','补充疯魔窟人物局势观察：幽魂与星宿的控制关系、乐土的事实浮冰、秦鼎菱与巨阳的运道博弈。']
+ ]},
  {v:'v1.14.37',items:[
   ['new','点击标题旁的版本号，可随时查看更新日志；首次进入本版也会自动弹一次。'],
   ['fix','修复：第一世收束时选「远走他乡」，不再被错误地送进疯魔窟；「前世微尘」结局恢复可达。'],
@@ -1714,16 +1736,16 @@ var ERA_TIMELINE = [
 ];
 
 var CHARACTER_ERA = {
-  '元始仙尊': {minEra:0, maxEra:0},
-  '星宿仙尊': {minEra:0, maxEra:1},
-  '无极魔尊': {minEra:2, maxEra:2},
-  '狂蛮魔尊': {minEra:3, maxEra:3},
-  '红莲魔尊': {minEra:4, maxEra:4},
-  '元莲仙尊': {minEra:5, maxEra:5},
-  '盗天魔尊': {minEra:6, maxEra:6},
-  '巨阳仙尊': {minEra:7, maxEra:7},
-  '幽魂魔尊': {minEra:8, maxEra:8},
-  '乐土仙尊': {minEra:9, maxEra:9},
+  '元始仙尊': {eras:[0,10]},
+  '星宿仙尊': {eras:[0,1,10]},
+  '无极魔尊': {eras:[2,10]},
+  '狂蛮魔尊': {eras:[3,10]},
+  '红莲魔尊': {eras:[4,10]},
+  '元莲仙尊': {eras:[5,10]},
+  '盗天魔尊': {eras:[6,10]},
+  '巨阳仙尊': {eras:[7,10]},
+  '幽魂魔尊': {eras:[8,10]},
+  '乐土仙尊': {eras:[9,10]},
   '炼天魔尊': {minEra:10, maxEra:10},
   '薄青':     {minEra:4, maxEra:10},
   '血海老祖': {minEra:4, maxEra:10},
@@ -1743,7 +1765,20 @@ var CHARACTER_ERA = {
   '贾金生':   {minEra:10, maxEra:10},
   '商心慈':   {minEra:10, maxEra:10},
   '商睚':     {minEra:10, maxEra:10},
-  '花酒行者': {minEra:10, maxEra:10}
+  '花酒行者': {minEra:10, maxEra:10},
+  '黑楼兰': {minEra:10, maxEra:10}, '影无邪': {minEra:10, maxEra:10},
+  '紫山真君': {minEra:10, maxEra:10}, '紫薇仙子': {minEra:10, maxEra:10},
+  '正元老人': {minEra:10, maxEra:10}, '秦鼎菱': {minEra:10, maxEra:10},
+  '冰塞川': {minEra:10, maxEra:10}, '凤九歌': {minEra:8, maxEra:10},
+  '楚度': {minEra:10, maxEra:10}, '庙明神': {minEra:10, maxEra:10},
+  '沈从声': {minEra:10, maxEra:10}, '任修平': {minEra:10, maxEra:10},
+  '童画': {minEra:10, maxEra:10}, '曾落子': {minEra:10, maxEra:10},
+  '土头驮': {minEra:10, maxEra:10}, '气绝魔仙': {minEra:10, maxEra:10},
+  '气海老祖': {minEra:10, maxEra:10}, '吴帅': {minEra:10, maxEra:10},
+  '毛六': {minEra:10, maxEra:10}, '琅琊地灵': {minEra:10, maxEra:10},
+  '陆畏因': {minEra:10, maxEra:10}, '沈伤': {minEra:10, maxEra:10},
+  '古月方源': {minEra:10, maxEra:10}, '星宿意志': {minEra:10, maxEra:10},
+  '元始意志': {minEra:10, maxEra:10}, '红莲意志': {minEra:10, maxEra:10}
 };
 
 var SPEC_ERA = {
@@ -1800,11 +1835,35 @@ var EVENT_ERA = {
   '地灵三问': {minEra:10},
   '狐仙真传·认主': {minEra:10},
   '鹤门压境': {minEra:10},
-  '福地稳固': {minEra:10}
+  '福地稳固': {minEra:10},
+  '琅琊·毛民炼道': {minEra:10}, '紫薇仙子·星算追踪': {minEra:10},
+  '冰塞川·劫运坛': {minEra:10}, '黑楼兰·霸仙之志': {minEra:10},
+  '影无邪·分魂残响': {minEra:10}, '龙鲸乐土·悔哭海': {minEra:10},
+  '紫山真君·影宗遗谋': {minEra:10}, '凤九歌·命运歌': {minEra:10}
+};
+
+/* 时间线只读导出：供外部工具/AI 提取，禁止运行期修改 */
+var __timelineFrozen=true, __timelineErr='';
+try{Object.freeze(ERA_TIMELINE);}catch(e){__timelineFrozen=false;__timelineErr+='ERA_TIMELINE: '+String(e)+'; ';}
+try{Object.freeze(CHARACTER_ERA);}catch(e){__timelineFrozen=false;__timelineErr+='CHARACTER_ERA: '+String(e)+'; ';}
+try{Object.freeze(SPEC_ERA);}catch(e){__timelineFrozen=false;__timelineErr+='SPEC_ERA: '+String(e)+'; ';}
+try{Object.freeze(EVENT_ERA);}catch(e){__timelineFrozen=false;__timelineErr+='EVENT_ERA: '+String(e)+'; ';}
+window.__TIMELINE={
+  eras:ERA_TIMELINE,
+  characters:CHARACTER_ERA,
+  specs:SPEC_ERA,
+  events:EVENT_ERA,
+  pools:{mortal:{},birth:{}},
+  _frozen:__timelineFrozen,
+  _err:__timelineErr,
+  // 语义锚点：缺省 = 不限制；eraIdx 0–10；炼天(10) 内另有 fyLife 1/2
+  _note:'minEra 缺省=无下限；maxEra 缺省=无上限；整体缺席=通用；eraIdx=10 时另有 S.fyLife 世数维度；pools.mortal/birth 为只读结构视图（gated=是否有 g 门控，函数本体不导出）；CHARACTER_ERA.eras=离散出场时代'
 };
 
 function eraAllowed(entry){
   if(!entry) return true;
+  /* eras 用于复活尊者/残念/真传等跨时代但非连续出场，避免 minEra~maxEra 误放行中间时代 */
+  if(entry.eras && entry.eras.indexOf(S.eraIdx)<0) return false;
   if(entry.minEra!=null && S.eraIdx < entry.minEra) return false;
   if(entry.maxEra!=null && S.eraIdx > entry.maxEra) return false;
   return true;
@@ -2957,6 +3016,12 @@ async function fengkoku(){
   if(miss===1)await ending('尊路未及','你没能站上棋盘，却把棋盘的画法记住了。下一次，也许不必进窟。');
   await ending('长住疯魔','你在雾都要了一间屋。魔音当邻里，日子反而清静。');
  }
+ if(isSecondLife()){
+  await say('第九层局势骤变：生死门轰然洞开，幽魂魔尊从中冲出。星宿仙尊虽能借生死门与仙墓布置牵制幽魂，却不能真正抹去一位尊者的意志。','battle');
+  await say('另一方，乐土仙尊被星宿、巨阳逼得提前复活，起初只有亚仙尊修为；他隐藏的底牌，是吸收、消化事实浮冰以增长天道修为。','gold');
+  await say('巨阳仙尊离开生死门后，曾中了秦鼎菱的运道后手，一度落入下风；他不得不逐步揭开血道底牌。','battle');
+  await say('陆畏因、沈伤等人也在战局之外观战。他们看得出方源有意诱导诸尊互相消耗，却未必赞同他的做法。','sys');
+ }
  await say('星宿仙尊（星轨如书）与巨阳仙尊（金光如日）同时停手——他们争夺了许久的那个"事实"，此刻就在你手里。','battle');
  await say('星宿：把它给我。我许你一条完整的晋身之路——智道、星道、元境推演，皆可共享。','battle');
  await say('巨阳：把它给我。北原与疯魔窟都归你署理，我只取这一块。','battle');
@@ -2965,6 +3030,12 @@ async function fengkoku(){
  if(pick===1){await say('你把浮冰递了过去。星轨一卷，它落在星宿仙尊掌心——两位尊者同时松了口气。','');chr('交出浮冰·依附天庭');await ending('天庭客卿','你交出浮冰，活得很好，也很安稳——只是从此不再有人问你想要什么。');}
  if(pick===2){await say('你把浮冰递了过去。金光一裹，它落在巨阳仙尊掌心——两位尊者同时松了口气。','');chr('交出浮冰·依附长生天');await ending('长生天客卿','北原的风很大，你的名字排在别人后面。');}
  await say('你把手收回，攥紧，只说了两个字：不给。','gold');chr('拒两尊');
+ if(isSecondLife()){
+  var obs=await W('疯魔窟·人物局势观察盘','你无法左右所有尊者，但可以选择观察一条战局脉络',[['生死门·幽魂与星宿的控制关系',34],['黄土大世界·乐土的事实浮冰',33],['长生天·秦鼎菱与巨阳的运道博弈',33]],{small:true});
+  if(obs===0){S.flags.ghostInsight=true;setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));await say('你看清星宿能借势压制幽魂，却无法将其彻底化为傀儡——魂道境界+1。','gold');}
+  else if(obs===1){S.flags.paradiseInsight=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你记下乐土消化事实浮冰的思路。天道修行并非只靠蛮力，道缘+1。','gold');}
+  else{S.flags.qinDingLingInsight=true;setRealm('运道',Math.min(7,Math.max(1,rlm('运道')+1)));await say('你看出秦鼎菱后手的落点：不求一击制胜，只求改变巨阳的时机。运道境界+1。','gold');}
+ }
  var got=0;
  for(var k=1;k<=3;k++){ if(await grabYuanJing(k))got++; }
  /* 承诺不出山：取得元境后兑现隐居，或明确违约继续争尊并损失道心。 */
@@ -3000,6 +3071,11 @@ async function fengkoku(){
  if(got===3)await say('三块元境尽入你手，浮冰归于一身——两尊从此多了一位同辈。','gold');
  /* v1.4.6：炼天/疯魔窟成尊结局扩充 */
  S.flags.becameZun=true;
+ if(isSecondLife()){
+  await say('疯魔窟之争的收获不止尊位：元境落入手中，乐土北原真传与天道修行成果也成为你可参详的底蕴。','gold');
+  await say('你对星宿仙尊、巨阳仙尊、天庭与长生天的战斗体系有了更深情报；生死门仙墓、星宿棋盘、劫运坛与八极大阵，皆不再只是传闻。','sys');
+  await say('原著主线中，方源最终以炼道成尊。天庭与长生天宣扬的称号——【炼天魔尊】——自此传遍五域两天；你在此处走出的，则是玩家参与尊者之争的分支。','gold');
+ }
  /* v1.14.26 番外放宽：剑道主修 + 剑心≥2 → 斩道（不限时代/不限疯魔窟成尊） */
  if(isJianMain()&&jianXin()>=2&&!S.flags._jzOffered){
   if(await jianZunAfter())return;
@@ -3800,6 +3876,14 @@ setStage('出身');
   if(S.region==='南疆'||S.birth==='商家城'){travPool.push({n:'商家城一游',w:S.birth==='商家城'?12:9});} /* v1.14.29 商家线游历 */
   if(hasJian()){travPool.push({n:'剑冢一夜',w:isJianMain()?14:9});}
   if(hasZhiXing()&&!xxOn()){travPool.push({n:'观星台',w:(isZhiMain()||isXingMain())?13:8});}
+  /* v1.14.40：炼天第二世人物游历；以原著前置事件/地域/修为控制出现顺序 */
+  if(isSecondLife()){
+   if(!hasMark('琅琊炼道·相识'))travPool.push({n:'琅琊·毛民炼道',w:11});
+   if(!hasMark('紫薇推算·脱身'))travPool.push({n:'紫薇仙子·星算追踪',w:9});
+   if((S.region==='北原'||S.lv>=6)&&!hasMark('劫运坛·冰塞川'))travPool.push({n:'冰塞川·劫运坛',w:9});
+   if(hasMark('影宗之主')&&!hasMark('影无邪·残响'))travPool.push({n:'影无邪·分魂残响',w:10});
+   if(hasMark('影宗之主')&&!hasMark('黑楼兰·再会'))travPool.push({n:'黑楼兰·霸仙之志',w:9});
+  }
   /* v1.14.36：游历池统一按时代过滤 */
   travPool=travPool.filter(function(x){return eventEraAllowed(x.n);});
   for(var ti=0;ti<travN;ti++){
@@ -3909,6 +3993,17 @@ setStage('出身');
    {n:'推演一劫',w:(isZhiMain()||isXingMain())?12:8,g:function(){return hasZhiXing()&&xingNian()>=1;}},
    {n:'星宿意志',w:(isZhiMain()||isXingMain())?14:10,g:function(){return hasZhiXing()&&xingNian()>=2&&Math.floor(S.lv)>=6;}}
   ].filter(function(x){return nameAllowed(x.n);}); /* v1.1.5【项目1】：具名守门 */
+  /* v1.14.40：炼天第二世人物/势力线。事件需按前置标记、地域与修为逐步解锁。 */
+  if(isSecondLife()){
+   keyPool.push(
+    {n:'龙鲸乐土·悔哭海',w:12,g:function(){return S.lv>=6&&!hasMark('悔哭海·沈家线');}},
+    {n:'紫山真君·影宗遗谋',w:11,g:function(){return hasMark('影宗之主')&&!hasMark('紫山真君·遗谋已探');}},
+    {n:'黑楼兰·霸仙之志',w:10,g:function(){return hasMark('影宗之主')&&!hasMark('黑楼兰·再会');}},
+    {n:'紫薇仙子·星算追踪',w:10,g:function(){return S.lv>=6&&!hasMark('紫薇推算·脱身');}},
+    {n:'冰塞川·劫运坛',w:9,g:function(){return S.lv>=6&&!hasMark('劫运坛·冰塞川');}},
+    {n:'凤九歌·命运歌',w:12,g:function(){return S.lv>=7&&!hasMark('凤九歌·命运歌');}}
+   );
+  }
   /* v1.6.1：所有时代蛊仙阶段均可抽到的通用境界历练（不替代本时代专属历练） */
   keyPool.push(
    {n:'坐关悟道',w:12,g:function(){return true;}},
@@ -4884,7 +4979,48 @@ function lowestSchool(){
  return m||mainSchool()||{name:'主修',realm:0};
 }
 async function doTravail(n){
- if(n==='推演仙道杀招'){
+ /* v1.14.40 炼天第二世人物游历：以人物立场/原著关系为核心，不擅自改写人物归属 */
+ if(n==='琅琊·毛民炼道'){
+  await say('琅琊福地中，毛民炼道场炉火不熄。地灵仍记得长毛老祖留下的规矩：炼蛊先炼心，交易先讲价。','sys');
+  var ly=await optW('琅琊·毛民炼道',[['与地灵论炼道',40],['和毛民炼师换蛊材',35],['旁观三次炼蛊',25]]);
+  if(ly===0){if(await rollW(48+rlm('炼道')*6+S.tIdx*2,'琅琊论道盘')){setRealm('炼道',Math.min(7,Math.max(1,rlm('炼道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('地灵没有夸你，只把炉门开大了一寸——炼道精进，道缘+1。','gold');}else{S.tIdx=Math.min(8,S.tIdx+1);await say('你没能说服地灵，却从毛民的手法里看出一处细节——才情+1。','good');}}
+  else if(ly===1){await wormUp(1);await say('你拿出仙材换来一批蛊材，交易各取所需——完善度+1。','good');}
+  else{if(await rollW(55+rlm('炼道')*4,'毛民炼蛊观摩盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('三炉三法，各有巧思——才情+1。','gold');}else await say('你只看见炉火，没有看懂火候。','');}
+  if(!hasMark('琅琊炼道·相识'))S.marks.push('琅琊炼道·相识');chr('琅琊地灵·毛民炼道');
+ }
+ else if(n==='紫薇仙子·星算追踪'){
+  await say('中洲天庭，星宿棋盘推演不休。紫薇仙子并未现身，你却察觉自己的行踪正被一层层剥开。','bad');
+  var zv=await optW('紫薇仙子·星算追踪',[['布置反推演',40],['抛出假线索',35],['舍弃行踪立即远遁',25]]);
+  if(zv===0){if(await rollW(45+rlm('智道')*5+S.tIdx*3,'反推演盘')){S.pctMods+=0.05;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你抓住推演中的一处回环，反向抹去半截痕迹——权重+5%，道缘+1。','gold');}else{S.pctMods-=0.04;await say('对方算得更深，你只来得及斩断一条线索——权重-4%。','bad');}}
+  else if(zv===1){if(R(0.6)){S.pctMods+=0.04;await say('假线索被送入天庭视野。紫薇仙子的推演暂时偏了一步——权重+4%。','good');}else{S.pctMods-=0.05;await say('假线索反被识破，你的位置更加醒目——权重-5%。','bad');}}
+  else{spendLife(2);S.dhIdx=Math.min(8,S.dhIdx+1);await say('你舍弃一处经营多年的落脚点，换来短暂清静（额外耗寿2年，道心+1）。','good');}
+  if(!hasMark('紫薇推算·脱身'))S.marks.push('紫薇推算·脱身');chr('紫薇仙子·星算追踪');
+ }
+ else if(n==='冰塞川·劫运坛'){
+  await say('北原冰河深处，劫运坛的气机隐而不发。冰塞川看重的是大局与时机，不会因几句豪言便轻易交底。','sys');
+  var bs=await optW('冰塞川·劫运坛',[['以情报换取信任',40],['请教运道战法',35],['试探劫运坛虚实',25]]);
+  if(bs===0){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('你交出一份有用情報，冰塞川没有许诺结盟，只记下了这份人情——才情+1，道缘+1。','gold');}
+  else if(bs===1){if(await rollW(45+rlm('运道')*6+S.tIdx*2,'劫运坛问道盘')){setRealm('运道',Math.min(7,Math.max(1,rlm('运道')+1)));await say('劫运坛运转一周，你窥见运道布局的一角——运道精进。','gold');}else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你未能看透阵势，却记住了冰塞川的谨慎——道心+1。','good');}}
+  else{if(await rollW(55+S.lv*3,'劫运坛试探盘')){await wormUp(1);await say('你只探到外围禁制，顺手取走一份遗落蛊材——完善度+1。','gold');}else{S.pctMods-=0.04;await say('禁制反震，你被迫退开（权重-4%）。','bad');}}
+  if(!hasMark('劫运坛·冰塞川'))S.marks.push('劫运坛·冰塞川');chr('冰塞川·劫运坛');
+ }
+ else if(n==='影无邪·分魂残响'){
+  await say('影宗残部藏在一处阴暗福地。影无邪的神情时而迷惘，时而狠厉；那并非普通失忆，而是幽魂分魂与自身意志的撕扯。','sys');
+  var yw=await optW('影无邪·分魂残响',[['助其稳住魂魄',40],['追问幽魂本体',35],['趁乱取走魂材',25]]);
+  if(yw===0){if(await rollW(45+rlm('魂道')*6+S.dhIdx*3,'稳魂盘')){S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('魂魄暂时归于平稳。影无邪没有道谢，只将一段残缺魂道心得留在原地——道心+1，道缘+1。','gold');}else{S.pctMods-=0.03;await say('分魂反噬，你被迫退出（权重-3%）。','bad');}}
+  else if(yw===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你听到幽魂布局的只言片语，却无法据此断言其全部计划——才情+1。','good');}
+  else{await wormUp(2);S.morIdx=Math.max(0,S.morIdx-1);await say('你取走魂材，影无邪没有追击。完善度+2，道德-1。','bad');}
+  if(!hasMark('影无邪·残响'))S.marks.push('影无邪·残响');chr('影无邪·分魂残响');
+ }
+ else if(n==='黑楼兰·霸仙之志'){
+  await say('黑楼兰立在山巅，气势不减。她的野心与处境都不容旁人轻慢；她不会因为你的一句招揽便改变立场。','sys');
+  var hl2=await optW('黑楼兰·霸仙之志',[['坦诚谈论霸业',40],['切磋力道',35],['观察后离去',25]]);
+  if(hl2===0){if(await rollW(45+S.tIdx*3+S.dhIdx*2,'霸仙论志盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('你们对霸业的理解并不相同，却都听懂了对方的野心——才情+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('话不投机。她不再给你第二次解释的机会——道心-1。','bad');}}
+  else if(hl2===1){var hbw=await battleRound(foeAnchor(2,2),'黑楼兰·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('一击之后各自收手。力道境界精进。','gold');});if(!hbw)await say('你被她的蛮力逼退，至少看清了差距。','bad');}
+  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有试图控制她。强者之间，有时保持距离才是尊重——道心+1。','good');}
+  if(!hasMark('黑楼兰·再会'))S.marks.push('黑楼兰·再会');chr('黑楼兰·霸仙之志');
+ }
+ else if(n==='推演仙道杀招'){
   learnXian(mainSchool().name);
   await say('推演有成——习得仙道杀招【'+S.moves[S.moves.length-1].name+'】。','good');
  }else if(n==='独特X道见解'){
@@ -5747,6 +5883,26 @@ var BIRTH_STORY={
  '黑凡洞天':[{n:'黑凡残局',w:10,g:function(){return !hasMark('黑凡残局毕');}}],
  '铁鹰福地':[{n:'铁鹰旧主',w:9,g:function(){return !hasMark('铁鹰旧主毕');}}]
 };
+/* 内容池只读结构视图：仅导出名称/权重/g 门控存在性，不暴露函数源码 */
+try{
+  var __poolView=function(src){
+    var out={};
+    for(var k in src){if(Object.prototype.hasOwnProperty.call(src,k)){
+      out[k]=(src[k]||[]).map(function(e){return {n:e.n,w:e.w,gated:!!e.g};});
+      try{out[k].forEach(function(x){Object.freeze(x);});Object.freeze(out[k]);}catch(_e){window.__TIMELINE._frozen=false;window.__TIMELINE._err+=(window.__TIMELINE._err?' | ':'')+'pool freeze: '+String(_e);}
+    }}
+    try{Object.freeze(out);}catch(_e2){window.__TIMELINE._frozen=false;window.__TIMELINE._err+=(window.__TIMELINE._err?' | ':'')+'pool map freeze: '+String(_e2);}
+    return out;
+  };
+  window.__TIMELINE.pools.mortal=__poolView(ERA_MORTAL_EVENTS);
+  window.__TIMELINE.pools.birth=__poolView(BIRTH_STORY);
+  try{Object.freeze(window.__TIMELINE.pools);}catch(_e3){window.__TIMELINE._frozen=false;window.__TIMELINE._err+=(window.__TIMELINE._err?' | ':'')+'pools freeze: '+String(_e3);}
+}catch(e){
+  window.__TIMELINE._frozen=false;
+  window.__TIMELINE._err+=(window.__TIMELINE._err?' | ':'')+'pool export: '+String(e);
+  window.__TIMELINE.pools=window.__TIMELINE.pools||{mortal:{},birth:{}};
+}
+try{Object.freeze(window.__TIMELINE);}catch(_e4){window.__TIMELINE._frozen=false;window.__TIMELINE._err+=(window.__TIMELINE._err?' | ':'')+'timeline freeze: '+String(_e4);}
 function buildWujiMortalPool(){
  var list=(ERA_MORTAL_EVENTS[S.eraIdx]||[]).slice();
  var extra=BIRTH_STORY[S.birth];
@@ -7251,6 +7407,40 @@ async function ltL6(){
  chr('善念试炼');
 }
 async function doKeyTrial(n){
+ /* v1.14.40 炼天第二世人物线：以原著既有势力关系为骨架，事件成功不强行改写人物归属 */
+ if(n==='龙鲸乐土·悔哭海'){
+  await say('东海龙鲸乐土开启功德任务。庙明神邀你同行，沈从声也在寻找悔蛊；任修平、童画等人各怀心思，表面合作之下暗流涌动。','sys');
+  var lh=await optW('龙鲸乐土·悔哭海',[['与庙明神一行合作',40],['同沈从声交换情报',35],['独自探查悔哭海',25]]);
+  if(lh===0){if(await rollW(48+rlm('阵道')*4+S.tIdx*2,'龙鲸乐土协作盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你与庙明神等人分工探阵，收获一段土道大阵心得。阵道精进，道缘+1。','gold');}else{S.pctMods-=0.04;await say('队伍意见不合，探阵受阻（权重-4%）。','bad');}}
+  else if(lh===1){if(await rollW(50+S.tIdx*3,'沈家情报盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('沈从声透露了部分悔蛊线索，但对核心情报仍留有余地——才情+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('你未能取得信任，反被沈家试探了一番——道心-1。','bad');}}
+  else{if(await rollW(45+rlm('水道')*5,'悔哭海独探盘')){await wormUp(2);await say('你避开各方耳目，在悔哭海边缘取到蛊材——完善度+2。','gold');}else{S.life=Math.max(1,S.life-3);await say('悔意黑火侵蚀心神，你耗去三年才脱身。','bad');}}
+  if(!hasMark('悔哭海·沈家线'))S.marks.push('悔哭海·沈家线');chr('龙鲸乐土·悔哭海');return;
+ }
+ if(n==='紫山真君·影宗遗谋'){
+  await say('影宗遗藏中，一缕紫意映出紫山真君的旧日布置。其谋划围绕尊者复生与影宗存续，并非一份可以轻易读尽的普通传承。','gold');
+  var zs=await optW('紫山真君·影宗遗谋',[['循遗谋追索真传',40],['拆解魂道布置',35],['封存遗藏不取',25]]);
+  if(zs===0){if(await rollW(48+rlm('魂道')*5+S.tIdx*2,'紫山遗谋盘')){if(!hasMove('智道·影杀'))learnXian('智道','智道·影杀');if(!hasMove('魂道·影卫'))learnXian('魂道','魂道·影卫');setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));await say('你只接过影宗遗产的一部分，未能掌握紫山真君全部谋划。影宗残篇补全，魂道精进。','gold');}else{S.pctMods-=0.04;await say('遗谋中有反制布置，你及时抽身（权重-4%）。','bad');}}
+  else if(zs===1){setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));S.tIdx=Math.min(8,S.tIdx+1);await say('你从魂道布置中拆出一条线索——魂道精进，才情+1。','gold');}
+  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有贪取遗藏。影宗的局太深，暂时不碰也是一种判断——道心+1。','good');}
+  if(!hasMark('紫山真君·遗谋已探'))S.marks.push('紫山真君·遗谋已探');chr('紫山真君·影宗遗谋');return;
+ }
+ if(n==='黑楼兰·霸仙之志'){
+  await doTravail('黑楼兰·霸仙之志');return;
+ }
+ if(n==='紫薇仙子·星算追踪'){
+  await doTravail('紫薇仙子·星算追踪');return;
+ }
+ if(n==='冰塞川·劫运坛'){
+  await doTravail('冰塞川·劫运坛');return;
+ }
+ if(n==='凤九歌·命运歌'){
+  await say('宿命大战前夕，凤九歌的身影出现在中洲战局之外。命运歌声已成其标志；他并非天庭简单的棋子，行事自有选择。','gold');
+  var fg=await optW('凤九歌·命运歌',[['静听歌中命理',40],['以音律推演反制',35],['趁其分神远遁',25]]);
+  if(fg===0){S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('歌声落处，命运并非全无缝隙。道心+1，道缘+1。','gold');}
+  else if(fg===1){if(await rollW(45+rlm('音道')*5+S.tIdx*3,'命运歌推演盘')){setRealm('音道',Math.min(7,Math.max(1,rlm('音道')+1)));S.tIdx=Math.min(8,S.tIdx+1);await say('你从命运歌中拆出一段音律变化——音道精进，才情+1。','gold');}else{S.pctMods-=0.04;await say('命运歌反压心神，你只能中断推演（权重-4%）。','bad');}}
+  else{spendLife(2);S.pctMods+=0.03;await say('你不与凤九歌纠缠，趁战局未合远遁（耗寿2年，权重+3%）。','good');}
+  if(!hasMark('凤九歌·命运歌'))S.marks.push('凤九歌·命运歌');chr('凤九歌·命运歌');return;
+ }
  /* v1.6.1：蛊仙通用境界历练（所有时代可抽） */
  if(n==='坐关悟道'){
   await say('你封了洞府，只留一盏灯。关外四季轮转，关内只有道痕在响。','sys');
@@ -7690,6 +7880,7 @@ async function doKeyTrial(n){
  }
  /* ---------- 义天山大战（四层 + 至尊仙胎蛊 → 转身盘） ---------- */
  if(n==='义天山大战'){
+  S.flags.yiTianSeen=true;
   var camp=await optW('义天山·入场层',[['凡人层观战',advW(30)],['蛊仙层参战',50],['影宗线介入（需道心≥B）',S.dhIdx>=3?20:0]].filter(function(x){return x[1]>0;}));
   var entry=[['凡人层观战',advW(30)],['蛊仙层参战',50],['影宗线介入（需道心≥B）',S.dhIdx>=3?20:0]].filter(function(x){return x[1]>0;});
   var campName=entry[camp][0];
@@ -10307,7 +10498,7 @@ async function dtFinale(){
  await ending('枕缝而眠','最后一晚，你把耳朵贴在墙上。墙里没有风。你反而睡不着。');
 }
 
-/* ══ 14.7 CHG · 更新日志（v1.14.37 新增） ══════════════════════════════
+/* ══ 14.7 CHG · 更新日志组件 ═══════════════════════════════════════
    玩家可随时查看；首次进入或版本变化时自动弹一次（已读版本存 guSeenChg）。
    入口：点标题旁的版本号。 */
 function changelogRender(showNew){
@@ -10383,7 +10574,7 @@ try{
  if(_dm<=4&&_hc<=4)document.documentElement.classList.add('perf-low');
 }catch(e){}
 try{starThemeInit();}catch(e){}
-/* v1.14.37 更新日志：点版本号可看；首次进入本版自动弹一次 */
+/* v1.15 更新日志：点版本号可看；首次进入本版自动弹一次 */
 (function(){var v=$('verTag');if(v){v.textContent=APP_VER;v.style.cursor='pointer';v.title='查看更新日志';v.addEventListener('click',openChangelog);}})();
 on('chgClose','click',function(){closeChangelog();});
 try{if(!document.documentElement.hasAttribute('data-game-export-copy')&&localStorage.getItem('guSeenChg')!==APP_VER)setTimeout(openChangelog,500);}catch(e){}
