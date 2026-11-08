@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html class="theme-star" data-page-node-id="MHUAzqWWh27n7pajmfScjd" lang="zh-CN"><head data-page-node-id="oj2fWBR43inVolY8tbBoxn">
 <meta data-page-node-id="rhkEoL8euuI9smTiCpd9kd" charset="utf-8">
@@ -69,10 +70,10 @@ html,body{max-width:100%;overflow-x:hidden}body{-webkit-tap-highlight-color:tran
 #logCard{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
 #logCard h3{font-size:15px;margin:14px 0 6px;color:#6B6455;letter-spacing:2px}
 #logCard .chronLine{font-size:13.5px;line-height:1.9;color:#4A4436}
-#achvOverlay,#dexOverlay{position:fixed;inset:0;background:rgba(245,241,232,.985);z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:26px 16px 60px}
-#achvOverlay.hidden,#dexOverlay.hidden{display:none}
-#achvCard,#dexCard{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
-#achvCard h3,#dexCard h3{font-size:15px;margin:0 0 6px;color:#6B6455;letter-spacing:2px}
+#achvOverlay,#dexOverlay,#chgOverlay{position:fixed;inset:0;background:rgba(245,241,232,.985);z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:26px 16px 60px}
+#achvOverlay.hidden,#dexOverlay.hidden,#chgOverlay.hidden{display:none}
+#achvCard,#dexCard,#chgCard{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
+#achvCard h3,#dexCard h3,#chgCard h3{font-size:15px;margin:0 0 6px;color:#6B6455;letter-spacing:2px}
 #achvCard .achvLine,#dexCard .achvLine{display:flex;gap:10px;align-items:baseline;font-size:13.5px;line-height:1.9;color:#4A4436;padding:6px 0;border-bottom:1px dashed var(--line)}
 #achvCard .achvLine:last-child,#dexCard .achvLine:last-child{border-bottom:none}
 #achvCard .achvLine b,#dexCard .achvLine b{flex:none}
@@ -683,12 +684,33 @@ html.perf-low.theme-star #endCard.flipIn,
 html.perf-low.theme-star #endCard.flipIn::before,
 html.perf-low.theme-star #endCard.flipIn #endTitle{animation:none}
 html.perf-low.theme-star #overlay:not(.hidden){animation:none}
+/* ============ 更新日志浮层 ============ */
+#verTag{cursor:pointer;user-select:none}
+#verTag:hover{color:#A87B1F}
+#chgCard .chgVer{display:inline-block;font-size:12px;color:var(--faint);margin-left:8px;letter-spacing:1px;font-weight:400}
+#chgCard .chgHead{font-size:14px;font-weight:700;color:#161616;letter-spacing:1px;padding:8px 0 4px;margin-top:6px;border-bottom:1px solid var(--line)}
+#chgCard .chgHead:first-child{margin-top:0}
+#chgCard .chgLine{font-size:13.5px;line-height:1.9;color:#4A4436;padding:7px 0;border-bottom:1px dashed var(--line);word-break:break-word;overflow-wrap:anywhere}
+#chgCard .chgLine:last-child{border-bottom:none}
+#chgCard .chgTag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;margin-right:6px;background:rgba(212,175,55,.14);color:#A87B1F;font-weight:700;letter-spacing:.5px;vertical-align:1px}
+#chgCard .chgTag.new{background:rgba(229,67,61,.12);color:#C0392B}
+#chgCard .chgTag.fix{background:rgba(91,127,184,.15);color:#3F5E8C}
+#chgCard .chgTag.bal{background:rgba(95,168,143,.15);color:#2E7D5B}
+#chgCard .chgBadge{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:999px;margin-left:6px;background:rgba(229,67,61,.16);color:#C0392B;font-weight:700;vertical-align:2px}
+.theme-star #verTag:hover{color:var(--gold-hi)}
+.theme-star #chgCard .chgHead{color:var(--ink);border-bottom-color:rgba(212,175,55,.18)}
+.theme-star #chgCard .chgLine{color:var(--ink);border-bottom-color:rgba(212,175,55,.14)}
+.theme-star #chgCard .chgTag{background:rgba(212,175,55,.16);color:var(--gold-hi)}
+.theme-star #chgCard .chgTag.new{background:rgba(192,57,43,.22);color:#E08A80}
+.theme-star #chgCard .chgTag.fix{background:rgba(91,127,184,.22);color:#9AB4E0}
+.theme-star #chgCard .chgTag.bal{background:rgba(95,168,143,.22);color:#7DC4A6}
+.theme-star #chgCard .chgBadge{background:rgba(232,197,106,.22);color:var(--gold-hi)}
 </style>
 </head>
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag">v1.14.26</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag">v1.14.37</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -727,9 +749,10 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
   <div data-page-node-id="bDvsBTo0A3LcBrym0Zsg9e" id="logPanel"></div>
 </div>
 <div data-page-node-id="dkjSLRSl8VpiTyGrbWCy4n" class="hidden" id="logOverlay"><div data-page-node-id="jTppQ5oX1NYk2KWVeslvyS" id="logCard"><h3 data-page-node-id="QO5bWUaevzKZpkXd9COgnl"><!--pnid:1xnmOMXa4aGGT3NGAXZX1i-->编年史</h3><div data-page-node-id="HafHdPuiXciWOs8yj3W6m5" id="logChron"></div><h3 data-page-node-id="ojXJ4moAWZ68rA4SUsthkH"><!--pnid:eQgKEYygfxSkhyIlIrr1yf-->播报记录</h3><div data-page-node-id="MbJ2ixwq63v2N1mayym1gJ" id="logList"></div><button data-page-node-id="yeoKe1nW4ySIYtuqgmppjF" id="logClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px"><!--pnid:ZZEyrOWHvhZxFJLHKHI2Av-->关 闭</button></div></div>
-<div class="hidden" id="achvOverlay"><div id="achvCard"><h3>成就 <span id="achvCnt"></span></h3><div id="achvList"></div><button id="achvClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
+<div class="hidden" id="achvOverlay"><div id="achvCard"><h3>成就 <span id="achvCnt"></span></h3><div id="achvList"></div><div id="saveRow" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px"><button id="saveExportBtn" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导出成就与图鉴存档（Base64）">导出存档</button><button id="saveImportBtn" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导入成就与图鉴存档">导入存档</button></div><button id="achvClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
 <div id="achvToast" aria-hidden="true"></div>
-<div class="hidden" id="dexOverlay"><div id="dexCard"><h3>图鉴 <span id="dexCnt"></span></h3><div id="dexTabs"></div><div id="dexList"></div><button id="dexClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
+<div class="hidden" id="chgOverlay"><div id="chgCard"><h3>更新日志 <span class="chgVer" id="chgVer"></span></h3><div id="chgList"></div><button id="chgClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
+<div class="hidden" id="dexOverlay"><div id="dexCard"><h3>图鉴 <span id="dexCnt"></span></h3><div id="dexTabs"></div><div id="dexList"></div><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px"><button id="saveExportBtn2" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导出成就与图鉴存档（Base64）">导出存档</button><button id="saveImportBtn2" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导入成就与图鉴存档">导入存档</button></div><button id="dexClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
 <div data-page-node-id="e8EU2916vRrUywQEWaCPc2" class="hidden" id="overlay">
   <div data-page-node-id="Bmn5LabTXmbA0v9uge7Lyg" id="endCard">
     <div data-page-node-id="5o6KxTUhAISditMeYq46fu" id="endTitle"></div>
@@ -836,6 +859,95 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
                两结局标记：薄青合剑 / 薄青见剑；
             ③ 剑道成尊番外《剑尊之后·斩道》——任意时代/疯魔窟成尊均可触发，万剑来朝 → 三问 → 雷/心/道三关，
                四结局：雷下收剑 / 剑折 / 剑下留道 / 剑源（薄青出场三态随薄青线完成度变化）。
+   v1.14.27 原著人物与剧情对话（青茅山）：
+            ① 「白凝冰·月下」——溪边初遇三选对白，可获【见过白凝冰】【白凝冰约战】；
+            ② 「古月方正」——演武场同族对练/指点/冷淡；
+            ③ 「酒仙遗踪」——花酒行者遗迹，可获【花酒余韵】。
+   v1.14.28 原著人物线续写（青茅山）：
+            ① 「白凝冰·竹林试剑」——持【白凝冰约战】可触发，三招试剑战斗，胜获【白凝冰认可】与冰雪道精进；
+            ② 「古月青书」——仁心医蛊同族，诊治/请教/怀疑三分支；
+            ③ 「贾金生·赌石」——集市赌石对白与开石判定，可获【赌赢贾金生】【见过贾金生】；
+            事件门控与图鉴已同步，语气贴合原著。
+   v1.14.29 商家线：
+            ① 凡人事件「商心慈·账房」「商睚·比宝」「商家夜宴」「商城拍卖」（商家城出生；拍卖亦对南疆开放）；
+            ② 蛊仙游历「商家城一游」（南疆/商家城）——可再遇商心慈或初识；
+            ③ 标记：【识商心慈】【商心慈信一角】【见过商睚】【压过商睚】；对白贴合原著商心慈沉稳算计、商睚张扬好胜。
+   v1.14.30 商心慈长线：
+            ① 「商心慈·密谈」——信一角后屏退密议：合作约 / 姻盟之名 / 婉拒；
+            ② 「商心慈·联姻局」——姻盟公开宴，周旋/立威/宴后拆局 →【商心慈同盟】；
+            ③ 「商心慈·危城夜」——定约或同盟后火攻商城，守门/断补给/撤离；
+            ④ 游历「商家城一游」按标记优先级可直接切入长线幕；门控防重复。
+   v1.14.31 容貌联动三件套：
+            ① 社交类凡人事件（蛤蟆商队/坊间论道/临时委托/行旅救援等）仅抬「好结果」扇区权重 lookSocialMul；
+            ② 天外之魔暴露率 += lookExposePP（EX+8…E-6），clamp 5~95；
+            ③ 择派盘「魅情道」权重 × lookCharmMul（EX×3.0…E×0.7）；初识印象盘「好」同乘社交倍率。
+   v1.14.32 出生地专属剧情分层（原著素材厚度）：
+            ① BIRTH_STORY 表 + buildWujiMortalPool 合并故乡事件（跨时代可抽）；
+            ② tier2 一批：白骨山/武家/铁家/三叉山/义天山、黑家/刘家/大雪山、灵缘斋/仙鹤门/战仙宗、沈家/宋家、
+               狐仙福地/琅琊/星象/黑凡洞天/铁鹰福地；各 1–2 条有原著影子的对白事件；
+            ③ 青茅山/商家城仍走既有厚线；背景板地点不挂专属，靠大区通用池与 BIRTH_SCHOOL。
+   v1.14.33 狐仙福地真传线完善：
+            ① 凡人链：初临→地灵三问→认主真传→鹤门压境→福地稳固（门控防重复）；
+            ② 升仙重鉴 huxianLegacy（才情/道心/兽潮虚影），奴道向灌顶，与白相真传并列；
+            ③ 标记：狐仙地缘/地灵认可/狐仙真传/护地一战/福地稳固；真传池登记「狐仙」。
+   v1.14.34 升仙奖励盘重做：
+            ① 触发：甲等及以下（aptIdx≥2，含乙/丙/丁；十绝/甲九九不触发）；
+            ② 顺序：先仙蛊/主修重判，再开补偿盘，避免境界精进被覆盖；
+            ③ 动态过滤：realm≥7 / wormIdx≤0 / tIdx≥8 / dhIdx≥8 对应项不入池；
+            ④ 「天意指路」→「寿元延拓」（寿元+5、权重+3%）；乙丙丁可抽「资质提升」升一档。
+   v1.14.35 平衡与一致性修复：
+            ① 寿元延拓同步 S.age=maxLife-life，避免面板年龄错位；
+            ② 狐仙认主空 if 改为 45% 完善度/道缘小收益；
+            ③ 高收益凡人/出生事件加一次性门控标记，防刷资源；
+            ④ SOCIAL_SCENES 清理；异人交易/无名前辈好选项乘 lookSocialMul；
+            ⑤ 资质提升权重 7→11。
+   v1.14.36 小修补：星象观台门控；商家夜宴【赴过商家夜宴】；贾金生重复 push 删除；狐仙认主暂退标记。
+   v1.14.36 时间基准与门控补完：
+            ① 新增「AI 提示词锚点 · 世界时间基准」文件头注释；
+            ② 新增 03.5 DATA 区：ERA_TIMELINE / CHARACTER_ERA / SPEC_ERA / EVENT_ERA
+               四张表 + eraAllowed / charEraAllowed / specEraAllowed / eventEraAllowed
+               四个校验函数；
+            ③ 统一入口接线：learnSpec / findLegacy / nameAllowed / grantDreamSpec /
+               buildWujiMortalPool / travPool 六处，补完时代校验；
+            ④ 补 v1.14.35 遗留门控：星象观台 g 门控、商家夜宴「赴过商家夜宴」标记、
+               贾金生重复 push 清理、狐仙认主「狐仙认主·暂退」标记。
+   ===================================================================== */
+/* =====================================================================
+   【AI 提示词锚点 · 世界时间基准 v1.14.36】
+   ---------------------------------------------------------------------
+   这段注释是给所有读此文件的 AI 看的。改内容前先读这里。
+
+   时代顺序（数字越大越晚，同数字 = 同一时代）：
+     0 元始（远古）→ 1 星宿（远古）→ 2 无极（上古）→ 3 狂蛮（上古）→
+     4 红莲（上古）→ 5 元莲（中古）→ 6 盗天（中古）→ 7 巨阳（中古）→
+     8 幽魂（近古）→ 9 乐土（近古）→ 10 炼天（当代）
+
+   硬规则：
+     1. 任何人物、传承、杀招、事件，都有「最早可出场时代（minEra）」。
+     2. 玩家在 eraIdx=N 时，只能接触 minEra<=N 的内容。
+     3. 未登记 era 的内容视为通用，不限制。
+     4. 后世角色不得在更早时代以「本人」出场；其真传/残念/遗物同样遵循 minEra。
+     5. 后世杀招不得在更早时代被玩家习得。
+     6. 出生地事件按原著时代限制：狐仙福地线/中洲十大古派/北原家族/南疆地名
+        minEra=10；星象福地 minEra=1；黑凡洞天 minEra=5。
+
+   关键人物 minEra 速查：
+     元始 0 / 星宿 0 / 无极 2 / 狂蛮 3 / 红莲 4 / 元莲 5 / 盗天 6 /
+     巨阳 7 / 幽魂 8 / 乐土 9 / 炼天 10
+     薄青 4 / 血海老祖 4 / 白相 5 / 万寿娘子 5 / 黑凡 5 /
+     秦百胜 8 / 凤九歌 8 / 武庸 10 / 龙公 10 / 方源 10
+
+   数据表位置（搜「══ 03.5 DATA · 时代基准」）：
+     ERA_TIMELINE / CHARACTER_ERA / SPEC_ERA / EVENT_ERA
+   校验函数：
+     eraAllowed / charEraAllowed / specEraAllowed / eventEraAllowed
+   统一入口：
+     learnSpec（所有特殊杀招授予）
+     findLegacy（知名真传 / 尊者传承）
+     nameAllowed（具名角色出场）
+     grantDreamSpec（古梦杀招库）
+     buildWujiMortalPool（出生地事件池）
+     travPool 过滤（游历池）
    ===================================================================== */
 (function(){
 'use strict';
@@ -851,6 +963,37 @@ var $=function(id){
 };
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
+/* v1.14.37 版本号与更新日志（玩家可见）：升级时只改这里，标题、分享、导出全部跟着走 */
+var APP_VER='v1.14.37';
+/* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
+   tag：new 新增 / fix 修复 / bal 平衡 */
+var CHANGELOG=[
+ {v:'v1.14.37',items:[
+  ['new','点击标题旁的版本号，可随时查看更新日志；首次进入本版也会自动弹一次。'],
+  ['fix','修复：第一世收束时选「远走他乡」，不再被错误地送进疯魔窟；「前世微尘」结局恢复可达。'],
+  ['fix','修复：0 岁开局后第一次耗费寿元，年龄不再从 0 岁直接跳到 19 岁。'],
+  ['bal','「超级蛊阵争夺战」的四种进入方式现在各有实际后果：真身潜入更稳、伪装潜入可能被识破、正面接管阵心加成更高、掠夺则损道德但夺阵更凶。']
+ ]},
+ {v:'v1.14.36',items:[
+  ['new','时间基准：所有人物、杀招、事件都登记了「最早可出场时代」，后世内容不会穿越到更早的时代。'],
+  ['fix','补齐若干出生地专属剧情的一次性门控，避免重复刷取收益。']
+ ]},
+ {v:'v1.14.35',items:[
+  ['bal','升仙奖励盘「寿元延拓」同步年龄显示，面板不再错位。'],
+  ['bal','狐仙认主「暂退」分支新增小收益，不再空过。'],
+  ['bal','高收益凡人/出生事件加入一次性标记，防刷。']
+ ]},
+ {v:'v1.14.34',items:[
+  ['new','升仙奖励盘重做：甲等及以下才会触发；已满项不再入池；资质越低补偿越厚。'],
+  ['new','「天意指路」改为「寿元延拓」：寿元 +5、权重 +3%，效果可见。']
+ ]},
+ {v:'v1.14.33',items:[
+  ['new','狐仙福地真传线完整：初临 → 地灵三问 → 认主 → 鹤门压境 → 福地稳固；升仙后还有一次重鉴。']
+ ]},
+ {v:'v1.14.32',items:[
+  ['new','出生地专属剧情分层：白骨山、武家、铁家、黑家、刘家、大雪山、灵缘斋、仙鹤门、战仙宗、沈家、宋家、狐仙/琅琊/星象/黑凡/铁鹰等各有专属小线。']
+ ]}
+];
 /* ===== 天意眷顾（v1.5.0）：种子决定『天意对主角的眷顾档』——被培养的人是主角本人。
    第 1 档 微眷 / 第 2 档 眷顾 / 第 3 档 钟爱（由种子派生，同种子必同档）。 ===== */
 var TY_TIER=['微眷','眷顾','钟爱'];
@@ -867,6 +1010,15 @@ function tyJiW(){return [45,52,60][S.flags.tyTier]||45;}       /* 吉盘「吉�
 function ri(a,b){return a+Math.floor(RNG()*(b-a+1));}
 function R(p){return RNG()<p;}
 function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+/* v1.14.36 容貌联动：社交好结果权重 / 天外之魔暴露率 / 魅情道择派权重
+   只抬「好结果」扇区，不压坏结果，避免高颜值被反向惩罚。 */
+var LOOK_SOCIAL_MUL={EX:1.20,SSS:1.16,SS:1.12,S:1.08,A:1.04,B:1.00,C:0.97,D:0.94,E:0.90};
+var LOOK_EXPOSE_PP={EX:8,SSS:6,SS:4,S:2,A:0,B:0,C:-2,D:-4,E:-6};
+var LOOK_CHARM_MUL={EX:3.0,SSS:2.5,SS:2.0,S:1.6,A:1.3,B:1.0,C:0.9,D:0.8,E:0.7};
+var SOCIAL_SCENES={'蛤蟆商队':1,'坊间论道':1,'临时委托':1}; /* v1.14.36：仅 genericEvent 好结果扇区会命中；异人交易/无名前辈在各自函数内乘 lookSocialMul */
+function lookSocialMul(){return LOOK_SOCIAL_MUL[S&&S.look]||1;}
+function lookExposePP(){return LOOK_EXPOSE_PP[S&&S.look]||0;}
+function lookCharmMul(){return LOOK_CHARM_MUL[S&&S.look]||1;}
 /* 概率引擎修复：0 权重=严格不可抽中。旧版用 0.0001 兜底非正权重，导致炼天 100% 盘
    的其他时代以约十万分之一概率漏出。现改为：非法值（非数值/NaN/负/Infinity）一律按 0
    处理并永久排除；仅当整盘无任何正权重时才退化为均分。 */
@@ -1397,6 +1549,7 @@ var LEGACY_GATE = [
   note:'太白云生真传：仅在主角完整经历逆流河事件后入池'},
  /* —— 具名尊者/仙人传承：拥有者须已「身死/退场」（以剧情标记为准） —— */
  {name:'白相',       inPool:false, gate:function(){return hasMark('白相真传')||S.flags.baixiangSeen;}, note:'白相真传：白相福地升仙线专属，须已触发其考验'},
+ {name:'狐仙',       inPool:false, gate:function(){return hasMark('狐仙真传')||S.flags.huxianSeen;},   note:'狐仙真传：狐仙福地地灵认主/升仙重鉴专属（奴道向）'},
  {name:'无极',       inPool:false, gate:function(){return hasMark('无极真传')||S.flags.wujiSeen;},      note:'无极·无中生有：疯魔窟无极道场参悟专属'},
  {name:'陶铸',       inPool:false, gate:function(){return hasMark('陶铸真传')||S.flags.taozhuSeen;},    note:'陶铸真传：五界山脉混战专属'},
  {name:'盗天',       inPool:false, gate:function(){return hasMark('盗天真传');},                       note:'盗天真传：仙蛊拍卖会→落魄谷存活专属（归类：偷道一脉·盗天魔尊传承，落点偷道/宇道，招牌【鬼不觉】）'},
@@ -1414,7 +1567,8 @@ var NAME_GATE = [
 function nameAllowed(n){
  if(!n)return true;
  for(var i=0;i<NAME_GATE.length;i++){if(NAME_GATE[i].name===n||String(n).indexOf(NAME_GATE[i].name)>=0){if(!NAME_GATE[i].allow())return false;}}
- return true;
+ /* v1.14.36：时代校验 */
+ return charEraAllowed(n);
 }
 function legacyGatePass(n){
  if(!n)return true;
@@ -1539,6 +1693,137 @@ var ATTR_NOTE={
  dh:{'EX':'道心通明，八风不动','SSS':'心如磐石，诸邪不侵','SS':'意志坚定，百折不挠','S':'心志坚毅，临危不乱','A':'心境沉稳，可堪一搏','B':'道心寻常，随波逐流','C':'心志薄弱，易被动摇','D':'道心不稳，遇险常溃','E':'心如浮萍，随风而倒'},
  mor:{'SSS':'古道热肠，圣人可期','SS':'宅心仁厚，少有的善人','S':'心地善良，行得端正','A':'心存善念，偶有私心','B':'善恶掺半，人性本色','C':'自私自利，损人利己','D':'心狠手辣，恶名在外','E':'穷凶极恶，无恶不作'}
 };
+/* ══ 03.5 DATA · 时代基准（AI 提示词锚点） ═════════════════════════════════════
+   修改规则：只改表，不改逻辑。新增人物/杀招/事件时，在对应表补一行 minEra 即可。
+   未登记 = 不限制。 */
+
+var ERA_TIMELINE = [
+  {idx:0,  name:'元始仙尊', period:'远古'},
+  {idx:1,  name:'星宿仙尊', period:'远古'},
+  {idx:2,  name:'无极魔尊', period:'上古'},
+  {idx:3,  name:'狂蛮魔尊', period:'上古'},
+  {idx:4,  name:'红莲魔尊', period:'上古'},
+  {idx:5,  name:'元莲仙尊', period:'中古'},
+  {idx:6,  name:'盗天魔尊', period:'中古'},
+  {idx:7,  name:'巨阳仙尊', period:'中古'},
+  {idx:8,  name:'幽魂魔尊', period:'近古'},
+  {idx:9,  name:'乐土仙尊', period:'近古'},
+  {idx:10, name:'炼天魔尊', period:'炼天'}
+];
+
+var CHARACTER_ERA = {
+  '元始仙尊': {minEra:0, maxEra:0},
+  '星宿仙尊': {minEra:0, maxEra:1},
+  '无极魔尊': {minEra:2, maxEra:2},
+  '狂蛮魔尊': {minEra:3, maxEra:3},
+  '红莲魔尊': {minEra:4, maxEra:4},
+  '元莲仙尊': {minEra:5, maxEra:5},
+  '盗天魔尊': {minEra:6, maxEra:6},
+  '巨阳仙尊': {minEra:7, maxEra:7},
+  '幽魂魔尊': {minEra:8, maxEra:8},
+  '乐土仙尊': {minEra:9, maxEra:9},
+  '炼天魔尊': {minEra:10, maxEra:10},
+  '薄青':     {minEra:4, maxEra:10},
+  '血海老祖': {minEra:4, maxEra:10},
+  '白相':     {minEra:5, maxEra:10},
+  '万寿娘子': {minEra:5, maxEra:10},
+  '黑凡':     {minEra:5, maxEra:10},
+  '秦百胜':   {minEra:8, maxEra:10},
+  '凤九歌':   {minEra:8, maxEra:10},
+  '武庸':     {minEra:10, maxEra:10},
+  '龙公':     {minEra:10, maxEra:10},
+  '方源':     {minEra:10, maxEra:10},
+  '谢晗沫':   {minEra:10, maxEra:10},
+  '马鸿运':   {minEra:10, maxEra:10},
+  '古月方正': {minEra:10, maxEra:10},
+  '古月青书': {minEra:10, maxEra:10},
+  '白凝冰':   {minEra:10, maxEra:10},
+  '贾金生':   {minEra:10, maxEra:10},
+  '商心慈':   {minEra:10, maxEra:10},
+  '商睚':     {minEra:10, maxEra:10},
+  '花酒行者': {minEra:10, maxEra:10}
+};
+
+var SPEC_ERA = {
+  '三气归来': {minEra:0},
+  '星宿推演': {minEra:1}, '算无遗策': {minEra:1}, '星落如雨': {minEra:1},
+  '无极·无中生有': {minEra:2}, '退一步': {minEra:2}, '海阔天空': {minEra:2},
+  '自由残缺变': {minEra:3},
+  '前有古人': {minEra:4}, '后有来者': {minEra:4}, '光阴飞刃': {minEra:4},
+  '未来身': {minEra:4}, '未来已至': {minEra:4},
+  '五指拳心剑': {minEra:4}, '五指全心剑': {minEra:4},
+  '剑痕索命': {minEra:4}, '一剑西来': {minEra:4}, '无我剑意': {minEra:4},
+  '血神子': {minEra:4},
+  '无相手': {minEra:6}, '大盗鬼手': {minEra:6}, '见面曾相识': {minEra:6},
+  '鬼不觉': {minEra:6}, '空穴一线': {minEra:6}, '神不知': {minEra:6}, '赌博蛊': {minEra:6},
+  '阎帝': {minEra:8}, '魂爆': {minEra:8}, '万我': {minEra:8},
+  '救死扶伤': {minEra:9}, '夜歌': {minEra:9},
+  '落魄印': {minEra:10}, '鬼官衣': {minEra:10}, '魂啸': {minEra:10}, '魂压': {minEra:10},
+  '无量气海': {minEra:10}, '气呼山': {minEra:10}, '气流剪': {minEra:10}, '气盖山河': {minEra:10},
+  '力道大手印': {minEra:10}, '身体力行': {minEra:10}, '成双入对': {minEra:10},
+  '碎梦': {minEra:10}, '乱意散梦': {minEra:10},
+  '血漂流': {minEra:10}, '血染征袍': {minEra:10}, '血渐冷': {minEra:10},
+  '豆神兵卒': {minEra:10}, '桃花迷林': {minEra:10},
+  '激流勇进': {minEra:10}, '流川': {minEra:10},
+  '冰刃风暴': {minEra:10}, '冰雨冻土': {minEra:10}, '彻冰刀': {minEra:10},
+  '阳莽背火衣': {minEra:10}, '火海双蛟杀': {minEra:10}, '炎魔': {minEra:10},
+  '送友风': {minEra:10}, '无限风': {minEra:10},
+  '坐吃山空': {minEra:10}, '积土为山': {minEra:10},
+  '剑客': {minEra:10}, '剑浪三叠': {minEra:10}, '破晓剑': {minEra:10}, '暗歧杀': {minEra:10},
+  '春剪': {minEra:10}, '夏扇': {minEra:10}
+};
+
+var EVENT_ERA = {
+  '剑冢一夜': {minEra:4},
+  '观星台': {minEra:1},
+  '灵缘听雨': {minEra:10},
+  '仙鹤门下': {minEra:10},
+  '战仙演武': {minEra:10},
+  '沈家海盟': {minEra:10},
+  '诗情海域': {minEra:10},
+  '黑家议事': {minEra:10},
+  '王庭阴影': {minEra:10},
+  '刘家余烬': {minEra:10},
+  '雪原夜话': {minEra:10},
+  '白骨坊市': {minEra:10},
+  '武家差遣': {minEra:10},
+  '铁家风波': {minEra:10},
+  '三叉山旧影': {minEra:10},
+  '义天山风闻': {minEra:10},
+  '琅琊地灵': {minEra:10},
+  '铁鹰旧主': {minEra:10},
+  '星象观台': {minEra:1},
+  '黑凡残局': {minEra:5},
+  '狐仙福地·初临': {minEra:10},
+  '地灵三问': {minEra:10},
+  '狐仙真传·认主': {minEra:10},
+  '鹤门压境': {minEra:10},
+  '福地稳固': {minEra:10}
+};
+
+function eraAllowed(entry){
+  if(!entry) return true;
+  if(entry.minEra!=null && S.eraIdx < entry.minEra) return false;
+  if(entry.maxEra!=null && S.eraIdx > entry.maxEra) return false;
+  return true;
+}
+function charEraAllowed(name){
+  var e = CHARACTER_ERA[name];
+  if(!e) return true;
+  return eraAllowed(e);
+}
+function specEraAllowed(name){
+  var e = SPEC_ERA[name];
+  if(!e) return true;
+  return eraAllowed(e);
+}
+function eventEraAllowed(name){
+  var e = EVENT_ERA[name];
+  if(!e) return true;
+  return eraAllowed(e);
+}
+/* ══ 03.5 END ══ */
+
 var PALETTE=['#C0392B','#2471A3','#1E8449','#6C3483','#B7950B','#2E86C1','#A93226','#229954','#8E44AD','#21618C','#D35400','#5DADE2','#7D6608','#4A235A','#CB4335','#3498DB','#27AE60','#884EA0','#154360','#D4AC0D'];
 
 /* ══ 04 STATE · 状态机 ═════════════════════════════════════════════ */
@@ -2513,6 +2798,34 @@ async function baixiangLegacy(){
  if(!hasMark('白相真传'))S.marks.push('白相真传');
  chr('获白相真传');
 }
+/* 狐仙真传·升仙重鉴（v1.14.36）：出生狐仙福地且升仙后，地灵以仙身再问一次 */
+async function huxianLegacy(){
+ S.flags.huxianSeen=true;
+ await say('仙光落定，狐仙福地的地灵第一次以完整意志迎上你：「凡人时可认主，仙人时……再过一关。」','gold');
+ var r1=gradeRate(S.tIdx),r2=gradeRate(S.dhIdx);
+ if(!(await rollW(r1,'狐仙重鉴·才情（'+TAL_ORD[S.tIdx]+' → '+r1+'%）'))){await say('地灵叹息：「缘未至。」真传停在凡人期所得，不再加深。','bad');chr('狐仙真传·升仙未深');return;}
+ if(!(await rollW(r2,'狐仙重鉴·道心（'+TAL_ORD[S.dhIdx]+' → '+r2+'%）'))){await say('地灵：「心不稳，地不稳。」重鉴失败。','bad');chr('狐仙真传·心未过');return;}
+ await say('地灵召出一群福地兽潮虚影——要你以奴道或主力收服，而非屠杀殆尽。','battle');
+ if(!(await backRound(Math.max(120,Math.round(anchor()*0.85)),'狐仙福地·兽潮虚影',async function(){await say('虚影俯首。地灵：「可以。」','gold');},{}))){
+  await say('兽潮散了，地灵没有再说话。重鉴未过。','bad');chr('狐仙真传·行未过');return;
+ }
+ var isNu=hasSchool('奴道')&&mainSchool().name==='奴道';
+ if(!isNu){
+  if(!hasSchool('奴道'))S.schools.push({name:'奴道',g:'控',dir:'控',realm:1});
+  setRealm('奴道',Math.max(rlm('奴道'),4));
+  await say('奴道被地脉强行灌至宗师之境（未必改主修，但奴道已成你的骨血之一）。','gold');
+ }else{
+  setRealm('奴道',Math.min(7,Math.max(4,rlm('奴道')+1)));
+  S.lv=Math.max(S.lv,7);
+  await wormUp(2);
+  await say('奴道主修与真传相合——境界再进一步，完善度+2，仙身更稳。','gold');
+ }
+ if(!hasMark('狐仙真传'))S.marks.push('狐仙真传');
+ if(!hasMark('福地稳固'))S.marks.push('福地稳固');
+ S.flags.daoYuan=(S.flags.daoYuan||0)+2;
+ await say('【狐仙真传】在仙身中落成。道缘+2。地灵退回地脉深处：「去吧。门，我替你看着。」','gold');
+ chr('狐仙真传·升仙落成');
+}
 /* ============================================================
    疯魔窟（v1.3 抢夺元境版 · 游戏 1.3.0 实现）
    ①过场 ②入窟动机 ③雾都 ④疯魔之约 ⑤声灵战 ⑥道场守卫战+无极真传
@@ -2715,13 +3028,15 @@ async function fyFirstLifeFinale(){
  await say('那场名为「宿命」的大战，要再等五百年才会落下。你等不到那一天。','sys');
  if(S.flags.supreme)await say('可你手里的至尊仙胎体，本不该出现在这个时代——历史已经被你偏了一寸。','gold');
  if(S.flags.ya)await say('亚仙尊之姿，在此时已无人可制。但再高的修为，也跨不过五百年。','gold');
+ /* v1.14.37 P0：第三选项随门槛二选一，索引只有 0/1/2，旧 c===3 永不成立且远走会误入疯魔窟 */
+ var canKoku=!!(S.flags.ya||Math.floor(S.lv)>=8);
  var fyOpts=[['留下传承',40],['隐姓埋名',35]];
- if(S.flags.ya||Math.floor(S.lv)>=8)fyOpts.push(['入疯魔窟争元境',25]);
+ if(canKoku)fyOpts.push(['入疯魔窟争元境',25]);
  else fyOpts.push(['远走他乡',25]);
  var c=await optW('第一世·去路',fyOpts);
- if(c===0){await say('你把毕生所学刻进一处洞天，只留一句：五百年后，会有人来取。','gold');await ending('前世传灯','五百年后，宿命大战的战场上，有人踏着你的残卷而来。');}
- if(c===1){await say('你抹去自己的名字，在五域之间做一个没有来历的散修。','');await ending('前世无名','方源重生那年，世上已无人记得你。这也许正是你想要的。');}
- if(c===3){await say('你没有等到宿命大战，也没有留下名字。五百年后，连你的坟都被风抹平了。','');await ending('前世微尘','你来过，然后天地把你忘了。');}
+ if(c===0){await say('你把毕生所学刻进一处洞天，只留一句：五百年后，会有人来取。','gold');return await ending('前世传灯','五百年后，宿命大战的战场上，有人踏着你的残卷而来。');}
+ if(c===1){await say('你抹去自己的名字，在五域之间做一个没有来历的散修。','');return await ending('前世无名','方源重生那年，世上已无人记得你。这也许正是你想要的。');}
+ if(!canKoku){await say('你没有等到宿命大战，也没有留下名字。五百年后，连你的坟都被风抹平了。','');return await ending('前世微尘','你来过，然后天地把你忘了。');}
  await say('你走进疯魔窟——那里的元境，还没有被任何人取走。','gold');
  await fengkoku();
 }
@@ -2921,6 +3236,8 @@ function learnSpec(name,school,dir){
  if(hasMove(name))return;
  /* v1.1.8：限定杀招兜底校验（出身+流派），未达标者不得习得 */
  if(!limitSpecPass(name)){log('【'+name+'】属家族限定杀招——非'+((LIMIT_SPEC[name]||{}).birth||'')+'·'+((LIMIT_SPEC[name]||{}).school||'')+'一脉，无缘领悟。','bad');return;}
+ /* v1.14.36：时代校验——未到创造者时代，不得习得 */
+ if(!specEraAllowed(name)){log('【'+name+'】尚未现世——不在当前时代，无缘领悟。','bad');return;}
  addMove({name:name,t:'spec',dir:dir||'攻',school:school||mainSchool().name});
  log('习得特殊仙道杀招【'+name+'】','gold');
  dexAdd('spec',name); /* v1.4.17 杀招图鉴登记 */
@@ -3149,7 +3466,7 @@ setStage('出身');
    else if(S.childhood==='练武奇才')S.flags.freeMartial=true;
   }
   if(S.age>=56){pendDH+=1;await say('耄耋之年降世，一生阅尽——道心+1。','good');}
-  S.maxLife=100;S.life=S.maxLife-Math.max(S.age,16);
+  S.maxLife=100;S.life=S.maxLife-S.age;if(S.life<1)S.life=1; /* v1.14.37 P0：寿元与开局年龄对齐，避免 0~15 岁首次耗寿后 age 从 0 跳到 19 */
   var lSecs=[['EX',1],['SSS',2],['SS',4],['S',9],['A',14],['B',22],['C',26],['D',15],['E',7]];
   var lkIdx=await W('容貌盘','皮囊一副',lSecs,{small:true});
   S.look=lSecs[lkIdx][0];
@@ -3261,6 +3578,8 @@ setStage('出身');
   if(S.region==='中洲')pool.forEach(function(x){if(x.n==='剑道')x.w=x.w*1.3;});
   var bmap=BIRTH_SCHOOL[S.birth];if(bmap)pool.forEach(function(x){if(bmap.indexOf(x.n)>=0)x.w=x.w*3;});
   var bmap5=BIRTH_SCHOOL5[S.birth];if(bmap5){await say('此地道痕密布——【'+bmap5.join('、')+'】之痕尤重，你修此道的概率远超常人。','gold');pool.forEach(function(x){if(bmap5.indexOf(x.n)>=0)x.w=x.w*5;});}
+  /* v1.14.36：容貌越高，魅情道入池权重越高（EX×3.0 … E×0.7） */
+  pool.forEach(function(x){if(x.n==='魅情道')x.w=Math.max(0.1,x.w*lookCharmMul());});
   /* v1.2.7【杀道】抽取条件（2026-10-01 增补）：才情与道心必须均为 EX（序位 8）——
      任一项未达 EX，杀道自择派盘池中剔除（不可抽取）。判定时点＝池构造时刻的 S.tIdx / S.dhIdx。 */
   if(!(S.tIdx===8&&S.dhIdx===8))pool=pool.filter(function(x){return x.n!=='杀道';});
@@ -3414,21 +3733,13 @@ setStage('出身');
    if(S.origin==='天外之魔')await say('至于天庭——这个世道里天庭自顾不暇，没有人追索你的来历。','good');
   }else if(S.origin==='天外之魔'){
    var exP=(S.region==='北原')?40:28; /* v1.3.3：暴露率 56/40 → 40/28 */
-   if(await rollW(exP,'身份暴露判定盘（'+S.region+' · '+exP+'%）')){
+   exP+=lookExposePP(); /* v1.14.31：容貌影响显眼度 EX+8 … E-6 */
+   exP=clamp(exP,5,95);
+   if(await rollW(exP,'身份暴露判定盘（'+S.region+' · 容貌'+S.look+' · '+exP+'%）')){
     S.flags.exposed=true;
     await say('天机泄露——天庭循着天外之魔的气息锁定了你！','bad');
     chr('天外之魔身份暴露');
    } else await say('气息被遮掩得住——天庭暂未察觉。','good');
-  }
-  if(S.aptIdx===3){
-   var rSecs=[['境界精进',20],['仙蛊垂青',15],['天意指路',20],['才情加身',20],['道心澄澈',15],['毫无收获',10]];
-   var rr=await W('升仙奖励盘','冥冥中的补偿',rSecs,{small:true});
-   if(rr===0)mainSchool().realm=Math.min(7,mainSchool().realm+1);
-   else if(rr===1)await wormUp(1);
-   else if(rr===2)S.flatMods+=10;
-   else if(rr===3)S.tIdx=Math.min(8,S.tIdx+1);
-   else if(rr===4)S.dhIdx=Math.min(8,S.dhIdx+1);
-   if(rr<5)log('升仙奖励：'+rSecs[rr][0],'gold');
   }
   S.wormIdx=await W('仙蛊完善度·重判盘','成仙再定',(S.eraIdx===8?[['SSS',5],['S',12],['A',22],['B',28],['C',18],['D',10],['E',5]]:[['SSS',1],['S',4],['A',10],['B',20],['C',30],['D',25],['E',10]]),{small:true}); /* v1.2.9增补④：幽魂之世同上 */
   var mjSecs=[['大师',50],['准宗师',35],['宗师',15]];
@@ -3437,8 +3748,29 @@ setStage('出身');
   S.deducX=clamp(S.deduc+ri(-2,2),1,6);
   if(S.dhIdx<dhSnap){S.dhIdx=dhSnap;log('道心于仙光中凝定，未再折损。','sys');}
   while(S.moves.length>8)S.moves.shift();
+  /* v1.14.34 升仙补偿盘：重判之后再开；甲等及以下触发；已满项不入池；资质越低补偿略厚 */
+  if(S.aptIdx>=2){
+   var emptyW=[0,0,14,10,7,5,4][S.aptIdx]||10;
+   var baseBoost=[0,0,0.85,1.0,1.12,1.25,1.3][S.aptIdx]||1;
+   var pool=[];
+   if(mainSchool().realm<7)pool.push({n:'境界精进',w:Math.round(20*baseBoost),fn:async function(){mainSchool().realm=Math.min(7,mainSchool().realm+1);await say('主修境界→【'+REALMS[mainSchool().realm]+'】。','gold');}});
+   if(S.wormIdx>0)pool.push({n:'仙蛊垂青',w:Math.round(15*baseBoost),fn:async function(){await wormUp(1);await say('仙蛊完善度升一档→'+wormName()+'。','gold');}});
+   /* 原「天意指路」flatMods+10 过隐蔽 → 寿元+5 且权重+3% */
+   pool.push({n:'寿元延拓',w:Math.round(18*baseBoost),fn:async function(){S.life=(S.life||0)+5;if(S.maxLife!=null)S.age=Math.max(0,S.maxLife-S.life);S.pctMods=(S.pctMods||0)+0.03;await say('寿元+5，气机权重+3%。','gold');}});
+   if(S.tIdx<8)pool.push({n:'才情加身',w:Math.round(18*baseBoost),fn:async function(){S.tIdx=Math.min(8,S.tIdx+1);await say('才情→'+TAL_ORD[S.tIdx]+'。','gold');}});
+   if(S.dhIdx<8)pool.push({n:'道心澄澈',w:Math.round(15*baseBoost),fn:async function(){S.dhIdx=Math.min(8,S.dhIdx+1);await say('道心→'+TAL_ORD[S.dhIdx]+'。','gold');}});
+   if(S.aptIdx>=3&&S.aptIdx<=5)pool.push({n:'资质提升',w:Math.round(11*baseBoost),fn:async function(){S.aptIdx=Math.max(0,S.aptIdx-1);await say('空窍资质升一档→【'+aptName()+'】！','gold');}});
+   pool.push({n:'毫无收获',w:emptyW,fn:async function(){await say('仙光散尽，这一次没有额外馈赠。','sys');}});
+   if(pool.length>1){
+    var rSecs=pool.map(function(x){return [x.n,x.w];});
+    var rr=await W('升仙奖励盘','甲等以下的冥冥补偿（已满项不入池）',rSecs,{small:true});
+    await pool[rr].fn();
+    if(pool[rr].n!=='毫无收获')log('升仙奖励：'+pool[rr].n,'gold');
+   }
+  }
   chr('成仙 · 主修'+REALMS[mainSchool().realm]);
   if(S.birth==='白相福地'&&!hasMark('白相真传'))await baixiangLegacy(); /* 白相福地：游历之前触发真传 */
+  if(S.birth==='狐仙福地'&&(hasMark('地灵认可')||hasMark('狐仙真传')||hasMark('狐仙地缘')))await huxianLegacy(); /* v1.14.33 狐仙福地升仙重鉴 */
   renderPanel();
   await say('仙蛊完善度'+wormName()+'，主修境界'+REALMS[mainSchool().realm]+'，仙道推演'+S.deducX+'。');
 
@@ -3463,8 +3795,11 @@ setStage('出身');
   if(kmOn()){travPool.push({n:'兽骨堆',w:12},{n:'变形草滩',w:10},{n:'力祭台',w:9});}
   if(S.eraIdx===5){travPool.push({n:'青莲池',w:12},{n:'画中天地',w:10},{n:'木道长阶',w:9});}
   if(S.eraIdx===9){travPool.push({n:'净土边',w:12},{n:'厚土祭',w:10},{n:'渡魂渡口',w:9});}
+  if(S.region==='南疆'||S.birth==='商家城'){travPool.push({n:'商家城一游',w:S.birth==='商家城'?12:9});} /* v1.14.29 商家线游历 */
   if(hasJian()){travPool.push({n:'剑冢一夜',w:isJianMain()?14:9});}
   if(hasZhiXing()&&!xxOn()){travPool.push({n:'观星台',w:(isZhiMain()||isXingMain())?13:8});}
+  /* v1.14.36：游历池统一按时代过滤 */
+  travPool=travPool.filter(function(x){return eventEraAllowed(x.n);});
   for(var ti=0;ti<travN;ti++){
    if(S.life<=0)await ending('寿元尽消','寿数如烛，燃尽在登仙路上。');
    var tp2=[];travPool.forEach(function(x){tp2.push([x.n,x.w]);});
@@ -3812,7 +4147,8 @@ var RAND_EVENTS=[
  }},
  {id:'elder_point', n:'无名前辈', f:async function(){
   await say('茶棚里一个老人把碗一扣：「你那门功夫，差一口气。」','sys');
-  var c=await optW('无名前辈',[['虚心求教',55],['不服比试',30],['敷衍了事',15]]);
+  var _sm=lookSocialMul();
+  var c=await optW('无名前辈',[['虚心求教',Math.max(1,Math.round(55*_sm))],['不服比试',30],['敷衍了事',15]]);
   if(c===0){
    if(S.schools&&S.schools.length){
     var t=S.schools[S.mainIdx|0]||S.schools[0];
@@ -4370,10 +4706,16 @@ var ID_EVENTS={
   }}
  ]
 };
+function isBirthStoryName(name){
+ var k,arr,i;for(k in BIRTH_STORY){arr=BIRTH_STORY[k];for(i=0;i<arr.length;i++)if(arr[i].n===name)return true;}
+ return false;
+}
 async function genericEvent(name){
  var _eraPool=ERA_MORTAL_EVENTS[S.eraIdx]||[];
- if(!MORTAL_SCENES[name]&&!_eraPool.some(function(e){return e.n===name;}))return false;
+ if(!MORTAL_SCENES[name]&&!_eraPool.some(function(e){return e.n===name;})&&!isBirthStoryName(name))return false;
  dexAdd('ev',name); /* 只登记当前时代事件池中实际存在的事件 */
+ /* v1.14.36 出生地专属 */
+ if(await birthStoryDispatch(name))return;
  if(S.eraIdx===2){
   if(name==='偶遇凡人时期无极'){await wujiMeetMortal();return;}
   if(name==='魔音初啼'){await wujiF1();return;}
@@ -4453,6 +4795,19 @@ async function genericEvent(name){
   if(name==='熊家猎场'){await lianF4();return;}
   if(name==='春秋蝉蜕'){await lianF5();return;}
   if(name==='方源同门'){await lianF6();return;}
+  if(name==='白凝冰·月下'){await lianF7();return;}
+  if(name==='白凝冰·竹林试剑'){await lianF10();return;}
+  if(name==='古月方正'){await lianF8();return;}
+  if(name==='古月青书'){await lianF11();return;}
+  if(name==='贾金生·赌石'){await lianF12();return;}
+  if(name==='酒仙遗踪'){await lianF9();return;}
+  if(name==='商心慈·账房'){await shangF1();return;}
+  if(name==='商睚·比宝'){await shangF2();return;}
+  if(name==='商家夜宴'){await shangF3();return;}
+  if(name==='商城拍卖'){await shangF4();return;}
+  if(name==='商心慈·密谈'){await shangF5();return;}
+  if(name==='商心慈·联姻局'){await shangF6();return;}
+  if(name==='商心慈·危城夜'){await shangF7();return;}
  }
  if(S.eraIdx===8){
   if(name==='空村拾遗'){await hunF1();return;}
@@ -4479,8 +4834,10 @@ async function genericEvent(name){
   return;
  }
  var zhiW=Math.round(tyJiW()*zhiB());
+ /* v1.14.36：社交类事件仅抬高「好结果」扇区权重，中/坏结果不变 */
+ var goodW=SOCIAL_SCENES[name]?Math.max(1,Math.round(zhiW*lookSocialMul())):zhiW;
  var outcomeI=await W(scene.wheel,(zhiW>45?'智道加持 · ':'')+scene.caption,[
-  [scene.labels[0],zhiW,'#1E8449'],
+  [scene.labels[0],goodW,'#1E8449'],
   [scene.labels[1],40,'#8C8C8C'],
   [scene.labels[2],15,'#C0392B']
  ],{small:true});
@@ -4611,7 +4968,8 @@ async function doTravail(n){
  else if(n==='异人交易'){
   await say('夜市尽头有个蒙面人，摊上只摆三样东西，不标价，只问「你拿什么换」。','sys');
   S.flags.daoYuan=(S.flags.daoYuan||0)+1;
-  var t=await optW('异人交易',[['用完善度换杀招',35],['用道心换蛊材',35],['拒不交易',30]]);
+  var _sm=lookSocialMul();
+  var t=await optW('异人交易',[['用完善度换杀招',Math.max(1,Math.round(35*_sm))],['用道心换蛊材',Math.max(1,Math.round(35*_sm))],['拒不交易',30]]);
   if(t===0){
    if(S.wormIdx<6){S.wormIdx=Math.min(6,S.wormIdx+1);log('以完善度换杀招——完善度下降。','bad');}
    if(!hasMove('暗噬')){learnSpec('暗噬','暗道');await say('蒙面人丢来一卷黑绢——【暗噬】入手。','gold');}
@@ -4893,6 +5251,7 @@ async function doTravail(n){
  }
  else if(n==='黑市·见面不相识'){await dtT1();} /* v1.3.4：补接盗天游历路由 */
  else if(n==='盗天空间'){await dtT2();}
+ else if(n==='商家城一游'){await shangTravel();} /* v1.14.29 商家线游历 */
 }
 
 /* ── 11 EVENT · 关键历练 ─────────────────────────────────────────── */
@@ -5332,15 +5691,395 @@ var ERA_MORTAL_EVENTS={
      {n:'白家冰心',w:9,g:function(){return S.birth==='青茅山·白家';}},
      {n:'熊家猎场',w:9,g:function(){return S.birth==='青茅山·熊家';}},
      {n:'春秋蝉蜕',w:7},
-     {n:'方源同门',w:10,g:function(){return S.birth==='青茅山·古月'&&S.fyLife===2;}}]
+     {n:'方源同门',w:10,g:function(){return S.birth==='青茅山·古月'&&S.fyLife===2;}},
+     /* v1.14.36–28 原著人物对话事件 */
+     {n:'白凝冰·月下',w:9,g:function(){return qingmaoBirth()&&!hasMark('见过白凝冰');}},
+     {n:'白凝冰·竹林试剑',w:10,g:function(){return qingmaoBirth()&&hasMark('白凝冰约战')&&!hasMark('白凝冰试剑毕');}},
+     {n:'古月方正',w:8,g:function(){return S.birth==='青茅山·古月'&&!hasMark('识方正');}},
+     {n:'古月青书',w:8,g:function(){return S.birth==='青茅山·古月'&&!hasMark('识青书');}},
+     {n:'贾金生·赌石',w:9,g:function(){return qingmaoBirth()&&!hasMark('见过贾金生');}},
+     {n:'酒仙遗踪',w:8,g:function(){return qingmaoBirth()&&!hasMark('探过酒仙遗踪');}},
+     /* v1.14.36 商家线 */
+     {n:'商心慈·账房',w:10,g:function(){return S.birth==='商家城'&&!hasMark('识商心慈');}},
+     {n:'商睚·比宝',w:9,g:function(){return S.birth==='商家城'&&!hasMark('比过商睚');}},
+     {n:'商家夜宴',w:9,g:function(){return S.birth==='商家城'&&!hasMark('赴过商家夜宴');}},
+     {n:'商城拍卖',w:8,g:function(){return (S.birth==='商家城'||S.region==='南疆')&&!hasMark('拍过商城');}},
+     /* v1.14.36 商心慈长线 */
+     {n:'商心慈·密谈',w:11,g:function(){return hasMark('商心慈信一角')&&!hasMark('商家定约·合作')&&!hasMark('商家定约·姻盟')&&!hasMark('商家拒约');}},
+     {n:'商心慈·联姻局',w:10,g:function(){return hasMark('商家定约·姻盟')&&!hasMark('商心慈同盟');}},
+     {n:'商心慈·危城夜',w:10,g:function(){return (hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商城共守');}}]
 };
 function qingmaoBirth(){return ['青茅山·熊家','青茅山·白家','青茅山·古月'].indexOf(S.birth)>=0;}
+function shangBirth(){return S.birth==='商家城';}
+/* v1.14.36 出生地专属剧情分层（按原著素材厚度）
+   tier1 核心：多事件+真传/结局向；tier2 有名地点：1 条小线；tier3 背景板：不挂专属，靠大区通用池。
+   出生专属事件跨时代可抽（故乡见闻），与 ERA_MORTAL_EVENTS 合并入凡人池。 */
+var BIRTH_STORY={
+ /* —— 南疆 tier2 —— */
+ '白骨山·白骨寨':[{n:'白骨坊市',w:11,g:function(){return !hasMark('逛过白骨坊市');}}],
+ '武仪山·武家':[{n:'武家差遣',w:11,g:function(){return !hasMark('领过武家差遣');}}],
+ '万城山·铁家':[{n:'铁家风波',w:11,g:function(){return !hasMark('查过铁家');}}],
+ '三叉山':[{n:'三叉山旧影',w:10,g:function(){return !hasMark('坐过三叉山');}}],
+ '义天山':[{n:'义天山风闻',w:10,g:function(){return !hasMark('义天见闻');}}],
+ /* —— 北原 —— */
+ '黑家':[{n:'黑家议事',w:11,g:function(){return !hasMark('黑家谋士');}},{n:'王庭阴影',w:9,g:function(){return !hasMark('押过王庭');}}],
+ '刘家':[{n:'刘家余烬',w:10,g:function(){return !hasMark('经手刘家');}}],
+ '大雪山福地':[{n:'雪原夜话',w:11,g:function(){return !hasMark('听过雪原夜话');}}],
+ /* —— 中洲十大古派抽样 —— */
+ '灵缘斋':[{n:'灵缘听雨',w:10,g:function(){return !hasMark('灵缘听雨毕');}}],
+ '仙鹤门·飞鹤山':[{n:'仙鹤门下',w:10,g:function(){return !hasMark('过仙鹤门');}}],
+ '战仙宗':[{n:'战仙演武',w:10,g:function(){return !hasMark('战仙演武毕');}}],
+ /* —— 东海 —— */
+ '沈家·顶级世家':[{n:'沈家海盟',w:10,g:function(){return !hasMark('海盟一笔');}}],
+ '宋家·超级势力':[{n:'诗情海域',w:10,g:function(){return !hasMark('诗情海试毕');}}],
+ /* —— 洞天福地 —— */
+ '狐仙福地':[
+  {n:'狐仙福地·初临',w:12,g:function(){return !hasMark('狐仙地缘');}},
+  {n:'地灵三问',w:11,g:function(){return hasMark('狐仙地缘')&&!hasMark('地灵认可');}},
+  {n:'狐仙真传·认主',w:12,g:function(){return hasMark('地灵认可')&&!hasMark('狐仙真传')&&!hasMark('狐仙认主·暂退');}},
+  {n:'鹤门压境',w:10,g:function(){return hasMark('狐仙地缘')&&!hasMark('护地一战');}},
+  {n:'福地稳固',w:9,g:function(){return hasMark('狐仙真传')&&hasMark('护地一战')&&!hasMark('福地稳固');}}
+ ],
+ '琅琊福地':[{n:'琅琊地灵',w:11,g:function(){return !hasMark('见过琅琊地灵');}}],
+ '星象福地':[{n:'星象观台',w:10,g:function(){return !hasMark('星象观台毕');}}],
+ '黑凡洞天':[{n:'黑凡残局',w:10,g:function(){return !hasMark('黑凡残局毕');}}],
+ '铁鹰福地':[{n:'铁鹰旧主',w:9,g:function(){return !hasMark('铁鹰旧主毕');}}]
+};
 function buildWujiMortalPool(){
- var list=ERA_MORTAL_EVENTS[S.eraIdx]||[];
+ var list=(ERA_MORTAL_EVENTS[S.eraIdx]||[]).slice();
+ var extra=BIRTH_STORY[S.birth];
+ if(extra&&extra.length){
+  extra.forEach(function(e){
+   /* v1.14.36：出生地事件按时代过滤 */
+   if(!eventEraAllowed(e.n))return;
+   if(!list.some(function(x){return x.n===e.n;}))list.push({n:e.n,w:e.w,g:e.g});
+  });
+ }
  return list.filter(function(x){
   if(!x.g)return true;
   try{return !!x.g();}catch(e){return false;}
  }).map(function(x){return {n:x.n,w:x.w};});
+}
+async function birthStoryDispatch(name){
+ if(name==='白骨坊市'){await birthBaiGu();return true;}
+ if(name==='武家差遣'){await birthWuJia();return true;}
+ if(name==='铁家风波'){await birthTieJia();return true;}
+ if(name==='三叉山旧影'){await birthSanCha();return true;}
+ if(name==='义天山风闻'){await birthYiTian();return true;}
+ if(name==='黑家议事'){await birthHeiJia();return true;}
+ if(name==='王庭阴影'){await birthWangTing();return true;}
+ if(name==='刘家余烬'){await birthLiuJia();return true;}
+ if(name==='雪原夜话'){await birthXueShan();return true;}
+ if(name==='灵缘听雨'){await birthLingYuan();return true;}
+ if(name==='仙鹤门下'){await birthXianHe();return true;}
+ if(name==='战仙演武'){await birthZhanXian();return true;}
+ if(name==='沈家海盟'){await birthShenJia();return true;}
+ if(name==='诗情海域'){await birthSongJia();return true;}
+ if(name==='狐仙福地·初临'){await birthHuXian1();return true;}
+ if(name==='地灵三问'){await birthHuXianAsk();return true;}
+ if(name==='狐仙真传·认主'){await birthHuXianTrue();return true;}
+ if(name==='鹤门压境'){await birthHuXian2();return true;}
+ if(name==='福地稳固'){await birthHuXianFirm();return true;}
+ if(name==='琅琊地灵'){await birthLangYa();return true;}
+ if(name==='星象观台'){await birthXingXiang();return true;}
+ if(name==='黑凡残局'){await birthHeiFan();return true;}
+ if(name==='铁鹰旧主'){await birthTieYing();return true;}
+ return false;
+}
+/* —— 出生地专属事件实现（原著影子，深度按素材厚度） —— */
+async function birthBaiGu(){
+ await say('白骨山的坊市不点灯，只用骨粉与蛊火。摊主戴着半张人皮面具，问你要买「活的」还是「死的」。','sys');
+ var c=await optW('白骨坊市',[['买一枚可用蛊材',40],['打听双胞胎旧事',35],['只看不买',25]]);
+ if(c===0){await wormUp(1);await say('你拿到一枚带着骨寒的凡蛊。完善度+1。','good');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);if(!hasMark('白骨旧闻'))S.marks.push('白骨旧闻');await say('有人说山上曾有一对双胞胎，后来只剩一个名字在流传。才情+1。','gold');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把目光收回。道心+1。','good');}
+ if(!hasMark('逛过白骨坊市'))S.marks.push('逛过白骨坊市');
+ chr('白骨坊市');
+}
+async function birthWuJia(){
+ await say('武家族老把一纸差遣拍在你面前：「边境有散修闹事。去，或者滚。」','sys');
+ var c=await optW('武家差遣',[['领命出战',45],['以智周旋',35],['推给旁支',20]]);
+ if(c===0){
+  var won=await battleRound(foeAnchor(0,1),'边境散修',async function(){await say('闹事者被你压下。','good');});
+  if(won){S.lv=Math.min(5.5,S.lv+1);if(!hasMark('武家听用'))S.marks.push('武家听用');await say('族老多看你一眼。等级+1，获【武家听用】。','gold');}
+ }else if(c===1){
+  if(await rollW(55+S.tIdx*3,'周旋盘')){S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);await say('你把事压成「误会」。才情+1，完善度+1。','good');}
+  else await say('散修不吃这套，族老当面斥了你一顿。','bad');
+ }else{S.morIdx=Math.max(0,S.morIdx-1);await say('差事落到旁支头上。道德-1。','bad');}
+ if(!hasMark('领过武家差遣'))S.marks.push('领过武家差遣');
+ chr('武家差遣');
+}
+async function birthTieJia(){
+ await say('万城山铁家近来不安。夜里有人听见蛊屋深处的锁链声，像在数人头。','bad');
+ var c=await optW('铁家风波',[['查蛊屋',40],['安抚族人',35],['趁乱取利',25]]);
+ if(c===0){
+  if(await rollW(50,'蛊屋盘')){S.tIdx=Math.min(8,S.tIdx+1);if(!hasMark('铁家隐情'))S.marks.push('铁家隐情');await say('你看见一排空枷。才情+1，获【铁家隐情】。','gold');}
+  else{S.pctMods-=0.03;await say('锁链擦过你的袖口（权重-3%）。','bad');}
+ }else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await say('族人稍安。道心+1，道德+1。','good');}
+ else{S.morIdx=Math.max(0,S.morIdx-1);await wormUp(1);await say('你摸走一点无人看管的材料。完善度+1，道德-1。','bad');}
+ if(!hasMark('查过铁家'))S.marks.push('查过铁家');
+ chr('铁家风波');
+}
+async function birthSanCha(){
+ await say('三叉山路口立着一块旧碑，字迹被风雨磨浅。有人说这里曾「死过一次人，又活过一次」。','sys');
+ var c=await optW('三叉山旧影',[['拓碑细读',40],['在路口坐一夜',35],['匆匆路过',25]]);
+ if(c===0){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('碑阴有一行极小的字：路可分，心不可分。才情+1，道缘+1。','gold');}
+ else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);if(!hasMark('三叉山夜坐'))S.marks.push('三叉山夜坐');await say('风从三条路同时吹来。道心+1。','good');}
+ else await say('你没有停。','');
+ if(!hasMark('坐过三叉山'))S.marks.push('坐过三叉山');
+ chr('三叉山旧影');
+}
+async function birthYiTian(){
+ await say('义天山方向近来蛊师往来频繁。有人说「尊者的影子」在山里晃了一下，又有人说只是抢仙蛊的人多了。','gold');
+ var c=await optW('义天山风闻',[['前往探路',40],['收集情报',40],['按兵不动',20]]);
+ if(c===0){
+  if(await rollW(48+S.tIdx*3,'义天探路盘')){S.flags.daoYuan=(S.flags.daoYuan||0)+1;if(!hasMark('义天见闻'))S.marks.push('义天见闻');await say('你在山腰看见废弃的阵基。道缘+1，获【义天见闻】。','gold');}
+  else{S.life=Math.max(1,S.life-1);await say('乱流擦伤你（寿元-1）。','bad');}
+ }else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你把几路消息拼在一起——才情+1。','good');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你选择不当出头鸟。道心+1。','good');}
+ if(!hasMark('义天见闻'))S.marks.push('义天见闻');
+ chr('义天山风闻');
+}
+async function birthHeiJia(){
+ await say('黑家议事堂里，黄金家族的名号被反复提起。有人咬牙，有人冷笑。','sys');
+ var c=await optW('黑家议事',[['主张联姻',35],['主张备战',40],['沉默旁听',25]]);
+ if(c===0){S.tIdx=Math.min(8,S.tIdx+1);if(!hasMark('黑家谋士'))S.marks.push('黑家谋士');await say('你的话被记了一笔。才情+1。','good');}
+ else if(c===1){S.flatMods+=4;await say('备战令下，你的气机更沉。','good');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把每张脸的表情都看清了。道心+1。','good');}
+ if(!hasMark('黑家谋士'))S.marks.push('黑家谋士');
+ chr('黑家议事');
+}
+async function birthWangTing(){
+ await say('北原王庭的影子压在每座帐篷上。有人说王庭之争要开始了，有人说已经开始了。','sys');
+ var c=await optW('王庭阴影',[['押一注气运',40],['为族中跑腿',35],['远离赌局',25]]);
+ if(c===0){
+  if(R(0.45)){S.flags.luck=(S.flags.luck||0)+1;await wormUp(1);await say('你押对了风向。气运+1，完善度+1。','gold');}
+  else{S.pctMods-=0.04;await say('注码沉了（权重-4%）。','bad');}
+ }else if(c===1){await wormUp(1);S.dhIdx=Math.min(8,S.dhIdx+1);await say('差事换来一点实利。完善度+1，道心+1。','good');}
+ else await say('你退后一步。有些局，不站进去才是赢。','');
+ if(!hasMark('押过王庭'))S.marks.push('押过王庭');
+ chr('王庭阴影');
+}
+async function birthLiuJia(){
+ await say('刘家的院墙裂了。族人说起墨人王时，声音会自觉压低。','sys');
+ var c=await optW('刘家余烬',[['收拾残局',45],['另寻出路',35],['落井下石',20]]);
+ if(c===0){S.morIdx=Math.min(7,S.morIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);await say('你帮着把账理清。道德+1，道心+1。','good');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你把自己的路从族谱里抽了出来。才情+1，道缘+1。','good');}
+ else{S.morIdx=Math.max(0,S.morIdx-1);await wormUp(1);await say('你捡了别人顾不上的东西。完善度+1，道德-1。','bad');}
+ if(!hasMark('经手刘家'))S.marks.push('经手刘家');
+ chr('刘家余烬');
+}
+async function birthXueShan(){
+ await say('大雪山的风能把人的话吹碎。火堆旁有人提起「雪胡老祖」三个字，全场静了一息。','gold');
+ var c=await optW('雪原夜话',[['追问鸿运传闻',40],['只听不语',40],['告辞离席',20]]);
+ if(c===0){
+  if(R(0.4)){S.flags.luck=(S.flags.luck||0)+1;if(!hasMark('鸿运风闻'))S.marks.push('鸿运风闻');await say('有人私下说：鸿运齐天蛊曾在这片雪里闪过。气运+1。','gold');}
+  else await say('没人愿意多说。','');
+ }else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你把几句半真半假的话记在心里。才情+1。','good');}
+ else await say('你站起身，雪马上盖住脚印。','');
+ if(!hasMark('听过雪原夜话'))S.marks.push('听过雪原夜话');
+ chr('雪原夜话');
+}
+async function birthLingYuan(){
+ await say('灵缘斋的雨落在青瓦上，像有人在屋檐下轻轻叹气。女修往来，气息清冷。','sys');
+ var c=await optW('灵缘听雨',[['请教双修理论',40],['观摩仙子演道',35],['雨中独自悟',25]]);
+ if(c===0){S.tIdx=Math.min(8,S.tIdx+1);await say('你听懂了一句，又听不懂三句。才情+1。','good');}
+ else if(c===1){setRealm('信道',Math.min(7,Math.max(1,rlm('信道')+1)));await say('信道精进。','good');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('雨停时，心也静了。道心+1。','good');}
+ if(!hasMark('灵缘听雨毕'))S.marks.push('灵缘听雨毕');
+ chr('灵缘听雨');
+}
+async function birthXianHe(){
+ await say('仙鹤门的弟子走路都带着算计。有人笑着跟你打招呼，眼睛却在打量你的空窍。','sys');
+ var c=await optW('仙鹤门下',[['以礼往来',40],['拒绝试探',35],['反试对方',25]]);
+ if(c===0){S.morIdx=Math.min(7,S.morIdx+1);await say('你没有露出破绽。道德+1。','good');}
+ else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把话堵了回去。道心+1。','good');}
+ else{S.tIdx=Math.min(8,S.tIdx+1);await say('对方先乱了一拍。才情+1。','good');}
+ if(!hasMark('过仙鹤门'))S.marks.push('过仙鹤门');
+ chr('仙鹤门下');
+}
+async function birthZhanXian(){
+ await say('战仙宗演武场上，仙蛊屋的残影一闪而过。旁人说：那是给真正的战仙看的。','sys');
+ var c=await optW('战仙演武',[['上台过招',45],['观摩屋影',35],['记下阵图',20]]);
+ if(c===0){
+  var won=await battleRound(foeAnchor(0,0),'战仙宗同门',async function(){await say('你站稳了。','good');});
+  if(won){S.flatMods+=5;await say('气机更沉。','good');}
+ }else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你看见屋影里的一道杀机。才情+1。','good');}
+ else{setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));await say('阵道精进。','good');}
+ if(!hasMark('战仙演武毕'))S.marks.push('战仙演武毕');
+ chr('战仙演武');
+}
+async function birthShenJia(){
+ await say('沈家的海盟文书铺在长案上。东海正道的语气，总是温润而难拒。','sys');
+ var c=await optW('沈家海盟',[['附议签约',40],['提出改条款',35],['不表态',25]]);
+ if(c===0){S.morIdx=Math.min(7,S.morIdx+1);if(!hasMark('海盟一笔'))S.marks.push('海盟一笔');await say('你的名字落在附录里。道德+1。','good');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('改了一句，全场多看你一眼。才情+1。','gold');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把沉默当成立场。道心+1。','good');}
+ if(!hasMark('海盟一笔'))S.marks.push('海盟一笔');
+ chr('沈家海盟');
+}
+async function birthSongJia(){
+ await say('诗情海域的风带着盐与墨。宋家人谈继承时，像在谈下一首诗的韵脚。','sys');
+ var c=await optW('诗情海域',[['参与海试',40],['结交宋亦诗一脉',35],['只取资源',25]]);
+ if(c===0){
+  if(await rollW(52,'海试盘')){S.lv=Math.min(5.5,S.lv+1);await say('你过了海试。等级+1。','gold');}
+  else await say('浪把你拍回岸上。','');
+ }else if(c===1){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('你得到一句没有写进族谱的提醒。道缘+1，才情+1。','gold');}
+ else{await wormUp(1);await say('海水退去，材料留下。完善度+1。','good');}
+ if(!hasMark('诗情海试毕'))S.marks.push('诗情海试毕');
+ chr('诗情海域');
+}
+/* ===== 狐仙福地真传线（v1.14.36） =====
+   链：初临→地灵三问→认主真传→鹤门压境→福地稳固；升仙后另有 huxianLegacy 重鉴。 */
+async function birthHuXian1(){
+ await say('狐仙福地的地气温顺得不真实。草木不争，兽群有序，像有一只看不见的手在梳理。','gold');
+ await say('风里忽然多了一句极轻的话：「莫负。」——地灵仍未现身，却已在看你。','sys');
+ var c=await optW('狐仙福地·初临',[['安抚地气',40],['勘察边防',35],['闭关吞灵',25]]);
+ if(c===0){
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('狐仙地缘'))S.marks.push('狐仙地缘');
+  await say('地气顺了一寸。道心+1，获【狐仙地缘】。','gold');
+ }else if(c===1){
+  S.tIdx=Math.min(8,S.tIdx+1);
+  if(!hasMark('狐仙地缘'))S.marks.push('狐仙地缘');
+  await say('你把可攻之缺口与可守之脉都记了下来。才情+1，获【狐仙地缘】。','gold');
+ }else{
+  await wormUp(1);S.lv=Math.min(5.5,S.lv+0.5);
+  if(!hasMark('狐仙地缘'))S.marks.push('狐仙地缘');
+  await say('灵气入窍。完善度+1，等级微晋，获【狐仙地缘】。','good');
+ }
+ chr('狐仙福地·初临');
+}
+async function birthHuXianAsk(){
+ await say('石台中央升起一团淡金地气，聚成人形轮廓。声音不辨男女：「三问。答得好，我认你；答得差，你仍是过客。」','gold');
+ var a1=await optW('地灵·第一问',[['福地是家',34],['福地是资粮',33],['福地是棋盘',33]]);
+ if(a1===0){S.dhIdx=Math.min(8,S.dhIdx+1);await say('「家……」地灵顿了顿，「很少有人先说这个。」道心+1。','good');}
+ else if(a1===1){S.tIdx=Math.min(8,S.tIdx+1);await say('「至少诚实。」才情+1。','good');}
+ else{S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('「棋盘。」地灵像是笑了一下，「你与某些人很像。」道缘+1。','gold');}
+ var a2=await optW('地灵·第二问',[['守住便是赢',34],['能换则换',33],['宁毁不交外敌',33]]);
+ if(a2===2){S.dhIdx=Math.min(8,S.dhIdx+1);S.flatMods+=3;await say('地气一紧：「这句话，我记下了。」道心+1。','gold');}
+ else if(a2===0){S.morIdx=Math.min(7,S.morIdx+1);await say('「守。」地灵重复了一遍。道德+1。','good');}
+ else{await wormUp(1);await say('「换，也是一种活法。」完善度+1。','');}
+ var a3=await optW('地灵·第三问',[['奴役万物为用',34],['与万物定契',33],['先自役其心',33]]);
+ if(a3===0){setRealm('奴道',Math.min(7,Math.max(1,rlm('奴道')+1)));await say('奴道精进。地灵道：「用，可以；忘本，不行。」','gold');}
+ else if(a3===1){S.morIdx=Math.min(7,S.morIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);await say('道心+1，道德+1。','good');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);S.tIdx=Math.min(8,S.tIdx+1);await say('「心役于欲，地亦不安。」道心+1，才情+1。','gold');}
+ if(!hasMark('地灵认可'))S.marks.push('地灵认可');
+ await say('淡金轮廓散开前，留下一句：「来认主吧——若你敢。」获【地灵认可】。','gold');
+ chr('地灵三问');
+}
+async function birthHuXianTrue(){
+ await say('地灵再现身时，不再是轮廓，而是一缕清楚的意志：「我曾有主。主死，地在。你若想成为下一任——把心放进这方土里。」','gold');
+ var c=await optW('狐仙真传·认主',[['以血滴入地脉',40],['以奴道印契',35],['暂且退出',25]]);
+ if(c===2){
+  if(!hasMark('狐仙认主·暂退'))S.marks.push('狐仙认主·暂退');
+  await say('「也可以。」地灵退去，「门仍开着。」','sys');
+  chr('狐仙真传·暂退');
+  return;
+ }
+ if(c===0){
+  S.life=Math.max(1,S.life-2);
+  await say('血入土，土温了一瞬（寿元-2）。','sys');
+ }else{
+  if(!hasSchool('奴道')){S.schools.push({name:'奴道',g:'控',dir:'控',realm:1});}
+  setRealm('奴道',Math.min(7,Math.max(2,rlm('奴道')+1)));
+  await say('奴道印落，地脉应了一声。奴道精进。','gold');
+ }
+ if(!hasMark('狐仙真传'))S.marks.push('狐仙真传');
+ S.flags.huxianSeen=true;
+ await wormUp(2);S.flags.daoYuan=(S.flags.daoYuan||0)+2;
+ if(R(0.45)){
+  await wormUp(1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+  await say('地气在窍中分出一道虚影，又自行合拢——奴道有所得（完善度+1，道缘+1）。','good');
+ }
+ await say('地气归涌入你周身——完善度+2，道缘+2。获【狐仙真传】。','gold');
+ await say('地灵最后说：「仙鹤门不会停。你既认了主，便要学会守。」','sys');
+ chr('获狐仙真传');
+}
+async function birthHuXian2(){
+ await say('仙鹤门的信使停在福地边缘。文书写得客气，每一个字都在要地。','bad');
+ if(hasMark('狐仙真传'))await say('地灵在你识海中只留一句：「他们来过不止一次。」','sys');
+ var c=await optW('鹤门压境',[['谈判拖时间',35],['示弱求援',25],['硬接一战',40]]);
+ if(c===0){
+  S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('护地一战'))S.marks.push('护地一战');
+  await say('你把战事谈成「再议」。才情+1，道心+1。获【护地一战】（暂缓）。','good');
+ }else if(c===1){
+  S.morIdx=Math.min(7,S.morIdx+1);await wormUp(1);
+  if(!hasMark('护地一战'))S.marks.push('护地一战');
+  await say('有人伸了援手。道德+1，完善度+1。','good');
+ }else{
+  var foe=hasMark('狐仙真传')?foeAnchor(1,2):foeAnchor(1,1);
+  var won=await battleRound(foe,'仙鹤门夺地弟子',async function(){await say('来人退去，文书被风吹皱。','gold');});
+  if(won){
+   S.flatMods+=8;await wormUp(1);
+   if(!hasMark('护地一战'))S.marks.push('护地一战');
+   await say('获【护地一战】。完善度+1。','gold');
+   if(hasMark('狐仙真传'))await say('地灵： 「这一次，你没有负。」','gold');
+  }else{
+   S.pctMods-=0.05;await say('你守得艰难，福地边缘被撕开一道口子（权重-5%）。','bad');
+   if(!hasMark('护地一战'))S.marks.push('护地一战');
+  }
+ }
+ chr('鹤门压境');
+}
+async function birthHuXianFirm(){
+ await say('鹤门退潮之后，地脉重新合拢。地灵将一缕固定的仙元气息导入你的空窍：「主既定，产元归主。莫再浪掷。」','gold');
+ var c=await optW('福地稳固',[['整顿兽群（奴道）',40],['加固边防阵',35],['闭关消化真传',25]]);
+ if(c===0){
+  setRealm('奴道',Math.min(7,Math.max(1,rlm('奴道')+1)));
+  await wormUp(1);
+  await say('兽群复归秩序。奴道精进，完善度+1。','gold');
+ }else if(c===1){
+  setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));
+  S.flatMods+=5;
+  await say('边防阵纹亮了一圈。阵道精进。','gold');
+ }else{
+  S.lv=Math.min(8.5,S.lv+0.5);S.tIdx=Math.min(8,S.tIdx+1);
+  await say('你把真传啃进骨子里。等级微晋，才情+1。','gold');
+ }
+ if(!hasMark('福地稳固'))S.marks.push('福地稳固');
+ S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+ await say('获【福地稳固】。道缘+1。狐仙福地暂时安静了下来。','gold');
+ chr('福地稳固');
+}
+async function birthLangYa(){
+ await say('琅琊地灵的声音从石壁里透出：「交易？可以。价格？你开。」','gold');
+ var c=await optW('琅琊地灵',[['以材料换炼方',40],['询问第二空窍传闻',35],['只参观不买',25]]);
+ if(c===0){await wormUp(2);setRealm('炼道',Math.min(7,Math.max(1,rlm('炼道')+1)));await say('炼方入手。完善度+2，炼道精进。','gold');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);if(!hasMark('空窍风闻'))S.marks.push('空窍风闻');await say('地灵只回了半句。才情+1。','good');}
+ else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你看完了炉火。道心+1。','good');}
+ if(!hasMark('见过琅琊地灵'))S.marks.push('见过琅琊地灵');
+ chr('琅琊地灵');
+}
+async function birthXingXiang(){
+ await say('星象福地的观台上，星轨像被谁用金线钉过。','sys');
+ var c=await optW('星象观台',[['夜观星变',45],['推演一卦',35],['睡到天明',20]]);
+ if(c===0){setRealm('星道',Math.min(7,Math.max(1,rlm('星道')+1)));await say('星道精进。','good');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('卦象含糊，却有用。才情+1。','good');}
+ else await say('你做了一个没有星的梦。','');
+ if(!hasMark('星象观台毕'))S.marks.push('星象观台毕');
+ chr('星象观台');
+}
+async function birthHeiFan(){
+ await say('黑凡洞天里，真传的残页与争夺的血迹叠在同一层灰尘上。','sys');
+ var c=await optW('黑凡残局',[['搜残页',40],['避开争夺',35],['参与分赃',25]]);
+ if(c===0){
+  if(await rollW(50,'残页盘')){S.tIdx=Math.min(8,S.tIdx+1);if(!hasMark('黑凡残页'))S.marks.push('黑凡残页');await say('你读到一角功法。才情+1。','gold');}
+  else{S.pctMods-=0.03;await say('残页在你眼前碎成灰（权重-3%）。','bad');}
+ }else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你活着离开。道心+1。','good');}
+ else{await wormUp(1);S.morIdx=Math.max(0,S.morIdx-1);await say('你分到一点余沥。完善度+1，道德-1。','bad');}
+ if(!hasMark('黑凡残局毕'))S.marks.push('黑凡残局毕');
+ chr('黑凡残局');
+}
+async function birthTieYing(){
+ await say('铁鹰福地的旧旗帜还在，新主人的规矩已经换了三轮。有人提百足天君，有人只提地租。','sys');
+ var c=await optW('铁鹰旧主',[['缴纳换平安',40],['打听旧主下落',35],['暗中积蓄',25]]);
+ if(c===0){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你买了一段安稳。道心+1。','good');}
+ else if(c===1){S.tIdx=Math.min(8,S.tIdx+1);await say('消息真假参半。才情+1。','good');}
+ else{await wormUp(1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你把力量藏进下一次。完善度+1，道缘+1。','good');}
+ if(!hasMark('铁鹰旧主毕'))S.marks.push('铁鹰旧主毕');
+ chr('铁鹰旧主');
 }
 async function wujiMortalFight(){
  await sayS('他放下树枝，抬手一压——山风骤然停了。','bad');
@@ -5354,6 +6093,7 @@ async function wujiMeetMortal(){
  await sayS('山道尽头，一个灰袍年轻人蹲在石头上画图。','gold');
  await sayS('他抬头看你一眼：「你也修蛊？坐。」','gold');
  var secs=S.region==='北原'?[['好',50,'#1E8449'],['中',30,'#8C8C8C'],['差',20,'#C0392B']]:[['好',30,'#1E8449'],['中',40,'#8C8C8C'],['差',30,'#C0392B']];
+ secs[0][1]=Math.max(1,Math.round(secs[0][1]*lookSocialMul())); /* v1.14.36：容貌只抬「好」印象 */
  var fi=await W('初识印象盘','未见其名，先见其人',secs,{small:true});
  var fav=['好','中','差'][fi];S.flags.wjFav=fav;
  if(fav==='好'){
@@ -5942,6 +6682,384 @@ async function lianF6(){
  else{S.morIdx=Math.max(0,S.morIdx-1);if(R(0.4))await wormUp(1);await say('你先一步押了注。道德-1。','bad');}
  if(!hasMark('见过方源'))S.marks.push('见过方源');
  chr('方源同门');
+}
+/* ===== v1.14.36 原著人物对话事件（青茅山） ===== */
+async function lianF7(){
+ await say('月色落在溪边白石上。一个白衣少年负手而立，眉目清冷，周身隐有寒意。','gold');
+ await say('「你的脚步声，比山里的狐还重。」他头也不回，「青茅山的人，都这么不会藏形吗？」','sys');
+ var c=await optW('白凝冰·月下',[['报上家门',35],['反问身份',35],['默然转身',30]]);
+ if(c===0){
+  await say('「某家某族，与你何干？」你报了出身。','');
+  await say('白衣少年轻哼一声：「不过如此。白家、熊家、古月……三家的人，我见过的比你活过的年岁还多。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('见过白凝冰'))S.marks.push('见过白凝冰');
+  await say('他没有再说话。寒意散了半寸——道心+1。','good');
+ }else if(c===1){
+  await say('「你又是谁？为何在此。」','');
+  await say('少年转过身来。那双眼睛像两片未化的冰：「白家的人，不需要向你解释。不过——」他顿了顿，「你若有胆，明日午后到后山竹林。我缺一个试剑的人。」','sys');
+  S.tIdx=Math.min(8,S.tIdx+1);
+  if(!hasMark('见过白凝冰'))S.marks.push('见过白凝冰');
+  if(!hasMark('白凝冰约战'))S.marks.push('白凝冰约战');
+  await say('约战落下。才情+1。你隐约感到，此人并非寻常白家弟子。','gold');
+ }else{
+  await say('你没有回答，只是转身沿溪上行。','');
+  await say('身后传来极轻的一声笑：「识趣。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('见过白凝冰'))S.marks.push('见过白凝冰');
+  await say('道心+1。有些人，第一次见面就不必多言。','good');
+ }
+ chr('白凝冰·月下');
+}
+async function lianF8(){
+ await say('演武场边，一个与你同龄的少年正擦拭着一柄凡剑。他抬头看见你，笑容很亮：「同族？我是古月方正。家老说，族里今年出了几个好苗子。」','sys');
+ await say('「你是哪一支的？要不要一起练一趟？」他把手里的木刀递过来一半。','sys');
+ var c=await optW('古月方正',[['接刀对练',40],['婉拒并指点',35],['冷淡走开',25]]);
+ if(c===0){
+  var ok=await battleRound(foeAnchor(0,0),'古月方正（同辈）',async function(){await say('方正收势，额头见汗：「你的路数……比我稳。」','gold');});
+  if(ok){S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);await say('对练见真章。才情+1，完善度+1。','good');}
+  else{await say('你落了下风。方正没有笑，只是说：「下次再来。」','');}
+  if(!hasMark('识方正'))S.marks.push('识方正');
+ }else if(c===1){
+  await say('你没有接刀，只点出他出招时肩肘的一处滞涩。','');
+  await say('方正愣了愣，随即认真点头：「多谢。家老总说我心急——原来是这里。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);
+  if(!hasMark('识方正'))S.marks.push('识方正');
+  await say('道心+1，道德+1。这份善意，他大概会记很久。','good');
+ }else{
+  await say('你点了点头，没有停步。','');
+  await say('方正的笑容僵了一瞬，随即又扬起来：「那……后会有期？」','sys');
+  S.morIdx=Math.max(0,S.morIdx-1);
+  await say('道德-1。有些同族的路，从一开始就不是同路。','bad');
+ }
+ chr('古月方正');
+}
+async function lianF9(){
+ await say('后山石缝里飘出一缕极淡的酒香，混着腐叶与旧年的土气。石壁上刻着半行字，字迹被风雨磨得只剩轮廓。','gold');
+ await say('「花酒……」你读出这两个字。山里老人说过：从前有个酒仙，爱酒胜过爱命，走的时候只留下一口空瓮和一窝没人敢碰的蛊。','sys');
+ var c=await optW('酒仙遗踪',[['深入石缝',40],['只取壁上刻痕',35],['原路退回',25]]);
+ if(c===0){
+  await say('石缝不深，尽头是一处干涸的酒窖。空瓮碎了一地，中央却有一枚凡蛊壳，壳上还沾着极淡的酒气。','');
+  if(await rollW(50,'酒仙遗藏盘')){
+   await wormUp(2);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+   if(!hasMark('花酒余韵'))S.marks.push('花酒余韵');
+   await say('你收起蛊壳。完善度+2，道缘+1。酒香在指尖停了一息，随即散尽。','gold');
+  }else{
+   S.pctMods-=0.03;await say('你踏碎了什么。一股闷劲顶上胸口（权重-3%）。酒仙的玩笑，并不温柔。','bad');
+  }
+ }else if(c===1){
+  S.tIdx=Math.min(8,S.tIdx+1);
+  await say('你把刻痕拓在布上。才情+1。字里藏着一段极简的行气法，与酒无关，与「忍」有关。','good');
+ }else{
+  await say('你退了回去。有些遗迹，留给更需要它的人——或者更不怕酒的人。','');
+ }
+ if(!hasMark('探过酒仙遗踪'))S.marks.push('探过酒仙遗踪');
+ chr('酒仙遗踪');
+}
+/* ===== v1.14.28 原著人物线续写 ===== */
+async function lianF10(){
+ await say('后山竹林。风过时竹叶相击，像有人在远处磨刀。','gold');
+ await say('白衣少年已经等在那里。他抬眼，寒意比昨夜更沉：「你来了。很好。」','sys');
+ await say('「我不要你的命——只试三招。你若能接下，我便认你一句『还算人』。」','sys');
+ var c=await optW('白凝冰·竹林试剑',[['正面硬接',40],['以巧破力',35],['弃约离去',25]]);
+ if(c===2){
+  await say('你拱手：「今日不宜。」转身出林。','');
+  await say('身后没有挽留，只有一句极轻的：「懦夫。」','bad');
+  S.dhIdx=Math.max(0,S.dhIdx-1);
+  if(!hasMark('白凝冰试剑毕'))S.marks.push('白凝冰试剑毕');
+  await say('道心-1。约已废。','bad');
+  chr('白凝冰·竹林试剑');
+  return;
+ }
+ await say('竹影一晃，冰刃已至面前——不是凡器，是他空窍里催动的冰雪道杀招雏形。','bad');
+ var won=await battleRound(foeAnchor(0,1),'白凝冰（试剑）',async function(){
+  await say('第三招收势。竹叶落了一地，他的袖口裂开一线。','gold');
+ });
+ if(!hasMark('白凝冰试剑毕'))S.marks.push('白凝冰试剑毕');
+ if(won){
+  await say('「……还能打。」他收起寒气，第一次正眼看你，「名字。」','sys');
+  S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('白凝冰认可'))S.marks.push('白凝冰认可');
+  setRealm('冰雪道',Math.min(7,Math.max(1,rlm('冰雪道')+1)));
+  await say('你报了名。他点一下头，转身没入竹影。才情+1，道心+1，冰雪道精进，获【白凝冰认可】。','gold');
+ }else{
+  await say('你被冰气震退三步，嘴角见血。他却没有追击。','bad');
+  await say('「差一口气。」他收剑，「下次若还敢来，我便认真了。」','sys');
+  S.pctMods-=0.03;await wormUp(1);
+  await say('完善度+1（险中得机），权重-3%。','');
+ }
+ chr('白凝冰·竹林试剑');
+}
+async function lianF11(){
+ await say('学舍廊下，一名青年蛊师正在替伤员换药。手法稳，话却不多。旁人低声说：那是古月青书，族中少有的仁心。','sys');
+ await say('他抬头见你：「新进的同族？手伸过来——你袖口有毒虫爬过的痕。」','sys');
+ var c=await optW('古月青书',[['让他诊治',40],['婉谢并请教',35],['怀疑其意',25]]);
+ if(c===0){
+  await say('青书点穴封毒，又喂你一枚解毒凡蛊。','');
+  await say('「族里的人，不必见外。你若愿学医蛊，午后可以来我这边。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await wormUp(1);
+  if(!hasMark('识青书'))S.marks.push('识青书');
+  await say('道心+1，道德+1，完善度+1。获【识青书】。','good');
+ }else if(c===1){
+  await say('你谢过，转而问他行气时如何护住经脉。他想了想，在沙地上画了三道简易图。','');
+  S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('识青书'))S.marks.push('识青书');
+  await say('才情+1，道心+1。他的教法没有私藏。','good');
+ }else{
+  await say('你抽回手。青书一顿，随即笑了笑：「疑心重也好，能活得久些。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  await say('道心+1。他没有恼。','good');
+ }
+ if(!hasMark('识青书'))S.marks.push('识青书');
+ chr('古月青书');
+}
+async function lianF12(){
+ await say('山脚集市，赌石棚前围了一圈人。一个锦衣少年把玩着一块紫皮原石，语气张扬：「再开不出好东西，我贾金生的名号就算白叫了。」','sys');
+ await say('他瞥见你：「新面孔？来不来一刀？输了，你袖里那只蛊归我；赢了——」他踢开脚边一只木箱，「这里面随便挑。」','sys');
+ var c=await optW('贾金生·赌石',[['应赌开石',40],['旁观识石',35],['拒绝离开',25]]);
+ if(c===0){
+  await say('原石切开。里面——','');
+  if(R(0.45)){
+   await wormUp(2);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+   if(!hasMark('赌赢贾金生'))S.marks.push('赌赢贾金生');
+   await say('一线宝光！贾金生脸色当场铁青。完善度+2，道缘+1，获【赌赢贾金生】。','gold');
+   await say('「……算你运气。」他甩袖就走，木箱倒是没收回。','sys');
+  }else{
+   S.morIdx=Math.max(0,S.morIdx-1);S.pctMods-=0.02;
+   await say('石中空空。你的蛊被他收走一只。道德-1，权重-2%。','bad');
+   await say('贾金生大笑：「青茅山也有送货上门的。」','sys');
+  }
+ }else if(c===1){
+  if(await rollW(55,'识石盘')){
+   S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);
+   await say('你看出他手中那块是废皮，又指旁侧一枚被冷落的原石。摊主暗自点头，事后塞你一点好处。才情+1，完善度+1。','gold');
+  }else await say('你看了半天，没看出门道。贾金生已经开完石，扬长而去。','');
+ }else{
+  await say('你摇头离开。身后传来他的嘲讽，你没有回头。','');
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  await say('道心+1。不是所有局都值得下。','good');
+ }
+ if(!hasMark('见过贾金生'))S.marks.push('见过贾金生');
+ chr('贾金生·赌石');
+}
+/* ===== v1.14.36 商家线（商心慈 / 商睚 / 商城） ===== */
+async function shangF1(){
+ await say('商家账房里烛火通明。一名青衣少女正核对手中账册，指尖翻页极快，却一笔不乱。','gold');
+ await say('她抬眼看你：「你是新调来的？把这三日的进出过一遍。错一笔，我便知道。」','sys');
+ var c=await optW('商心慈·账房',[['认真核对',40],['暗中观察她',35],['敷衍了事',25]]);
+ if(c===0){
+  if(await rollW(55+S.tIdx*3,'账册盘')){
+   S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
+   if(!hasMark('识商心慈'))S.marks.push('识商心慈');
+   await say('你指出两处可疑的尾数。她点头：「眼力尚可。」才情+1，道心+1，获【识商心慈】。','gold');
+  }else{
+   await say('她轻轻合上册子：「回去再练。」没有责备，却也没有第二句。','');
+  }
+ }else if(c===1){
+  await say('你假装算账，实际在看她如何分派、如何压住旁人的试探。','');
+  S.tIdx=Math.min(8,S.tIdx+1);
+  if(!hasMark('识商心慈'))S.marks.push('识商心慈');
+  await say('才情+1。商心慈的手段不在杀伐，在算无遗漏。','good');
+ }else{
+  S.morIdx=Math.max(0,S.morIdx-1);
+  await say('她只看了你一眼，便让人换了你的差事。道德-1。','bad');
+ }
+ chr('商心慈·账房');
+}
+async function shangF2(){
+ await say('比宝会场里热闹非凡。商睚把一块妖异原石拍在案上，环视四周：「谁敢压我这手？」','sys');
+ await say('有人低声说：商睚是商家旁支里最横的，输了会记仇，赢了会更横。','');
+ var c=await optW('商睚·比宝',[['应战比宝',40],['在旁观局',35],['出言拆台',25]]);
+ if(c===0){
+  if(await rollW(48+S.tIdx*4+(S.flags.luck||0)*6,'比宝盘')){
+   await wormUp(2);S.flags.luck=(S.flags.luck||0)+1;
+   if(!hasMark('压过商睚'))S.marks.push('压过商睚');
+   await say('你的那件压过他。全场静了一息。完善度+2，气运+1，获【压过商睚】。','gold');
+   await say('商睚脸色铁青：「……算你走运。」','sys');
+  }else{
+   S.pctMods-=0.04;await say('你输了。商睚大笑收走彩头（权重-4%）。','bad');
+  }
+ }else if(c===1){
+  S.tIdx=Math.min(8,S.tIdx+1);
+  await say('你看清他原石的裂纹走向——才情+1。这一局你没有下场，却比下场的人多看了一层。','good');
+ }else{
+  await say('你指出他原石的一处硬伤。场子一阵骚动。','');
+  var ok=await battleRound(foeAnchor(0,0),'商睚亲随',async function(){await say('亲随被你逼退。商睚没再纠缠，只丢下一句：「记住你。」','bad');});
+  if(ok){S.tIdx=Math.min(8,S.tIdx+1);await say('才情+1。商睚不会忘你。','good');}
+  if(!hasMark('见过商睚'))S.marks.push('见过商睚');
+ }
+ if(!hasMark('见过商睚'))S.marks.push('见过商睚');
+ if(!hasMark('比过商睚'))S.marks.push('比过商睚');
+ chr('商睚·比宝');
+}
+async function shangF3(){
+ await say('商家夜宴，灯火连成河。商家族老轮流敬酒，话题在生意与联姻之间转。','sys');
+ await say('席间，商心慈从主位侧座起身，走过你面前时极轻地说：「今夜有人会递假约，不要签。」','gold');
+ var c=await optW('商家夜宴',[['记下她的提醒',40],['主动结交宾客',35],['中途离席',25]]);
+ if(c===0){
+  S.dhIdx=Math.min(8,S.dhIdx+1);S.tIdx=Math.min(8,S.tIdx+1);
+  if(!hasMark('识商心慈'))S.marks.push('识商心慈');
+  if(!hasMark('商心慈信一角'))S.marks.push('商心慈信一角');
+  await say('后来果然有人递来一份措辞漂亮的合伙书。你没有签。道心+1，才情+1，获【商心慈信一角】。','gold');
+ }else if(c===1){
+  S.flags.daoYuan=(S.flags.daoYuan||0)+1;await wormUp(1);
+  await say('你换来几条商路消息和一只凡蛊。道缘+1，完善度+1。','good');
+ }else{
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  await say('你在宴高潮前离开。道心+1。有些热闹，不站在中心更安全。','good');
+ }
+ if(!hasMark('赴过商家夜宴'))S.marks.push('赴过商家夜宴');
+ chr('商家夜宴');
+}
+async function shangF4(){
+ await say('商城拍卖行金槌三响。台上轮流出现仙材、残页与来历不明的玉匣。','sys');
+ await say('有人喊价喊到面红，有人始终不举牌，只盯着某一件东西的主人。','');
+ var c=await optW('商城拍卖',[['竞拍一件实用物',40],['只看不买',35],['浑水摸鱼',25]]);
+ if(c===0){
+  if(await rollW(50+S.tIdx*3,'拍卖盘')){
+   await wormUp(2);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+   await say('槌落。你拿到手的东西比价钱值。完善度+2，道缘+1。','gold');
+  }else{
+   S.pctMods-=0.03;await say('你被抬价抬到吃瘪，只得弃拍（权重-3%）。','bad');
+  }
+ }else if(c===1){
+  S.tIdx=Math.min(8,S.tIdx+1);
+  await say('你把全场的出价习惯与几张生面孔记了下来——才情+1。','good');
+ }else{
+  if(R(0.5)){await wormUp(1);S.morIdx=Math.max(0,S.morIdx-1);await say('混乱里你顺走一点边角料。完善度+1，道德-1。','bad');}
+  else{S.pctMods-=0.04;await say('你被眼尖的护卫盯上，只能空手退出（权重-4%）。','bad');}
+ }
+ if(S.birth==='商家城'&&!hasMark('识商心慈')&&R(0.35)){
+  await say('散场时，账房方向有人远远看了你一眼——像是商心慈。','sys');
+  if(!hasMark('识商心慈'))S.marks.push('识商心慈');
+ }
+ if(!hasMark('拍过商城'))S.marks.push('拍过商城');
+ chr('商城拍卖');
+}
+async function shangTravel(){
+ await say('南疆商路尽头，商家城灯火比山寨亮十倍。城门处盘查不严，银货却比刀剑更锋利。','sys');
+ /* 长线优先：已定约则可能直接进入危城或联姻后续意象 */
+ if(hasMark('商家定约·姻盟')&&!hasMark('商心慈同盟')&&R(0.55)){await shangF6();return;}
+ if((hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商城共守')&&R(0.5)){await shangF7();return;}
+ if(hasMark('商心慈信一角')&&!hasMark('商家定约·合作')&&!hasMark('商家定约·姻盟')&&!hasMark('商家拒约')&&R(0.6)){await shangF5();return;}
+ if(hasMark('识商心慈')){
+  await say('你在内城又见到商心慈。她只说：「既然来了，便帮我看一眼这份货单。」','gold');
+  S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);
+  if(!hasMark('商心慈信一角'))S.marks.push('商心慈信一角');
+  await say('才情+1，完善度+1。她对你的信任又厚了一分。','gold');
+ }else{
+  var c=await optW('商家城一游',[['拜访商家外院',40],['混入拍卖场',35],['只走商市',25]]);
+  if(c===0){
+   await say('外院执事问了你几句来历。正说话间，青衣少女自廊下经过，停步看了你一眼。','sys');
+   await say('「让他进来。」她声音不重，却没有人敢驳。','gold');
+   if(!hasMark('识商心慈'))S.marks.push('识商心慈');
+   S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+   await say('你见到了商心慈。道心+1，道缘+1，获【识商心慈】。','gold');
+  }else if(c===1){
+   await shangF4();
+   return;
+  }else{
+   await wormUp(1);S.tIdx=Math.min(8,S.tIdx+1);
+   await say('商市里什么都卖。你换到合用的蛊材——完善度+1，才情+1。','good');
+  }
+ }
+ chr('商家城一游');
+}
+/* —— 商心慈长线三幕 —— */
+async function shangF5(){
+ await say('夜深人静。商心慈屏退左右，只留一盏灯。','gold');
+ await say('「我需要一个能站在台前的人。」她语气平得像在谈账，「不是家奴，不是护卫。是能让商路与族老都闭嘴的……名分。」','sys');
+ await say('「你可以拒绝。拒绝之后，我们仍是点头之交。若你应了——」她看着你，「便按商家的规矩走，假戏也要做全。」','sys');
+ var c=await optW('商心慈·密谈',[['应下合作（不联姻）',34],['应下姻盟之名',33],['婉拒',33]]);
+ if(c===0){
+  if(!hasMark('商家定约·合作'))S.marks.push('商家定约·合作');
+  S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await wormUp(1);
+  await say('「也好。少一层麻烦。」她展卷一纸商约，「从今日起，南疆三条支路的账，你有权过目。」','gold');
+  await say('才情+1，道缘+1，完善度+1。获【商家定约·合作】。','gold');
+ }else if(c===1){
+  if(!hasMark('商家定约·姻盟'))S.marks.push('商家定约·姻盟');
+  S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+  await say('她沉默片刻，点头：「姻盟是给外人看的。你我心里清楚：这是局，也是刀。」','gold');
+  await say('「三日内有一场公开宴。你要学会被称呼为……商公子侧近之人。」','sys');
+  await say('道心+1，道缘+1。获【商家定约·姻盟】。','gold');
+ }else{
+  if(!hasMark('商家拒约'))S.marks.push('商家拒约');
+  S.dhIdx=Math.min(8,S.dhIdx+1);
+  await say('「我知道了。」她把灯芯拨亮半分，「门仍为你开。只是不再谈这个。」','sys');
+  await say('道心+1。获【商家拒约】。有些路，不走比走更干净。','good');
+ }
+ chr('商心慈·密谈');
+}
+async function shangF6(){
+ await say('公开宴上，红烛高烧。商家族老轮流敬酒，目光却在你与商心慈之间来回。','sys');
+ await say('商心慈端坐主位侧，声音清朗：「此人从今往后，与商家利益同进退。质疑的，现在说。」','gold');
+ await say('席下一阵静。商睚的脸色很难看，却没有当场发作。','');
+ var c=await optW('商心慈·联姻局',[['以礼周旋到底',40],['当众立威',35],['宴后私下拆局',25]]);
+ if(c===0){
+  S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+  await say('你滴酒不漏地应下每一句试探。宴散时，商心慈只说：「过关了。」才情+1，道心+1，获【商心慈同盟】。','gold');
+ }else if(c===1){
+  var won=await battleRound(foeAnchor(0,1),'宴上挑衅者',async function(){
+   await say('挑衅者被你逼得退席。全场再无人公开质疑。','gold');
+  });
+  if(won){
+   S.flatMods+=5;if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+   await say('气机更沉。获【商心慈同盟】。商心慈看你的眼神里，多了一分「可用」。','gold');
+  }else{
+   S.pctMods-=0.03;await say('你没有打赢，却也没有当场丢人。权重-3%。商心慈事后替你压下了闲话。','bad');
+   if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+  }
+ }else{
+  await say('宴后，你与她在账房重逢。你把「假戏」二字说得更清楚。','');
+  await say('她点头：「我本来也没打算让它变成真的。名分够用即可。」','sys');
+  S.dhIdx=Math.min(8,S.dhIdx+1);S.tIdx=Math.min(8,S.tIdx+1);
+  if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+  await say('道心+1，才情+1。获【商心慈同盟】。刀还在鞘里，但刀已出借。','gold');
+ }
+ chr('商心慈·联姻局');
+}
+async function shangF7(){
+ await say('入夜，商城东门火起。不是天灾——是有人要在商家最满的夜里，撕开一条口子。','bad');
+ await say('商心慈出现在城墙下，发髻仍整，只是袖口沾了灰：「能打的去东门。能算的，跟我来。」','sys');
+ var c=await optW('商心慈·危城夜',[['守东门硬拼',40],['随她断补给线',35],['保全自身撤离',25]]);
+ if(c===2){
+  S.morIdx=Math.max(0,S.morIdx-1);S.dhIdx=Math.max(0,S.dhIdx-1);
+  await say('你在混乱里出了城。身后火光把半边天映红。道德-1，道心-1。','bad');
+  await say('后来听说商城守住了。商心慈没有再找过你。','sys');
+  if(!hasMark('商城共守'))S.marks.push('商城共守'); /* 事件结束，避免反复刷 */
+  chr('商心慈·危城夜');
+  return;
+ }
+ if(c===0){
+  var wins=0;
+  for(var i=0;i<2;i++){
+   if(await battleRound(foeAnchor(0,1),'破城人马·第'+(i+1)+'波',async function(){await say('这一波被你压下。','good');}))wins++;
+   else break;
+  }
+  if(wins>=2){
+   await wormUp(2);S.lv=Math.min(8.5,S.lv+0.5);
+   if(!hasMark('商城共守'))S.marks.push('商城共守');
+   if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+   await say('东门未破。完善度+2，等级微晋。获【商城共守】。','gold');
+   await say('黎明时她站在城头，对你只说了两个字：「记下了。」','sys');
+  }else{
+   S.pctMods-=0.05;await say('东门险些失守，你负伤退入内城（权重-5%）。','bad');
+   if(!hasMark('商城共守'))S.marks.push('商城共守');
+  }
+ }else{
+  await say('她带你绕至城外粮草囤积处。火不是目标——截的是运粮的人。','sys');
+  if(await rollW(52+S.tIdx*4,'断补给盘')){
+   S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+   if(!hasMark('商城共守'))S.marks.push('商城共守');
+   if(!hasMark('商心慈同盟'))S.marks.push('商心慈同盟');
+   await say('补给线一断，攻城声势立刻矮了半截。才情+1，完善度+1，道缘+1。获【商城共守】。','gold');
+   await say('「你比许多家老会算。」她说完这句，便去指挥灭火。','sys');
+  }else{
+   S.life=Math.max(1,S.life-2);await say('伏击暴露，你两人且战且退（寿元-2）。商城仍是守住了。','bad');
+   if(!hasMark('商城共守'))S.marks.push('商城共守');
+  }
+ }
+ chr('商心慈·危城夜');
 }
 /* ---------- 幽魂之世·关键历练（交战争少 · 蛊材与魂道见长） ---------- */
 async function hunI1(){
@@ -6629,18 +7747,41 @@ async function doKeyTrial(n){
  }
  /* ---------- 超级蛊阵争夺战 ---------- */
  if(n==='超级蛊阵争夺战'){
-  var ent=await optW('超级蛊阵·进入方式',[['真身潜入',50],['伪装潜入（暴露30%）',50],['正面接管',chalW(20)],['掠夺·夺阵',raidW()]].filter(function(x){return x[1]>0;}));
+  /* v1.14.37 P0：进入方式按选项名生效（filter 后索引不稳，勿用裸数字） */
+  var entOpts=[['真身潜入',50],['伪装潜入（暴露30%）',50],['正面接管',chalW(20)],['掠夺·夺阵',raidW()]].filter(function(x){return x[1]>0;});
+  var ent=await optW('超级蛊阵·进入方式',entOpts);
+  var entName=(entOpts[ent]&&entOpts[ent][0])||'真身潜入';
+  var battleMul=1, coreBonus=0, ctrlEase=0;
+  if(entName.indexOf('真身')===0){
+   await say('你以真身潜入梦境水道——气机外露，易被察觉，却最能感应阵心。','sys');
+   battleMul=1.05; coreBonus=8; ctrlEase=1;
+  }else if(entName.indexOf('伪装')===0){
+   if(R(0.3)){
+    await say('伪装被识破——影宗提前锁定了你！','bad');
+    battleMul=1.18;
+   }else{
+    await say('伪装成功，你悄然贴近阵眼。','good');
+    battleMul=0.92;
+   }
+  }else if(entName.indexOf('正面')===0){
+   await say('你正面接管阵枢，气势压人，也把自身推到了风口。','gold');
+   battleMul=1.2; coreBonus=12; ctrlEase=1; S.pctMods+=0.02;
+  }else if(entName.indexOf('掠夺')===0){
+   await say('你意在夺阵，不问来路。道德-1。','bad');
+   S.morIdx=Math.max(0,S.morIdx-1);
+   battleMul=1.25; ctrlEase=1;
+  }
   var cnt=0;
   for(var s3=0;s3<3;s3++){
    var p3=await optW('梦境水道·第'+(s3+1)+'段',[['河道修炼',34],['梦境探秘',33],['修复蛊阵核心',33]]);
    if(p3===0){setRealm(pick(['水道','阵道','暗道']),Math.min(6,(S.schools.filter(function(x){return x.name===pick(['水道','阵道','暗道']);})[0]||{realm:0}).realm+1));await say('河道修炼——流派境界+1。','good');}
    else if(p3===1){S.tIdx=Math.min(8,S.tIdx+1);if(R(hasMark('获得梦境')?0.6:0.3))learnXian('梦道','梦道·织梦');await say('梦境探秘——才情+1。','good');}
-   else{if(await rollW(60,'蛊阵核心修复盘')){cnt++;await say('修复推进（'+cnt+'/2）。','good');}else await say('修复受阻。','bad');}
+   else{if(await rollW(Math.min(90,60+coreBonus),'蛊阵核心修复盘')){cnt++;await say('修复推进（'+cnt+'/2）。','good');}else await say('修复受阻。','bad');}
   }
-  var ctrl=(cnt>=2);
-  var ok3=await backRound(240,'超级蛊阵·影宗来袭',async function(){await say('影宗退去！','good');},{});
+  var ctrl=(cnt>=2)||(ctrlEase&&cnt>=1&&R(0.35));
+  var ok3=await backRound(Math.max(120,Math.round(240*battleMul)),'超级蛊阵·影宗来袭',async function(){await say('影宗退去！','good');},{});
   if(ok3){
-   if(tierLevel()>=3){await backRound(280,'超级蛊阵·反攻夺阵',async function(){await say('夺阵成功！','gold');},{noFlee:true});}
+   if(tierLevel()>=3){await backRound(Math.max(140,Math.round(280*battleMul)),'超级蛊阵·反攻夺阵',async function(){await say('夺阵成功！','gold');},{noFlee:true});}
    else await say('天庭压制之下，你只能死守待援。','bad');
   }
   var self=await optW('势力抉择',[['与影宗联合',60],['独走',40],['自立门户（需道心≥A）',S.dhIdx>=4?chalW(20):0]].filter(function(x){return x[1]>0;}));
@@ -6648,7 +7789,7 @@ async function doKeyTrial(n){
   S.lv=Math.min(8.5,S.lv+1);await wormUp(3);S.pctMods+=0.03;
   if(R(0.1))learnSpec('五禁玄光气',mainSchool().name);
   if(ctrl){S.flags.ctrlOnce=(S.flags.ctrlOnce||0)+1;await say('【超级蛊阵控制权】到手——可抵消一次战败盘「当场死亡」。','gold');}
-  chr('超级蛊阵');
+  chr('超级蛊阵·'+entName);
   return;
  }
  /* ---------- 龙鲸·悔蛊（加长版：5 轮预算 + 搜悔蛊） ---------- */
@@ -6933,7 +8074,7 @@ async function findLegacy(){
   await say('六七转蛊仙遗府——习得杀招一式或境界+1。','good');
  }else if(zi===1){
   /* v1.1.5：知名真传须过具名前置表（未达剧情节点者不入池） */
-  var sagePool=SAGES.filter(function(x){return legacyGatePass(x[0]);});
+  var sagePool=SAGES.filter(function(x){return legacyGatePass(x[0])&&charEraAllowed(x[0]);});
   if(!sagePool.length)sagePool=SAGES.slice();
   var sage=pick(sagePool),sc=sage[1];
   if(sage[0]==='薄青'){ await boqingTrue(); } /* v1.2.9：薄青真传重制（60% 判定 + 奖励库抽二） */
@@ -6958,7 +8099,7 @@ async function findLegacy(){
    /* v1.1.8【彩蛋真传】：尊者真传子层 1% 命中 → 跳过考验直接发奖 */
    if(R(EGG_TRUE_TOTAL/100)){await grantEggTrue();await swordCheck();return;}
    /* v1.1.5：尊者残念传承亦须过具名前置（如幽魂真传须已获标记才可再入池） */
-   var pool2=pool.filter(function(z){return legacyGatePass(z);});if(!pool2.length)pool2=pool;
+   var pool2=pool.filter(function(z){return legacyGatePass(z)&&charEraAllowed(z);});if(!pool2.length)pool2=pool;
    var zun=pick(pool2);
    if(zun==='狂蛮魔尊'){ await kuangmanTrue(); } /* v1.2.9：狂蛮真传重制（奖励库四项抽二·抽后移除） */
    else{
@@ -7092,9 +8233,12 @@ var DREAM_SPEC_POOL=[
  {name:'星落如雨',  w:1, grant:function(){if(!hasMove('星落如雨'))learnSpec('星落如雨','星道');}}
 ];
 async function grantDreamSpec(){
- var tot=DREAM_SPEC_POOL.reduce(function(a,b){return a+b.w;},0);
- var r=RNG()*tot,acc=0,pick=DREAM_SPEC_POOL[DREAM_SPEC_POOL.length-1]; /* v1.2.5 修复：R() 为布尔函数，原写法 R(tot) 恒真、永远落最后一条 */
- for(var pi=0;pi<DREAM_SPEC_POOL.length;pi++){acc+=DREAM_SPEC_POOL[pi].w;if(r<acc){pick=DREAM_SPEC_POOL[pi];break;}}
+ /* v1.14.36：只抽当前时代已现世的杀招 */
+ var available=DREAM_SPEC_POOL.filter(function(e){return specEraAllowed(e.name);});
+ if(!available.length){await say('古梦余韵散去——此世尚无可用之式。','sys');return;}
+ var tot=available.reduce(function(a,b){return a+b.w;},0);
+ var r=RNG()*tot,acc=0,pick=available[available.length-1];
+ for(var pi=0;pi<available.length;pi++){acc+=available[pi].w;if(r<acc){pick=available[pi];break;}}
  await say('古梦余韵凝成一式——【仙道杀招库】开启，得【'+pick.name+'】。','gold');
  pick.grant();
  chr('古梦·得'+pick.name);
@@ -7281,10 +8425,10 @@ function setShareStatus(message){
  ['shareStatus','endShareStatus'].forEach(function(id){var el=$(id);if(el)el.textContent=message||'';});
 }
 function makeRunShareText(){
- if(!S)return '天机一转 v1.14.26';
+ if(!S)return '天机一转 '+APP_VER;
  var schools=S.schools.map(function(x){return x.name+'（'+REALMS[x.realm]+'）';}).join('、')||'尚未生成';
  var lines=[
-  '天机一转 v1.14.26 · 本局战报',
+  '天机一转 '+APP_VER+' · 本局战报',
   '结局：'+(RESULT.end||'进行中'),
   '阶段：'+(S.stage||'序'),
   '出身：'+(S.region||'未定')+(S.birth||''),
@@ -7317,11 +8461,11 @@ function cleanGameHtml(){
 }
 async function shareGameFile(){
  setShareStatus('');
- var html=cleanGameHtml(),fileName='天机一转_v1.14.26.html';
+ var html=cleanGameHtml(),fileName='天机一转_'+APP_VER+'.html';
  try{
   if(typeof File==='function'&&navigator.share&&navigator.canShare){
    var file=new File([html],fileName,{type:'text/html'});
-   if(navigator.canShare({files:[file]})){await navigator.share({title:'天机一转 v1.14.26',text:'单文件离线游戏，下载后可用浏览器打开。',files:[file]});setShareStatus('已打开系统分享面板。');return;}
+   if(navigator.canShare({files:[file]})){await navigator.share({title:'天机一转 '+APP_VER,text:'单文件离线游戏，下载后可用浏览器打开。',files:[file]});setShareStatus('已打开系统分享面板。');return;}
   }
  }catch(e){if(e&&e.name==='AbortError'){setShareStatus('已取消分享。');return;}}
  try{downloadShareFile(new Blob([html],{type:'text/html;charset=utf-8'}),fileName);setShareStatus('浏览器不支持直接分享文件，已下载游戏副本；把该 HTML 文件发送给对方即可。');}
@@ -7329,11 +8473,11 @@ async function shareGameFile(){
 }
 async function shareRunReport(){
  var text=makeRunShareText();
- try{if(navigator.share){await navigator.share({title:'天机一转 v1.14.26 · 本局战报',text:text});setShareStatus('本局战报已交给系统分享面板。');return;}}
+ try{if(navigator.share){await navigator.share({title:'天机一转 '+APP_VER+' · 本局战报',text:text});setShareStatus('本局战报已交给系统分享面板。');return;}}
  catch(e){if(e&&e.name==='AbortError'){setShareStatus('已取消分享。');return;}}
  try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);setShareStatus('本局战报已复制，可粘贴发送。');return;}}
  catch(e){}
- try{downloadShareFile(new Blob([text],{type:'text/plain;charset=utf-8'}),'天机一转_v1.14.26_本局战报.txt');setShareStatus('浏览器不支持直接分享或复制，已下载本局战报 TXT 文件。');}
+ try{downloadShareFile(new Blob([text],{type:'text/plain;charset=utf-8'}),'天机一转_'+APP_VER+'_本局战报.txt');setShareStatus('浏览器不支持直接分享或复制，已下载本局战报 TXT 文件。');}
  catch(e){setShareStatus('无法自动导出；请打开履历并手动复制本局记录。');}
 }
 /* ═══════════════════════════════════════════════════════════════════════
@@ -7913,6 +9057,34 @@ function achvRender(){
   return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'●':'○')+' '+d[1]+'</b><span>'+d[2]+'</span></div>';
  }).join('');
 }
+/* v1.14.37 跨文件迁移：成就+图鉴导出/导入（Base64 JSON） */
+function saveExport(){
+ try{
+  var data={achv:achvGet(),dex:dexGet(),v:'1.14.37'};
+  var s=JSON.stringify(data);
+  return btoa(unescape(encodeURIComponent(s)));
+ }catch(e){return '';}
+}
+function saveImport(str){
+ try{
+  var s=decodeURIComponent(escape(atob(String(str).trim())));
+  var data=JSON.parse(s);
+  if(data.achv&&Array.isArray(data.achv))localStorage.setItem('guAchv',JSON.stringify(data.achv));
+  if(data.dex&&typeof data.dex==='object')localStorage.setItem('guDex',JSON.stringify(data.dex));
+  return true;
+ }catch(e){return false;}
+}
+function doSaveExport(){
+ var s=saveExport();
+ if(!s){alert('导出失败');return;}
+ prompt('复制这段存档字符串并妥善保存：',s);
+}
+function doSaveImport(){
+ var s=prompt('粘贴存档字符串：');
+ if(s==null||!String(s).trim())return;
+ if(saveImport(s)){alert('导入成功，页面将刷新');location.reload();}
+ else alert('导入失败：格式不对或数据损坏');
+}
 /* 终局结算型成就：覆盖多入口状态（亚仙尊/称尊有多条路径） */
 function achvFin(){
  achv('fin');
@@ -7968,7 +9140,7 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  '血祭夜','族谱记名','运道小赌','北原赛马','弃子逃亡','日蚀传言', /* 中古·巨阳 */
  '空村拾遗','白骨原野','无主蛊群','灭门旧宅','荒地灵泉','魂灯夜话', /* 近古·幽魂 */
  '净土施粥','厚土石窟','万家灯会','归土安魂','渡口问心','乐土钟声', /* 近古·乐土 */
- '青茅山祭祖','古月学舍','白家冰心','熊家猎场','春秋蝉蜕','方源同门' /* 炼天·青茅山出生向 */
+ '青茅山祭祖','古月学舍','白家冰心','熊家猎场','春秋蝉蜕','方源同门','白凝冰·月下','白凝冰·竹林试剑','古月方正','古月青书','贾金生·赌石','酒仙遗踪','商心慈·账房','商睚·比宝','商家夜宴','商城拍卖','商家城一游','商心慈·密谈','商心慈·联姻局','商心慈·危城夜','白骨坊市','武家差遣','铁家风波','三叉山旧影','义天山风闻','黑家议事','王庭阴影','刘家余烬','雪原夜话','灵缘听雨','仙鹤门下','战仙演武','沈家海盟','诗情海域','狐仙福地·初临','地灵三问','狐仙真传·认主','鹤门压境','福地稳固','琅琊地灵','星象观台','黑凡残局','铁鹰旧主' /* 出生地专属+青茅山 */
 ];
 var DEX_TABS=[['spec','杀招'],['end','结局'],['ev','事件'],['era','时代']];
 var DEX_TAB='spec';
@@ -9107,6 +10279,35 @@ async function dtFinale(){
  await ending('枕缝而眠','最后一晚，你把耳朵贴在墙上。墙里没有风。你反而睡不着。');
 }
 
+/* ══ 14.7 CHG · 更新日志（v1.14.37 新增） ══════════════════════════════
+   玩家可随时查看；首次进入或版本变化时自动弹一次（已读版本存 guSeenChg）。
+   入口：点标题旁的版本号。 */
+function changelogRender(showNew){
+ var list=$('chgList');if(!list)return;
+ var TAG={new:'新增',fix:'修复',bal:'平衡'};
+ list.innerHTML=CHANGELOG.map(function(block,i){
+  var fresh=(i===0&&showNew);
+  var head='<div class="chgHead">'+block.v+(fresh?'<span class="chgBadge">新</span>':'')+'</div>';
+  var body=block.items.map(function(it){
+   var t=TAG[it[0]]||'更新';
+   return '<div class="chgLine"><span class="chgTag '+it[0]+'">'+t+'</span>'+it[1]+'</div>';
+  }).join('');
+  return head+body;
+ }).join('');
+ var v=$('chgVer');if(v)v.textContent=APP_VER;
+}
+function openChangelog(){
+ var wasNew=false;
+ try{wasNew=(localStorage.getItem('guSeenChg')!==APP_VER);}catch(e){wasNew=true;}
+ changelogRender(wasNew);
+ var el=$('chgOverlay');if(el)el.classList.remove('hidden');
+ try{localStorage.setItem('guSeenChg',APP_VER);}catch(e){}
+}
+function closeChangelog(){
+ var el=$('chgOverlay');if(el)el.classList.add('hidden');
+ try{localStorage.setItem('guSeenChg',APP_VER);}catch(e){}
+}
+
 /* ══ 15 BOOT · 启动绑定 ════════════════════════════════════════════ */
 function syncToggles(){var _a=$('autoBtn');if(_a)_a.className='opSide'+(AUTO?' on':'');var _f=$('fastBtn');if(_f)_f.className='opSide'+(FAST?' on':'');var _r=$('rigBtn');if(_r)_r.className='opSide'+(RIG_ON&&chanTier()?' on':'');syncRerollBtn();syncRigBtn();}
 /* v1.1.3 卡死修复②：启动期 DOM 绑定一律走 on() 空值保护。
@@ -9138,6 +10339,10 @@ on('achvBtn','click',function(e){e.stopPropagation();achvRender();$('achvOverlay
 on('achvClose','click',function(){$('achvOverlay').classList.add('hidden');});
 on('dexBtn','click',function(e){e.stopPropagation();dexRender();$('dexOverlay').classList.remove('hidden');}); /* v1.4.17 图鉴面板 */
 on('dexClose','click',function(){$('dexOverlay').classList.add('hidden');});
+on('saveExportBtn','click',function(e){e.stopPropagation();doSaveExport();});
+on('saveImportBtn','click',function(e){e.stopPropagation();doSaveImport();});
+on('saveExportBtn2','click',function(e){e.stopPropagation();doSaveExport();});
+on('saveImportBtn2','click',function(e){e.stopPropagation();doSaveImport();});
 on('dexTabs','click',function(e){var t=e.target&&e.target.getAttribute&&e.target.getAttribute('data-dextab');if(t){DEX_TAB=t;dexRender();}});
 /* v1.2.9：R 键＝重抽（桌面端）；触屏不响应 */
 document.addEventListener('keydown',function(e){if(IS_TOUCH)return;if(!_pending2)return;if(e.key==='r'||e.key==='R'){e.preventDefault();if(rerollLeft()>0){btn(false,'· · ·');var h=_pending2;_pending2=null;h('reroll');}}});
@@ -9150,6 +10355,10 @@ try{
  if(_dm<=4&&_hc<=4)document.documentElement.classList.add('perf-low');
 }catch(e){}
 try{starThemeInit();}catch(e){}
+/* v1.14.37 更新日志：点版本号可看；首次进入本版自动弹一次 */
+(function(){var v=$('verTag');if(v){v.textContent=APP_VER;v.style.cursor='pointer';v.title='查看更新日志';v.addEventListener('click',openChangelog);}})();
+on('chgClose','click',function(){closeChangelog();});
+try{if(localStorage.getItem('guSeenChg')!==APP_VER)setTimeout(openChangelog,500);}catch(e){}
 chanInit();
 syncToggles();
 window.__G={getResult:function(){return RESULT;},getS:function(){return S;},logs:LOGS};
