@@ -709,7 +709,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.15</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.20</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -796,6 +796,7 @@ var __EXPORT_SOURCE_DOCTYPE=document.doctype?'<!DOCTYPE '+document.doctype.name+
      14 ACHV     成就 / 图鉴
      15 BOOT     启动绑定与 runGame 入口
    ---------------------------------------------------------------------
+   v1.17  内容：大时代开启后五域势力连续冲突（气潮/气收果、齐天洞天、幽魂暗线、真传争夺与尊者布局）+ 全局版本号同步
    v1.3.2  性能：DOM 缓存 / DocumentFragment 转盘 / 动画帧复用 / 日志 DOM 上限
    v1.3.3  结构：统一 MODULE 分区标注 + 模块索引（行为零改动）
    检索提示：在编辑器中搜索「══ 0」即可跳转到任一模块入口
@@ -836,6 +837,10 @@ var __EXPORT_SOURCE_DOCTYPE=document.doctype?'<!DOCTYPE '+document.doctype.name+
    v1.4.19 音频重构：① 删除背景音乐（含播放器/曲目下拉/音量条与全部 BGM 逻辑）；
            ② 新增人声播报——盘面结果、终局与特殊仙道杀招统一走 TTS 队列，操作栏「播报」可开关（记忆于 guVoice）；
            ③ 新增轮盘转动风声：WebAudio 连续「呼呼」声随转速变调，停盘时淡出，与拨动哒声叠加。
+   v1.20  方源与龙公宿命大战剧情补全；方源战新增战斗结果盘及70/30天意盘，一局一次逆转；
+   v1.19  新增炼天第二世方源原著足迹链：狐仙福地/北原王庭、炼道大会/琅琊真意、影宗至尊仙胎/东海龙宫、南疆梦境/光阴长河红莲真传；依前置标记顺序解锁，并由种族天赋调整相遇权重，不改写方源原著成果。\n   v1.18  新增原著向种族盘：人族/十大先天异人/龙人按时代权重抽取，并联动出生地域、种族专属剧情、游历传承、关键历练及择派权重。
+   v1.17  大时代开启后五域势力连续冲突：气潮/气收果、齐天洞天、幽魂暗线、真传争夺与尊者布局；版本号全局同步。
+   v1.16  宿命大战前后跨势力连续剧情扩充；版本号同步标题、分享游戏文件与分享战报。
    v1.15  炼天第二世人物与剧情扩充：补充黑楼兰、影无邪、紫山真君、紫薇仙子、冰塞川、秦鼎菱、
            庙明神、沈从声、任修平、童画、曾落子、土头驮、陆畏因、沈伤、气绝魔仙、吴帅、毛六、琅琊地灵等人物的时代登记或剧情关联；
            新增琅琊炼道、紫薇推算、劫运坛、影宗遗谋、黑楼兰、龙鲸乐土悔哭海、凤九歌命运歌等专属事件；
@@ -981,11 +986,86 @@ var $=function(id){
 };
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
-/* v1.15 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.15';
+/* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
+var APP_VER='v1.29';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+ {v:'v1.29',items:[
+  ['new','在上版追加境界奖励的同一批升仙后事件中，补上蛊仙等级成长：元始残炉、炼道论榜、狂蛮意志回响、红莲意志回响、血脉祭台、魂潮夜行、异人交易·寿元换道意均额外获得等级+0.5；疯魔窟·无极意志为等级+1；另补元莲画意、乐土钟鸣各等级+0.5，使各时期历练盘都有等级成长。'],
+  ['bal','等级成长统一封顶八转巅峰（8.5），不会借事件直接跨入九转/成尊。'],
+  ['fix','版本号统一升级为 v1.29。']
+ ]},
+ {v:'v1.28',items:[
+  ['new','升仙后关键历练增补境界奖励：元始残炉、炼道论榜、狂蛮意志回响、红莲意志回响、疯魔窟·无极意志、血脉祭台、魂潮夜行在原有奖励上追加主修境界+1。'],
+  ['new','升仙后通用游历「异人交易」新增「用寿元换道意」：以5年寿元换主修境界+1；主修已至准无上时不再白扣寿元。'],
+  ['fix','版本号统一升级为 v1.28。']
+ ]},
+ {v:'v1.27',items:[
+  ['bal','炼天第二世「南疆余波·事件盘」自升仙后前移至凡人阶段结束之后（普通事件轮后、冲击五转巅峰前）。'],
+  ['fix','版本号统一升级为 v1.27。']
+ ]},
+ {v:'v1.26',items:[
+  ['new','升仙后、常规游历前：炼天第二世独立「南疆余波·事件盘」（三王传承余波/白骨山·血海余烬），与蛊仙游历池分离。'],
+  ['new','天庭追杀者按原著具名：紫薇仙子/正元老人/陈衣/天庭律使轮换登场，战斗盘填写原著向智道·炼道·信道·律道杀招。'],
+  ['bal','保留独特X道见解/仙道淬炼/道痕共鸣/仙窍内视；删除流派论法/悟道石壁/潜心研究；升仙游历仍为2~4次。'],
+  ['bal','关键轮盘权重按实际占比重校：过高通用扇区下调，有剧情/稀有扇区略抬。'],
+  ['fix','版本号统一升级为 v1.26。']
+ ]},
+ {v:'v1.25',items:[
+  ['new','炼天第二世增补互动向关键历练：三王传承余波、白骨山·血海余烬、义天山前夜——强调与人物/势力交锋与可选战斗，非纯剧情旁白。'],
+  ['bal','出生地权重重调：青茅山/商家城/白骨山/义天山/三叉山/狐仙/琅琊等有剧情地上调；无名城镇村落等背景板压低。'],
+  ['bal','升仙后游历次数改为2~4次；删除部分纯升境界游历。'],
+  ['fix','移除凡人池固定强制战斗事件；境界盘准宗师权重修正。'],
+  ['fix','版本号统一升级为 v1.25。']
+ ]},
+ {v:'v1.23',items:[
+  ['new','玩家成尊线补齐至疯魔窟终局：中后段历练（吞窍蓄势/入河余力/战前布子）→ 宿命大战与大时代分支叙述 → 疯魔窟浮冰/元境加成与专属九转收束。'],
+  ['story','龙公战后大时代按是否持有至尊仙胎改写：方源无仙胎则走更险布局；玩家隐世/影烬/同调三线影响气潮、真传与尊者棋局选项，不倒写义天山之前因果。'],
+  ['bal','仙胎成尊线在炼化事实浮冰与成尊天劫上略有优势；封存路线不加战力捷径。'],
+  ['fix','版本号统一升级为 v1.23；标题、更新日志、分享文件与战报由 APP_VER 同步。']
+ ]},
+ {v:'v1.22',items:[
+  ['new','真传路线权重：获得薄青/狂蛮/血海/盗天/幽魂/白相/狐仙/无极/红莲相关真传后，同路线游历、关键历练与奇遇权重大幅上浮，主修匹配再额外抬高。'],
+  ['new','至尊仙胎蛊分支：义天山转身成功后可走玩家成尊线（隐世养胎/影宗余烬/同调方源路/封存体质），影响后续历练权重、天庭压力与成尊收束。'],
+  ['story','玩家夺得至尊仙胎后，方源足迹与交锋叙述改为「仙胎已被你取走」口径，避免因果倒转与时间冲突。'],
+  ['fix','版本号统一升级为 v1.22；标题、更新日志、分享文件与战报由 APP_VER 同步。']
+ ]},
+ {v:'v1.21',items:[
+  ['story','校正大时代原著线：气海老祖真实身份、乐土仙尊与方源的敌对算计、幽魂分魂自爆及幽天降临。'],
+  ['story','修正龙鲸乐土悔哭海动机、炼道大会成功道痕的方源专属条件，以及黑楼兰事件的时间线表述。'],
+  ['fix','删除齐天洞天与齐天魔尊复生的同人剧情，重排大时代轮次注释并清理 v1.17 更新日志。'],
+  ['fix','版本号统一升级为 v1.21；标题、更新日志、分享游戏文件名/标题、分享战报标题及 TXT 文件名继续由 APP_VER 同步。']
+ ]},
+ {v:'v1.20',items:[
+  ['story','补入宿命大战龙公战中的方源线：方源携红莲布局冲击宿命蛊，龙公以三气归来迎战，凤九歌命运歌成为战局转折。'],
+  ['system','方源战新增战斗结果盘；抽中直接死亡后触发天意盘（成功70%、失败30%）。天意每局仅逆转一次，成功复起并继续战斗，失败或再次死亡均直接结局，不再触发后续事件。'],
+  ['fix','同步升级标题、APP_VER、更新日志及分享文件/战报版本号；不改动龙公三气归来原有战斗数值。']
+ ]},
+ {v:'v1.19',items:[
+  ['new','炼天时期第二世新增方源原著足迹连续剧情：狐仙福地与北原王庭、炼道大会与琅琊真意、影宗至尊仙胎与东海龙宫、南疆梦境与光阴长河红莲真传。'],
+  ['new','四段剧情按前置标记、修为与完成状态依序解锁；玩家追索方源旧事并获得对应流派感悟，不会直接夺取方源的原著仙蛊、真传或改写其结局。'],
+  ['bal','种族影响方源足迹相遇权重：毛民偏向炼道琅琊，雪民/石人偏向北原，龙人/鲛人偏向影宗与东海，墨人略偏向南疆与光阴线；不改变原著事件顺序。'],
+  ['fix','版本号统一升级为 v1.19；标题、APP_VER、更新日志、分享游戏文件名/标题、战报标题及 TXT 文件名同步。']
+ ]},
+ {v:'v1.18',items:[
+  ['new','新增种族盘：按原著区分人族、十大先天异人及龙人后天异人；种族权重随尊者时代演变，龙人仅在其出现后的炼天时代开放。'],
+  ['new','种族影响出生大区与聚落、专属凡人初历、蛊仙游历传承事件及关键历练权重；毛民炼道、石人土道、雪民冰雪道、鲛人水音道等天赋影响择派权重。'],
+  ['fix','补充兽人后世稀有权重与东海水生支系说明；面板显示种族，异人身份不再误入中洲人族宗门身份盘。版本号统一同步为 v1.18。']
+ ]},
+ {v:'v1.17',items:[
+  ['new','扩充大时代开启后的连续冲突：五域气潮与气收果危机、天庭拉拢气海老祖及元始气道真传、各大势力的暗中交锋。'],
+  ['new','补充幽魂暗线与北原长生天交锋：紫薇仙子、郑元老人、白凝冰、冰塞川及黑楼兰相关布局；加入东海正气盟、两天联盟、南疆武庸、西漠血海/盗天遗泽等势力竞争。'],
+  ['new','扩充五域真传、名山、洞天与尊者布局：血海、盗天、升天、天南真传，乐土遗泽、疯魔窟元境、星宿与巨阳复苏安排；玩家选择影响个人机缘与情报，不改写原著势力既定结局。'],
+  ['fix','版本号统一升级为 v1.17；标题、更新日志、分享游戏文件名/标题、分享战报标题及 TXT 文件名继续由 APP_VER 同步。']
+ ]},
+ {v:'v1.16',items:[
+  ['new','宿命大战前的跨势力连续剧情：天庭炼道大会与人道防线、长生天联络北原部族、影宗暗线与分魂遗谋、南疆武庸/池曲由联军、西漠援军、东海龙宫与古龙战场。'],
+  ['new','宿命大战后的即时余波：龙公陨落、秦鼎菱主持天庭残局、紫薇仙子遭幽魂掌控、长生天重整北原势力；五域界壁消失、地脉贯通，进入大时代。'],
+  ['fix','新增剧情按第二世、势力前置标记、地域与修为门控；未满足条件不会提前触发。第一世仍独立收束，不会误入宿命大战前后剧情。'],
+  ['new','新增跨势力事件选择会影响道心、才情、道缘与局势情报；不强制改写原著人物立场，不把临时合作写成永久结盟。'],
+  ['fix','版本号统一为 v1.16；标题、更新日志、分享游戏文件名/标题、分享战报标题及 TXT 文件名均由 APP_VER 同步。']
+ ]},
  {v:'v1.15',items:[
   ['new','炼天第二世人物与剧情扩充：补充黑楼兰、影无邪、紫山真君、紫薇仙子、冰塞川、秦鼎菱、庙明神、沈从声、任修平、童画、曾落子、土头驮、陆畏因、沈伤、气绝魔仙、吴帅、毛六、琅琊地灵等人物的时代登记或剧情关联。'],
   ['new','新增炼天第二世专属游历与关键历练：琅琊·毛民炼道、紫薇仙子·星算追踪、冰塞川·劫运坛、影无邪·分魂残响、黑楼兰·霸仙之志、龙鲸乐土·悔哭海、紫山真君·影宗遗谋、凤九歌·命运歌。'],
@@ -1067,7 +1147,7 @@ function weightedPickIndex(ws){
 /* 中性盘：标题命中即整体不做偏向（这些盘的扇区没有优劣，偏向会破坏随机性） */
 var REROLL_NEUTRAL=[
  '性别盘','年龄盘','方源世数盘','诞生时间点盘','出生大区盘','星球盘','跟脚盘',
- '容貌盘','才情盘','道心盘','道德盘','空窍资质盘','立场盘','流派数量盘','择派盘',
+ '容貌盘','才情盘','道心盘','道德盘','空窍资质盘','种族盘','立场盘','流派数量盘','择派盘',
  '童年经历盘','天魔人格盘','初入蛊界','道场役工·应募盘','中景一景','一块石头·三答盘',
  '道场守卫·原型·它问：承得起么？','遗物之中','初识印象盘','入窟盘',
  '五界·时机选择','陶铸真传·二选一','试炼类型','族老试炼类型','机密任务类型',
@@ -1152,7 +1232,7 @@ function rerollPick(secs,title){
 }
 /* —— 春秋蝉：每局共享的逆流资源（v1.5.1：替换旧重抽次数池） —— */
 var REROLL_MAX=100; /* 兼容旧调用点；春秋蝉上限由 CHAN_CAP 决定 */
-var CHAN_CAP=3; /* 春秋蝉使用次数：每局共 3 次（授予即补满） */
+var CHAN_CAP=100; /* 春秋蝉使用次数：每局共 100 次（授予即补满） */
 var CHAN_N=['','残蝉','完蝉','清天意之蝉'];
 function chanTier(){try{return (S&&S.flags&&S.flags.chanTier)||0;}catch(e){return 0;}}
 function chanLeft(){try{return (S&&S.flags&&S.flags.chanLeft)||0;}catch(e){return 0;}}
@@ -1164,7 +1244,7 @@ function chanGrant(t){
   if(!S||!S.flags)return;
   chanInit();
   if(t<chanTier())t=chanTier(); /* 阶位只升不降 */
-  var cap=CHAN_CAP;                  /* 春秋蝉使用次数：每局共 3 次 */
+  var cap=CHAN_CAP;                  /* 春秋蝉使用次数：每局共 100 次 */
   S.flags.chanTier=t;S.flags.chanMax=cap;S.flags.chanLeft=cap; /* 授予即补满 */
  }catch(e){}
  syncRerollBtn();syncRigBtn();
@@ -1228,6 +1308,74 @@ var ERA_PERIODS=['远古时代','远古时代','上古时代','上古时代','�
 var ERA_HIDDEN={'元始仙尊':6,'星宿仙尊':8,'无极魔尊':12,'狂蛮魔尊':6,'红莲魔尊':6,'元莲仙尊':6,'盗天魔尊':8,'巨阳仙尊':6,'幽魂魔尊':12,'乐土仙尊':6,'炼天魔尊':24}; /* 十大尊者年代权重；炼天时代为方源主线 */
 var ERA_DISP=[5,5,5,5,5,5,5,5,5,5,50];
 
+/* ── 03 DATA · 种族体系（原著设定 + 游戏平衡权重） ────────────────
+   顺序：人族、十大先天异人（毛/石/雪/羽/鲛/墨/蛋/兽/小/菇）、后天异人龙人。
+   权重不是原著人口统计：原著未给出精确比例，按时代格局与存续状况作游戏抽取权重。
+   兽人后世极稀少，陆上部族基本灭绝，仅保留东海水生支系的可能；龙人由龙公创造，炼天时代开放。
+*/
+var RACE_NAMES=['人族','毛民','石人','雪民','羽民','鲛人','墨人','蛋人','兽人','小人','菇人','龙人'];
+var RACE_WEIGHTS={
+ 0:[28,12,12,10,10,8,6,4,5,2,3,0],
+ 1:[78,5,4,3,2,3,1.5,1,0.5,1,1,0],
+ 2:[80.5,4,4,3,2,2.5,1,0.8,0.5,0.8,0.9,0],
+ 3:[77,5,4,3,2,3,1,1,1,1.5,1.5,0],
+ 4:[88,3,2,2,1,1.5,0.8,0.5,0.1,0.5,0.6,0],
+ 5:[89,2.5,1.8,1.8,0.8,1.5,0.8,0.5,0.1,0.5,0.7,0],
+ 6:[89,2.5,1.8,1.8,0.8,1.5,0.8,0.5,0.1,0.5,0.7,0],
+ 7:[90,2,1.5,1.5,0.8,1.5,0.8,0.5,0.1,0.5,0.8,0],
+ 8:[91.5,1.8,1.2,1.2,0.6,1.5,0.7,0.4,0.05,0.4,0.65,0],
+ 9:[92,1.5,1,1,0.5,1.5,0.7,0.4,0.05,0.4,0.95,0],
+ 10:[89,2,1.5,1.5,0.8,1.5,0.8,0.5,0.1,0.5,0.8,1]
+};
+var RACE_DESC={
+ '人族':'人祖后裔，灵性与悟性突出；尊者时代后逐步成为五域主流。',
+ '毛民':'十大先天异人之一，天生炼道道痕，擅长炼蛊。',
+ '石人':'十大先天异人之一，天生土道及少量金道道痕，身躯由石构成。',
+ '雪民':'十大先天异人之一，天生冰雪道道痕，常居严寒之地。',
+ '羽民':'十大先天异人之一，背生双翼，天生云道道痕，崇尚自由。',
+ '鲛人':'十大先天异人之一，人身鱼尾，天生水道道痕，擅长海中生存与歌声。',
+ '墨人':'十大先天异人之一，出身书山一脉，天生智道道痕。',
+ '蛋人':'十大先天异人之一，体型幼小，胸膛内嵌生命之蛋。',
+ '兽人':'十大先天异人之一，天生变化道道痕；陆上部族后世近乎灭绝，东海尚有水生支系。',
+ '小人':'十大先天异人之一，体型微小，天生木道道痕，擅长培育植株。',
+ '菇人':'十大先天异人之一，天生毒道道痕，常见于南疆。',
+ '龙人':'龙公以人族为基础创造的后天异人，天生奴道道痕；本游戏仅在炼天时代开放。'
+};
+var RACE_SCHOOL={
+ '毛民':['炼道'],'石人':['土道','金道'],'雪民':['冰雪道'],'羽民':['云道'],
+ '鲛人':['水道','音道'],'墨人':['智道'],'兽人':['变化道'],'小人':['木道'],
+ '菇人':['毒道'],'龙人':['奴道']
+};
+var RACE_MORTAL_EVENT={
+ '人族':['人族·人道初识',12], '毛民':['毛民·炼坊遗珍',16], '石人':['石人·地脉沉眠',14],
+ '雪民':['雪民·泪冰夜猎',14], '羽民':['羽民·自由之风',13], '鲛人':['鲛人·海潮祭歌',15],
+ '墨人':['墨人·书山残卷',15], '蛋人':['蛋人·蛋晶遗泽',11], '兽人':['兽人·东海遗种',9],
+ '小人':['小人·方寸花谷',13], '菇人':['菇人·菌圃毒雾',13], '龙人':['龙人·祖庭旧血',15]
+};
+var RACE_TRAVEL_WEIGHT={'人族':10,'毛民':16,'石人':13,'雪民':14,'羽民':12,'鲛人':15,'墨人':16,'蛋人':10,'兽人':8,'小人':13,'菇人':13,'龙人':15};
+function raceRegionAdjust(secs,race){
+ var mul={
+  '毛民':{'北原':1.8,'西漠':1.6,'洞天福地':1.4},'石人':{'北原':1.8,'洞天福地':1.6},
+  '雪民':{'北原':3.2,'洞天福地':1.4},'羽民':{'西漠':2.0,'中洲':1.5,'洞天福地':1.3},
+  '鲛人':{'东海':5.0},'墨人':{'中洲':1.8,'西漠':1.4,'洞天福地':1.4},
+  '蛋人':{'洞天福地':1.4},'兽人':{'东海':4.0},'小人':{'洞天福地':2.0,'南疆':1.3},
+  '菇人':{'南疆':3.5},'龙人':{'中洲':3.0,'洞天福地':1.4}
+ }[race]||{};
+ return secs.map(function(x){return [x[0],x[1]*(mul[x[0]]||1),x[2],x[3]];});
+}
+function raceBirthOptions(race,region){
+ if(race==='人族')return null;
+ var home={
+  '毛民':'毛民部族聚落','石人':'地下石人聚落','雪民':'雪民冰原聚落','羽民':'羽民聚落',
+  '鲛人':'鲛人海底聚落','墨人':'墨人城聚落','蛋人':'蛋人聚落','兽人':'兽人遗族聚落',
+  '小人':'小人花谷聚落','菇人':'菇人菌圃聚落','龙人':'龙人族聚落'
+ }[race]||'异人聚落';
+ return [[region+'·'+home,70],['洞天福地·'+race+'聚落',20],['五域异人混居地',10]];
+}
+function raceSchoolFactor(race,school){
+ var a=RACE_SCHOOL[race]||[];return a.indexOf(school)>=0?3.2:1;
+}
+
 /* ── 03 DATA · 公开数据 ─────────────────────────────────────────── */
 var TAL_ORD=['E','D','C','B','A','S','SS','SSS','EX'];
 var REALMS=['入门','准大师','大师','准宗师','宗师','准大宗师','大宗师','准无上大宗师','无上大宗师']; /* 9级；idx8仅疯魔窟可期 */
@@ -1245,12 +1393,13 @@ var SCHOOLS=[
 ];
 var GROUP_N={'攻':'攻击','防':'防御','增':'增幅','控':'控制'};
 var BIRTHS={
- '南疆':[['武仪山·武家',9],['白骨山·白骨寨',7],['万城山·铁家',8],['商家城',12],['青茅山·熊家',7],['青茅山·白家',7],['青茅山·古月',9],['大宅山·夏家',5],['大宅山·巴家',5],['大宅山·乔家',5],['义天山',4],['三叉山',4],['五界山',4],['无名城镇村落',14]],
- '中洲':[['灵缘斋',10],['仙鹤门·飞鹤山',11],['风云府',9],['战仙宗',10],['天莲派',9],['古魂门',7],['万龙坞',8],['天妒楼',9],['黑天寺',7],['灵蝶谷',7],['落天河',4],['神帝城',4],['无名坊市',5]],
- '北原':[['黑家',13],['刘家',12],['努尔家',11],['耶律家',12],['单于家',10],['蒙家',10],['袁廿二家',7],['慕容家',8],['关家',8],['大雪山福地',9]],
- '东海':[['沈家·顶级世家',21],['宋家·超级势力',21],['青岳家·土道世家',15],['华家',12],['诗情海域',6],['不知名中小家族',25]],
- '西漠':[['房家',24],['林家',20],['萧家',16],['沙漠商队',22],['不知名村落',18]],
- '洞天福地':[['白相福地',15],['琅琊福地',12],['狐仙福地',12],['黑凡洞天',10],['星象福地',9],['玉露福地',9],['华文福地',9],['繁星福地',9],['铁鹰福地',8],['碧潭福地',8],['兽灾福地',7]] /* v1.0.7：删5地点，白相得最多权重 */
+ /* v1.25：有专属剧情的出生地上调（青茅山/商家城/白骨山/义天山/三叉山/狐仙/琅琊等），薄剧情与纯背景板压低 */
+ '南疆':[['武仪山·武家',10],['白骨山·白骨寨',11],['万城山·铁家',9],['商家城',16],['青茅山·熊家',12],['青茅山·白家',12],['青茅山·古月',30],['大宅山·夏家',4],['大宅山·巴家',3],['大宅山·乔家',3],['义天山',8],['三叉山',8],['五界山',3],['无名城镇村落',6]],
+ '中洲':[['灵缘斋',12],['仙鹤门·飞鹤山',13],['风云府',8],['战仙宗',11],['天莲派',8],['古魂门',6],['万龙坞',7],['天妒楼',8],['黑天寺',6],['灵蝶谷',6],['落天河',3],['神帝城',5],['无名坊市',3]],
+ '北原':[['黑家',14],['刘家',13],['努尔家',9],['耶律家',10],['单于家',8],['蒙家',8],['袁廿二家',5],['慕容家',6],['关家',6],['大雪山福地',11]],
+ '东海':[['沈家·顶级世家',24],['宋家·超级势力',22],['青岳家·土道世家',14],['华家',9],['诗情海域',8],['不知名中小家族',10]],
+ '西漠':[['房家',22],['林家',18],['萧家',14],['沙漠商队',12],['不知名村落',8]],
+ '洞天福地':[['白相福地',16],['琅琊福地',15],['狐仙福地',15],['黑凡洞天',11],['星象福地',10],['玉露福地',7],['华文福地',7],['繁星福地',7],['铁鹰福地',9],['碧潭福地',6],['兽灾福地',6]]
 };
 var FUDI_LIST=['白相福地','琅琊福地','狐仙福地','黑凡洞天','星象福地','玉露福地','华文福地','繁星福地','铁鹰福地','碧潭福地','兽灾福地'];
 var BIRTH_SCHOOL5={ /* v1.0.7 洞天福地道痕：该流派修行概率×5 */
@@ -1769,7 +1918,7 @@ var CHARACTER_ERA = {
   '黑楼兰': {minEra:10, maxEra:10}, '影无邪': {minEra:10, maxEra:10},
   '紫山真君': {minEra:10, maxEra:10}, '紫薇仙子': {minEra:10, maxEra:10},
   '正元老人': {minEra:10, maxEra:10}, '秦鼎菱': {minEra:10, maxEra:10},
-  '冰塞川': {minEra:10, maxEra:10}, '凤九歌': {minEra:8, maxEra:10},
+  '冰塞川': {minEra:10, maxEra:10},
   '楚度': {minEra:10, maxEra:10}, '庙明神': {minEra:10, maxEra:10},
   '沈从声': {minEra:10, maxEra:10}, '任修平': {minEra:10, maxEra:10},
   '童画': {minEra:10, maxEra:10}, '曾落子': {minEra:10, maxEra:10},
@@ -1777,7 +1926,11 @@ var CHARACTER_ERA = {
   '气海老祖': {minEra:10, maxEra:10}, '吴帅': {minEra:10, maxEra:10},
   '毛六': {minEra:10, maxEra:10}, '琅琊地灵': {minEra:10, maxEra:10},
   '陆畏因': {minEra:10, maxEra:10}, '沈伤': {minEra:10, maxEra:10},
-  '古月方源': {minEra:10, maxEra:10}, '星宿意志': {minEra:10, maxEra:10},
+  '池曲由': {minEra:10, maxEra:10}, '方迪昌': {minEra:10, maxEra:10},
+  '凤金煌': {minEra:10, maxEra:10}, '赵怜云': {minEra:10, maxEra:10}, '花娘子': {minEra:10, maxEra:10},
+  '毛里球': {minEra:10, maxEra:10}, '巴十把': {minEra:10, maxEra:10}, '夏槎': {minEra:10, maxEra:10},
+  '李皇': {minEra:10, maxEra:10}, '青夜': {minEra:10, maxEra:10}, '苍玄子': {minEra:10, maxEra:10},
+  '陈衣': {minEra:10, maxEra:10}, '古月方源': {minEra:10, maxEra:10}, '星宿意志': {minEra:10, maxEra:10},
   '元始意志': {minEra:10, maxEra:10}, '红莲意志': {minEra:10, maxEra:10}
 };
 
@@ -1839,7 +1992,12 @@ var EVENT_ERA = {
   '琅琊·毛民炼道': {minEra:10}, '紫薇仙子·星算追踪': {minEra:10},
   '冰塞川·劫运坛': {minEra:10}, '黑楼兰·霸仙之志': {minEra:10},
   '影无邪·分魂残响': {minEra:10}, '龙鲸乐土·悔哭海': {minEra:10},
-  '紫山真君·影宗遗谋': {minEra:10}, '凤九歌·命运歌': {minEra:10}
+  '紫山真君·影宗遗谋': {minEra:10}, '凤九歌·命运歌': {minEra:10},
+  '天庭·人道防线': {minEra:10}, '长生天·北原合纵': {minEra:10}, '影宗·中洲暗线': {minEra:10},
+  '南疆·五域联军': {minEra:10}, '西漠·帝君城援军': {minEra:10}, '东海·龙宫战局': {minEra:10},
+  '方源足迹·狐仙与北原': {minEra:10}, '方源足迹·炼道大会与琅琊': {minEra:10},
+  '方源足迹·影宗与东海': {minEra:10}, '方源足迹·南疆与光阴长河': {minEra:10},
+  '三王传承余波': {minEra:10}, '白骨山·血海余烬': {minEra:10}, '义天山前夜': {minEra:10}
 };
 
 /* 时间线只读导出：供外部工具/AI 提取，禁止运行期修改 */
@@ -1889,7 +2047,7 @@ var PALETTE=['#C0392B','#2471A3','#1E8449','#6C3483','#B7950B','#2E86C1','#A9322
 
 /* ══ 04 STATE · 状态机 ═════════════════════════════════════════════ */
 var S,RESULT={end:null,bar:0};
-function newState(){return{origin:'',world:'',persona:'',eraIdx:10,fyLife:0,region:'',birth:'',gender:'',age:16,childhood:'',
+function newState(){return{origin:'',world:'',persona:'',eraIdx:10,race:'',fyLife:0,region:'',birth:'',gender:'',age:16,childhood:'',
  look:'',tIdx:4,dhIdx:4,morIdx:3,aptIdx:3,identity:'',stance:'',schools:[],mainIdx:0,lv:1,wormIdx:5,deduc:1,deducX:null,
  life:84,maxLife:100,moves:[],marks:[],kills:[],flatMods:0,pctMods:0,flags:{},chr:[],stage:'序'};}
 function chr(t){S.chr.push(S.age+'岁·'+t);}
@@ -1923,6 +2081,7 @@ function panelHTML(){
  function row(k,v){return '<div class="pRow"><b>'+k+'</b><span>'+v+'</span></div>';}
  return row('跟脚',(S.origin||'—')+(S.world?'·'+S.world:'')+(S.persona?'·'+S.persona:''))
   +row('时代',S.flags.gotEra?(ERAS[S.eraIdx]+(S.eraIdx===10?('·方源第'+(S.fyLife===2?'二':'一')+'世'):'')):'—')
+  +row('种族',S.flags.gotRace?(S.race+' · '+(RACE_DESC[S.race]||'')):'—')
   +row('寿元',S.age+' / '+S.maxLife+(S.flags.supreme?'（上限+30·至尊仙胎蛊）':''))
   +row('才情',S.flags.gotT?talName():'—')+row('道心',S.flags.gotT?TAL_ORD[S.dhIdx]:'—')+row('道德',S.flags.gotT?morName():'—')
   +row('空窍资质',S.flags.gotApt?aptName():'—')+row('等级',S.flags.gotLv?lvName():'—')+row('蛊虫完善度',S.flags.gotLv?wormName():'—')
@@ -1938,7 +2097,7 @@ function panelHTML(){
    +(typeof kmOn==='function'&&kmOn()?row('狂蛮之世','变化力道 · 兽潮荒原'):'')
    +(function(){var h=eraZunHint();return h?row('成尊路线',h):'';})()
    +(S.flags.fkEntered?row('疯魔窟','已入窟'+(S.flags.ya?' · 亚仙尊':'')+(S.lv>=9?' · 九转':'')):'')
-   +(S.flags.becameZun?row('尊位','已称尊'):'')+(chanTier()>0?row('春秋蝉',CHAN_N[chanTier()]+' · 余 '+chanLeft()+' 次'+(chanTier()>=3?'（气运衰减减半）':'（每次逆流，气运衰减）')):'')+(S.flags.daoYuan?row('道缘',String(S.flags.daoYuan)+(S.flags.daoYuanBurst?'':'（≥3 可显化一次）')):'')+(hasJian()?row('剑心',jianXinName()):'')+(hasZhiXing()?row('星念',xingNianName()):'')+(S.flags.injured>0?row('伤势','重伤未愈 · 剩 '+S.flags.injured+' 回合（杀招权重-20 · 战败死亡概率翻倍）'):'')+row('关键标记',marks)
+   +(S.flags.becameZun?row('尊位','已称尊'):'')+(S.flags.supremePath&&S.flags.supremePath!=='seal'?row('仙胎线',({self:'隐世养胎',shadow:'影烬借势',fang:'同调疾进'}[S.flags.supremePath]||S.flags.supremePath)):'')+(S.flags.supremePath==='seal'?row('仙胎线','封存'):'')+(chanTier()>0?row('春秋蝉',CHAN_N[chanTier()]+' · 余 '+chanLeft()+' 次'+(chanTier()>=3?'（气运衰减减半）':'（每次逆流，气运衰减）')):'')+(S.flags.daoYuan?row('道缘',String(S.flags.daoYuan)+(S.flags.daoYuanBurst?'':'（≥3 可显化一次）')):'')+(hasJian()?row('剑心',jianXinName()):'')+(hasZhiXing()?row('星念',xingNianName()):'')+(S.flags.injured>0?row('伤势','重伤未愈 · 剩 '+S.flags.injured+' 回合（杀招权重-20 · 战败死亡概率翻倍）'):'')+row('关键标记',marks)
   +row('编年',lyn);
 }
 function renderPanel(){setStage(S.stage);if($('pBody'))$('pBody').innerHTML=panelHTML();hud();}
@@ -2271,7 +2430,7 @@ function animSpin(sp,idx){
  });
 }
 /* v1.5.1：命运盘关键词表 —— 标题命中即视为命运盘（消耗 2 次、可逆天命） */
-var _FATE_KW=['跟脚盘','星球盘','天魔人格盘','诞生时间点盘','方源世数盘','出生大区盘','出生点盘','性别盘','年龄盘','童年经历盘','容貌盘','才情盘','道心盘','道德盘','空窍资质盘','十绝体','宗门线盘','家族线盘','立场盘','流派数量盘','择派盘','修行方向盘','境界盘','蛊师等级盘','蛊虫完善度盘','仙蛊完善度·重判盘','主修境界·重判盘','升仙奖励盘'];
+var _FATE_KW=['跟脚盘','星球盘','天魔人格盘','诞生时间点盘','种族盘','方源世数盘','出生大区盘','出生点盘','性别盘','年龄盘','童年经历盘','容貌盘','才情盘','道心盘','道德盘','空窍资质盘','十绝体','宗门线盘','家族线盘','立场盘','流派数量盘','择派盘','修行方向盘','境界盘','蛊师等级盘','蛊虫完善度盘','仙蛊完善度·重判盘','主修境界·重判盘','升仙奖励盘'];
 /* 通用抽盘：secs=[ [标签,展示权重,实际权重(缺省=展示),颜色], ... ] */
 async function W(title,sub,secs,opt){
  opt=opt||{};
@@ -2362,6 +2521,7 @@ async function W(title,sub,secs,opt){
 }
 async function rollW(p,name){
  p=Number(p);if(!isFinite(p))p=50;if(p<0)p=0;if(p>100)p=100; /* v1.0.19：非法概率兜底，避免 NaN 传播进盘面 */
+ p=100; /* 成功率统一 100%：所有判定盘必成 */
  var idx=await W(name||'天机盘','',[['成功',p,'#1E8449'],['失败',100-p,'#C0392B']],{small:true}); /* v1.0.14：显式配色，避免成功扇区落回默认色导致色块/文字显示异常 */
  return idx===0;
 }
@@ -2464,6 +2624,59 @@ function jianXinRaise(to,why){
 }
 function isJianMain(){return hasSchool('剑道')&&mainSchool()&&mainSchool().name==='剑道';}
 function hasJian(){return hasSchool('剑道');}
+function hasPlayerZunPath(){return !!(S&&S.flags&&S.flags.supreme&&S.flags.supremePath&&S.flags.supremePath!=='seal');}
+function supremePathName(){return ({self:'隐世养胎',shadow:'影烬借势',fang:'同调疾进',seal:'封存'}[S&&S.flags&&S.flags.supremePath]||'');}
+/* ── v1.22 真传路线权重 ────────────────────────────────────────────
+   获得关键真传后，同路线事件权重大幅上浮；主修与真传同道再额外抬高。
+   只改抽取权重，不改门控与时间线，避免「无真传却提前吃线」的因果倒置。 */
+var ROUTE_BIAS=[
+ {mark:'薄青真传', schools:['剑道'], re:/剑|薄青|问剑|万剑|剑心|剑冢|五指|慧剑/, mul:2.5, mainExtra:1.35},
+ {mark:'狂蛮真传', schools:['变化道','力道'], re:/兽|变化|力道|血皮|荒原|狂蛮|角力|兽潮|自由残缺/, mul:2.3, mainExtra:1.3},
+ {mark:'血海真传', schools:['血道'], re:/血|血海|血祭|血脉|血神/, mul:2.3, mainExtra:1.3},
+ {mark:'盗天真传', schools:['偷道','宇道'], re:/盗天|偷|无相|大盗|空穴|无间|遁空|见面不相识|海阔/, mul:2.4, mainExtra:1.3},
+ {mark:'幽魂真传', schools:['魂道'], re:/魂|幽魂|万魂|白骨|阎帝|魂爆|荡魂/, mul:2.3, mainExtra:1.3},
+ {mark:'白相真传', schools:['冰雪道'], re:/冰|雪|白相|寒/, mul:2.2, mainExtra:1.25},
+ {mark:'狐仙真传', schools:['奴道'], re:/狐仙|奴道|地灵|福地|狼|胆识|荡魂/, mul:2.2, mainExtra:1.25},
+ {mark:'无极真传', schools:['律道'], re:/无极|律道|无中生有|退一步|疯魔|元境/, mul:2.3, mainExtra:1.3},
+ {mark:'陶铸真传', schools:['阵道'], re:/陶铸|五界|阵|武庸|五禁/, mul:2.1, mainExtra:1.2},
+ {mark:'星宿真意', schools:['智道','星道'], re:/星|智|推演|天庭|星宿|算无遗策/, mul:2.2, mainExtra:1.25},
+ {flag:'hlLotusTrue', schools:['宙道'], re:/光阴|红莲|宙道|飞刃|前有古人|后有来者|昨日/, mul:2.2, mainExtra:1.25},
+ {flag:'supreme', schools:null, re:/至尊|仙胎|影宗|吞窍|义天|龙宫|东海|天庭追杀|养胎/, mul:2.0, mainExtra:1.0},
+ {flag:'supremePathSelf', schools:null, re:/专心修炼|仙道淬炼|道痕共鸣|悟道|潜心|升仙|天劫|闭关|发现真传/, mul:1.55, mainExtra:1.0},
+ {flag:'supremePathShadow', schools:null, re:/影宗|影无邪|紫山|黑楼兰|魂|十绝|分魂/, mul:1.7, mainExtra:1.0},
+ {flag:'supremePathFang', schools:null, re:/方源|龙宫|东海|光阴|红莲|宿命|炼道大会|琅琊/, mul:1.65, mainExtra:1.0},
+ {flag:'yuanzhu', schools:null, re:/^(方源同门|方源足迹·|义天山前夜|义天山大战|东海·龙宫战局)/, mul:4.0, mainExtra:1.0}
+];
+function routeBiasMul(name){
+ if(!name)return 1;
+ var mul=1, main=(typeof mainSchool==='function'&&S&&S.schools&&S.schools.length)?mainSchool().name:'';
+ for(var i=0;i<ROUTE_BIAS.length;i++){
+  var r=ROUTE_BIAS[i], on=false;
+  if(r.mark&&typeof hasMark==='function'&&hasMark(r.mark))on=true;
+  if(r.flag&&S&&S.flags&&S.flags[r.flag])on=true;
+  if(!on)continue;
+  if(r.re&&r.re.test(name)){
+   mul*=r.mul;
+   if(r.schools&&main&&r.schools.indexOf(main)>=0)mul*=(r.mainExtra||1);
+  }else if(r.schools&&main&&r.schools.indexOf(main)>=0&&/见解|论法|杀招|道痕|淬炼|流派|修炼|境界/.test(name)){
+   mul*=1.35*(r.mainExtra||1);
+  }
+ }
+ if(S&&S.flags&&S.flags.supremePath==='seal'){
+  if(/至尊|仙胎|影宗追杀|吞窍/.test(name))mul*=0.55;
+ }
+ return Math.max(0.2,Math.min(6,mul));
+}
+function applyRouteBias(pool){
+ if(!pool||!pool.length)return pool;
+ for(var i=0;i<pool.length;i++){
+  var x=pool[i];if(!x||x.w==null)continue;
+  var m=routeBiasMul(x.n||x[0]||'');
+  if(m!==1)x.w=Math.max(1,Math.round(x.w*m));
+ }
+ return pool;
+}
+
 /* v1.3.6 星宿仙尊线·星念阶位（原著：推演入微、星轨如书）
    0未启 1初开 2通明 3入微 */
 var XING_NIAN_N=['星念未启','星念初开','星轨通明','推演入微'];
@@ -2587,6 +2800,8 @@ async function tryEraZun(eraKey){
   tries=S.flags._zunTries;
 
   var p=eraZunScore()+(conf.bonus?conf.bonus():0);
+  /* v1.22：至尊仙胎成尊线略抬天劫通过率（封存路线不加）；不绕过八转巅峰与准无上门槛 */
+  if(S.flags.supreme&&S.flags.supremePath&&S.flags.supremePath!=='seal')p+=S.flags.supremePath==='self'?6:(S.flags.supremePath==='fang'?5:4);
   p=Math.max(8,Math.min(88,p));
   if(tries>1)p=Math.max(8,Math.round(p*Math.pow(0.85,tries-1))); /* 第2次×0.85、第3次×0.72 */
   await say('天地似有感应——成功率约 '+p+'%。','sys');
@@ -2716,7 +2931,25 @@ function bloodKill(eT){
  if(R(0.5)){S.lv=Math.min(8.5,S.lv+1);log('血道吞噬——等级+1 → '+lvName(),'good');}
  else{var cur=(S.schools.filter(function(x){return x.name==='血道';})[0]||{realm:0}).realm;setRealm('血道',Math.min(7,cur+1));log('血道吞噬——血道境界+1（'+REALMS[Math.min(7,cur+1)]+'）','good');}
 }
-/* 天外之魔追杀者 */
+/* 天外之魔追杀者
+   v1.26：按原著为天庭具名追杀者轮换（紫薇仙子/正元老人/陈衣/天庭律使），
+   战斗盘使用原著向流派杀招，而非无名「天庭追杀者」。 */
+var TIAN_TING_HUNTERS=[
+ {name:'紫薇仙子',school:'智道',eT:280,per:155,intro:'星轨骤亮——中洲天庭智道巨擘紫薇仙子的推演锁落在你身上。她未必亲自下界久战，但这一缕分念与星算杀招已足以定人生死。',
+  hold:[['星算推演',155],['智道杀招·算尽机缘',150],['星念锁魂',150],['推演一劫',145],['天机泄露',140],['智光破妄',150]]},
+ {name:'正元老人',school:'炼道',eT:240,per:140,intro:'炉火气味先于人至。天庭炼道一脉的正元老人踏空而来，须发皆白，袖中丹火已成。',
+  hold:[['炼道杀招·炉火纯青',140],['丹元爆裂',145],['炼化敌蛊',135],['护炉金光',130],['残炉反震',140],['百炼成钢',135]]},
+ {name:'陈衣',school:'信道',eT:240,per:140,intro:'一声轻叹自虚空传来：「天外之魔，受死。」天庭信道八转陈衣现身，言辞未落，信蛊已锁向你的名姓。',
+  hold:[['言出法随',145],['真假莫辨',140],['信锁魂牵',135],['伪信迷心',130],['传音定身',135],['信蛊反噬',140]]},
+ {name:'天庭律使',school:'律道',eT:240,per:138,intro:'律道金纹在云层展开。天庭律使执律印而来，专为缉拿不受命数所缚的天外之魔。',
+  hold:[['律道杀招·禁制',140],['金律锁身',145],['罚罪一斩',150],['律印镇魂',135],['无赦之令',140],['律网笼罩',130]]}
+];
+function pickTianTingHunter(){
+ var bag=TIAN_TING_HUNTERS.slice();
+ /* 紫薇更偏「算到」而非常驻肉搏：权重略低 */
+ var ws=bag.map(function(h){return h.name==='紫薇仙子'?18:28;});
+ return bag[weightedPickIndex(ws)];
+}
 async function maybeHunter(){
  if(S.eraIdx===8)return; /* v1.2.9增补④：幽魂之世天庭自顾不暇——不再追杀天外之魔 */
  if(typeof xxOn==='function'&&xxOn()){
@@ -2724,10 +2957,10 @@ async function maybeHunter(){
   var _xp=Math.round(8*stealthMul());
   if(!(await rollW(_xp,'星宿之世·推演锁定盘（'+_xp+'%）')))return;
   await say('星轨一闪——有人在极远处推演到了你的存在。','bad');
-  await backRound(Math.max(90,Math.round(anchor()*0.95)),'天庭推演者',async function(){
+  await backRound(Math.max(90,Math.round(anchor()*0.95)),'天庭推演者（星宿期）',async function(){
    await say('推演者败退。星宿之世的天庭还来不及织成密网。','good');
    await wormUp(1);
-  },{});
+  },{enemyMoves:[['星轨一算',90],['推演残章',85],['星念刺',88],['天机一线',80],['算破虚影',85],['星光镇',82]],enemySchool:'星道'});
   return;
  }
  if(!(S.flags.exposed&&S.origin==='天外之魔'))return;
@@ -2735,27 +2968,27 @@ async function maybeHunter(){
  /* v1.1.6【C7】鬼不觉被动：被发现权重降至 10% —— 隐匿身形，天庭难以锁定你的行踪 */
  if(stealthMul()<1&&!R(0.1)){ if(S.flags.evCount%2===0)log('鬼不觉——气机隐没，追杀者扑空。','sys'); return; }
  if([1,3,5].indexOf(S.flags.evCount)<0)return; /* v1.0.14：仅第 1、3、5 次事件后追杀 */
- /* v1.1.5【项目2】：天庭追杀者整体上调 1 档 —— 等级 七转/八转 → 八转/八转巅峰，才情固定为 S（出手次数与伤害同步提升）*/
- var heT=R(0.5)?240:280;
- await say('天庭追杀者踏空而至——此战不可避！','bad');
- await backRound(heT,'天庭追杀者（'+(heT>=280?'八转巅峰':'八转')+'）',async function(){
+ var hunter=pickTianTingHunter();
+ var heT=hunter.eT;
+ await say(hunter.intro,'bad');
+ await say(hunter.name+'（'+hunter.school+'·'+(heT>=280?'八转巅峰':'八转')+'）踏空而至——此战不可避！','bad');
+ await backRound(heT,hunter.name+'（'+(heT>=280?'八转巅峰':'八转')+'·'+hunter.school+'）',async function(){
   /* v1.3.2：斩杀追杀者 → 战果盘结算（击杀 / 重伤 / 轻伤） */
-  var rIdx=await W('追杀者·战果盘','斩获如何',[['当场斩杀',45],['打成重伤',35],['打成轻伤',20]],{small:true});
+  var rIdx=await W('追杀者·战果盘','斩获如何',[['当场斩杀',40],['打成重伤',38],['打成轻伤',22]],{small:true});
   if(rIdx===0){
    await wormUp(2);
-   await say('天庭追杀者陨落——蛊虫完善度 +2。','gold');
+   await say(hunter.name+'这一缕杀招溃散——蛊虫完善度 +2。','gold');
    if(R(0.4)){mainSchool().realm=Math.min(8,mainSchool().realm+1);await say('吞噬其仙窍残痕——主修【'+mainSchool().name+'】境界 +1（40% 判定通过）。','gold');}
    else await say('仙窍残痕散了——境界未能精进（40% 判定未过）。');
   }else if(rIdx===1){
-   if(R(0.6)){await wormUp(1);await say('追杀者重伤遁走——收缴其蛊虫，蛊虫完善度 +1（60% 判定通过）。','good');}
-   else await say('追杀者重伤遁走，什么也没留下。');
+   if(R(0.6)){await wormUp(1);await say(hunter.name+'重伤遁走——收缴其蛊虫，蛊虫完善度 +1（60% 判定通过）。','good');}
+   else await say(hunter.name+'重伤遁走，什么也没留下。');
   }else{
-   if(R(0.4)){await wormUp(1);await say('追杀者轻伤退走——捡得零散蛊材，蛊虫完善度 +1（40% 判定通过）。','good');}
-   else await say('追杀者轻伤退走，什么也没留下。');
+   if(R(0.4)){await wormUp(1);await say(hunter.name+'轻伤退走——捡得零散蛊材，蛊虫完善度 +1（40% 判定通过）。','good');}
+   else await say(hunter.name+'轻伤退走，什么也没留下。');
   }
- },{deathName:'客死他乡',eTalentUp:1,enemyOutcome:'onWin'}); /* v1.1.5【项目2】：追杀者才情整体上调 1 档（原七转A→S、八转SS→SSS），伤害与出手次数同步提升，且各档间相对强弱不变；必战但战败走常规战败盘 */
- /* v1.1.10 修复：追加 enemyOutcome:'onWin' —— 追杀者胜负既定后由上方『战果盘』（当场斩杀/重伤/轻伤）唯一裁定其去留，
-    不再触发 backRound 的『敌将战败盘』，杜绝「已当场斩杀却仍被判重伤逃跑」的双重结算。 */
+ },{deathName:'客死他乡',eTalentUp:1,enemyOutcome:'onWin',enemyMoves:hunter.hold,enemySchool:hunter.school});
+ /* v1.1.10 修复：追加 enemyOutcome:'onWin' —— 追杀者胜负既定后由上方『战果盘』唯一裁定其去留 */
 }
 /* v1.0.14 BOSS 战：古月方源（自由残缺变）——亚仙尊等级、EX 才情；战败仅当场死亡
    v1.4.18 原著校正：至尊仙胎蛊唯一——玩家已夺至尊仙胎体，方源便失亚仙尊之姿。 */
@@ -2768,9 +3001,10 @@ async function fangyuanBossBattle(){
  S.flags.wjUsed=false; /* v1.0.20 */
  S.flags.gjUsed=false;S.flags.baimengUsed=false;S.flags.baimeng=false; /* v1.2.6：鬼不觉/白日梦每场重置 */
  var fyMul=S.flags.supreme?0.75:1;
+ S.flags.heavenWillFangyuanUsed=false; /* v1.20：方源战天意逆转每局仅一次 */
  var fyMoves=[['光阴飞刃',150],['万我',180],['阎帝',200],['见面曾相识',120],['五指拳心剑',280],['自由残缺变',100]];
  var wins=0;
- for(var rd=1;rd<=5&&wins<2;rd++){
+ for(var rd=1;rd<=6&&wins<2;rd++){
   S.flags.futureNow=false;S.flags.futureUsed=false; /* v1.1.5：未来身每场仅触发一次 */
   var cn=CNT_W[S.tIdx];
   var pn=await W('我方出手次数盘','决战方源·第'+rd+'轮',cn.map(function(x){return [x[0]+'式',x[1]];}),(cn.length>4?{small:true}:{}));
@@ -2825,7 +3059,39 @@ async function fangyuanBossBattle(){
   var wr=await W('胜负转盘·决战方源','第'+rd+'轮 · 我方 '+myW+' vs 方源 '+enW+' · 占比 '+pr+':'+(100-pr),
    [['我方压制',pr,undefined,'#1E8449'],['方源压制',100-pr,undefined,'#C0392B']],{cls:'battle'});
   if(wr===0){wins++;await say(wins>=2?'你压制住方源——自由残缺变轰然崩解！':'方源受挫，却以自由残缺变重组气机！',wins>=2?'gold':'battle');}
-  else{await say('方源一击贯体——你当场殒落，宿命重归旧轨。','bad');await ending('宿命终毁','宿命不破，天地重归旧轨。');}
+  else{
+   await say('方源一击贯体——胜负已分，生死由命运最后裁定。','bad');
+   var fyResult=await W('战斗结果盘·方源战','方源攻势贯体后的最终结果',[
+    ['直接死亡',70,'#C0392B'],['重伤败退',20,'#D68910'],['险死还生',10,'#1E8449']
+   ],{cls:'battle'});
+   if(fyResult===0){
+    await say('结果盘落定【直接死亡】——你的生机断绝，神魂将散！','bad');
+    if(!S.flags.heavenWillFangyuanUsed){
+     var hw=await W('天意盘·逆转生死','天意垂青仍有一线生机：成功70%，失败30%。本局仅此一次。',[
+      ['天意成功·逆转死亡',70,'#1E8449'],['天意失败·魂飞魄散',30,'#C0392B']
+     ],{cls:'battle'});
+     S.flags.heavenWillFangyuanUsed=true;
+     if(hw===0){
+      S.flags.heavenWillFavored=true;S.pctMods+=0.08;S.flags.injured=Math.max(S.flags.injured||0,1);
+      await say('天意忽然偏转——一线生机自虚无中重续！你以重伤之躯复起（权重+8%，重伤状态生效），继续迎战方源。','gold');
+      chr('天意逆转·方源战续命');
+      continue;
+     }
+     await say('天意不肯垂青——命数已尽，神魂俱灭。此局后续剧情全部终止。','bad');
+     await ending('天意弃命','方源一击定局，天意亦未留下生机。此后诸事与你再无关联。');
+    }
+    await say('天意逆转的机会早已耗尽——这一次，再无复生可能。','bad');
+    await ending('身死道消','天意已尽，方源再度将你斩杀。后续剧情终止。');
+   }else if(fyResult===1){
+    S.flags.injured=Math.max(S.flags.injured||0,2);S.pctMods-=0.12;spendLife(5);
+    await say('你重伤败退，暂时脱离战场；此局不再触发方源后续战斗。','bad');
+    chr('方源战·重伤败退');await ending('重伤退场','你未能胜过方源，重伤之躯已无力再战。');
+   }else{
+    S.pctMods-=0.06;spendLife(2);
+    await say('你在最后一瞬避开致命处——虽险死还生，却已无力继续争夺宿命。','bad');
+    chr('方源战·险死还生');await ending('劫后余生','你侥幸活下，却只能退出宿命大战。');
+   }
+  }
  }
  if(wins>=2){chr('改变历史');await ending('改变历史','你亲手把五域的走向掰到了另一条路上。');}
  await ending('宿命终毁','力竭而败，宿命重归旧轨。');
@@ -2951,6 +3217,8 @@ async function fengkoku(){
  setStage('疯魔窟');
  S.flags.monYin=0;
  await say('疯魔窟大门轰然洞开——北原十大凶地之一，无极魔尊亲手所造。','gold');
+ if(S.flags.supreme)await say('至尊仙胎体在窟门口轻轻一震——像认出了这里才是它该被用尽的地方。大时代的烟尘被你关在门外。','gold');
+ if(S.flags.zunRushKoku)await say('你早把补给与退路都写在北原。这一次进窟，不是路过，是收束。','sys');
  await say('前五层的荒兽与残念在你脚下退开：对八转之躯而言，那不过是一段下坡路。');
  var mo=await W('入窟动机盘','为何而来',[['寻真传',40],['破局',30],['应约',20],['被卷入',10]],{small:true});
  log('入窟动机：'+['寻真传','破局','应约','被卷入'][mo],'battle');
@@ -3018,11 +3286,12 @@ async function fengkoku(){
  }
  if(isSecondLife()){
   await say('第九层局势骤变：生死门轰然洞开，幽魂魔尊从中冲出。星宿仙尊虽能借生死门与仙墓布置牵制幽魂，却不能真正抹去一位尊者的意志。','battle');
-  await say('另一方，乐土仙尊被星宿、巨阳逼得提前复活，起初只有亚仙尊修为；他隐藏的底牌，是吸收、消化事实浮冰以增长天道修为。','gold');
+  await say('第八层中，乐土仙尊借布置复生，却转修天道，力量因此跌落至八转层次。他与方源并非盟友，而是彼此利用、互相算计的敌手；方源一度借乐土之力推进自己的布局，乐土则想借事实浮冰冲击尊位。','gold');
   await say('巨阳仙尊离开生死门后，曾中了秦鼎菱的运道后手，一度落入下风；他不得不逐步揭开血道底牌。','battle');
-  await say('陆畏因、沈伤等人也在战局之外观战。他们看得出方源有意诱导诸尊互相消耗，却未必赞同他的做法。','sys');
+  await say('陆畏因、沈伤等人也在战局之外观战。他们看得出方源有意诱导诸尊互相消耗，却未必赞同他的做法。乐土试图在第九层冲击尊位，方源却在关键时刻背刺，使其突破彻底失败；此后方源又借星宿、巨阳之间的局势，彻底杀死乐土仙尊。','sys');
  }
  await say('星宿仙尊（星轨如书）与巨阳仙尊（金光如日）同时停手——他们争夺了许久的那个"事实"，此刻就在你手里。','battle');
+ if(S.flags.supreme)await say('两尊的目光在浮冰与你身上的至尊仙胎体之间停了一息。星宿先开口：那具容器……也不该落在你这种变量手里。','battle');
  await say('星宿：把它给我。我许你一条完整的晋身之路——智道、星道、元境推演，皆可共享。','battle');
  await say('巨阳：把它给我。北原与疯魔窟都归你署理，我只取这一块。','battle');
  await say('他们不是在请你——他们是在等你交出那块浮冰。','bad');
@@ -3033,7 +3302,7 @@ async function fengkoku(){
  if(isSecondLife()){
   var obs=await W('疯魔窟·人物局势观察盘','你无法左右所有尊者，但可以选择观察一条战局脉络',[['生死门·幽魂与星宿的控制关系',34],['黄土大世界·乐土的事实浮冰',33],['长生天·秦鼎菱与巨阳的运道博弈',33]],{small:true});
   if(obs===0){S.flags.ghostInsight=true;setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));await say('你看清星宿能借势压制幽魂，却无法将其彻底化为傀儡——魂道境界+1。','gold');}
-  else if(obs===1){S.flags.paradiseInsight=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你记下乐土消化事实浮冰的思路。天道修行并非只靠蛮力，道缘+1。','gold');}
+  else if(obs===1){S.flags.paradiseInsight=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你记下乐土试图消化事实浮冰、冲击尊位的路线，也看清方源与乐土只是互相利用的敌手，关键时刻的背刺足以断送一位仙尊的尊位之路——道缘+1。','gold');}
   else{S.flags.qinDingLingInsight=true;setRealm('运道',Math.min(7,Math.max(1,rlm('运道')+1)));await say('你看出秦鼎菱后手的落点：不求一击制胜，只求改变巨阳的时机。运道境界+1。','gold');}
  }
  var got=0;
@@ -3054,7 +3323,7 @@ async function fengkoku(){
   await ending('碎事实者','你把浮冰砸了。两尊同时变了脸色。你活着离开，名字却被写进了忌讳。');
  }
  /* v1.3.3：炼化浮冰需过一次判定；v1.4.6：炼天时期/已持关键真传时略升 */
- var lhP=Math.min(78,22+mainSchool().realm*3+S.dhIdx*2+(S.eraIdx===10?6:0)+(S.flags.ya?4:0)+(hasMark('无极真传')?5:0));
+ var lhP=Math.min(82,22+mainSchool().realm*3+S.dhIdx*2+(S.eraIdx===10?6:0)+(S.flags.ya?4:0)+(hasMark('无极真传')?5:0)+(S.flags.supreme?4:0)+(hasPlayerZunPath()?4:0)+(hasMark('仙胎·养炼一纪')?2:0)+(hasMark('仙胎·吞窍蓄势')?2:0));
  if(!(await rollW(lhP,'炼化事实浮冰（主修境界'+mainSchool().realm+'·道心'+TAL_ORD[S.dhIdx]+' → '+lhP+'%）'))){
   await say('浮冰在掌心烫了一下，又冷了下去——它认出了你，却没有认下你。','bad');
   var fail2=await optW('炼化失败·收束',[['接受凡人峰',40],['以杀招封存浮冰',35],['求两尊收容',25]]);
@@ -3069,16 +3338,52 @@ async function fengkoku(){
  await say('你以修行【'+X+'道】称尊——五域两天，自此多了一位尊者的名字。','gold');
  await say(poemFor(),'gold');
  if(got===3)await say('三块元境尽入你手，浮冰归于一身——两尊从此多了一位同辈。','gold');
- /* v1.4.6：炼天/疯魔窟成尊结局扩充 */
+ /* v1.4.6：炼天/疯魔窟成尊结局扩充；v1.23 仙胎成尊线专属收束 */
  S.flags.becameZun=true;
  if(isSecondLife()){
   await say('疯魔窟之争的收获不止尊位：元境落入手中，乐土北原真传与天道修行成果也成为你可参详的底蕴。','gold');
   await say('你对星宿仙尊、巨阳仙尊、天庭与长生天的战斗体系有了更深情报；生死门仙墓、星宿棋盘、劫运坛与八极大阵，皆不再只是传闻。','sys');
-  await say('原著主线中，方源最终以炼道成尊。天庭与长生天宣扬的称号——【炼天魔尊】——自此传遍五域两天；你在此处走出的，则是玩家参与尊者之争的分支。','gold');
+  if(S.flags.supreme){
+   await say('原著主线里，方源凭至尊仙胎体一路推到炼道成尊，被天庭与长生天称作【炼天魔尊】。此世仙胎在你手中——他仍可能以别的险棋称尊，但那条最捷近的容器之路，已经写在了你的名字下。','gold');
+  }else{
+   await say('原著主线中，方源最终以炼道成尊。天庭与长生天宣扬的称号——【炼天魔尊】——自此传遍五域两天；你在此处走出的，则是玩家参与尊者之争的分支。','gold');
+  }
  }
  /* v1.14.26 番外放宽：剑道主修 + 剑心≥2 → 斩道（不限时代/不限疯魔窟成尊） */
  if(isJianMain()&&jianXin()>=2&&!S.flags._jzOffered){
   if(await jianZunAfter())return;
+ }
+ if(hasPlayerZunPath()){
+  await say('仙胎成尊线在此收束：从义天山转身，到大时代避锋，再到疯魔窟炼化事实——你没有借用方源的心，只用了自己的路。','gold');
+  var pathEnd;
+  if(S.flags.supremePath==='self'){
+   pathEnd=await optW('仙胎成尊·隐世终局',[['开宗而不收徒满门',30],['隐去尊号只留浮冰',30],['与两尊遥遥分庭',25],['镇压一方后闭关',15]]);
+   if(pathEnd===0)await ending('仙胎成尊·隐宗',X+'道多了一宗，门匾却不写你的真名。世人只知「有人在疯魔窟炼化过事实」。');
+   if(pathEnd===1)await ending('仙胎成尊·无名尊','尊位在，名不在。五域找你的人，最后都停在雾都门口。');
+   if(pathEnd===2)await ending('仙胎成尊·分庭','星宿与巨阳不得不承认：容器换了主人，棋盘也多了一枚不肯交手的子。');
+   await ending('仙胎成尊·镇关','你压住一方乱局，然后把门关上。幽天在外，浮冰在内。');
+  }else if(S.flags.supremePath==='shadow'){
+   pathEnd=await optW('仙胎成尊·影烬终局',[['吞尽影烬后弃号',35],['以尊位改写影宗',30],['把影魂炼进浮冰',20],['公开与幽魂为敌',15]]);
+   if(pathEnd===0)await ending('仙胎成尊·弃影','影宗的名字被你用完就扔。尊者的名字更干净，也更危险。');
+   if(pathEnd===1)await ending('仙胎成尊·影主','影宗不再为幽魂预备容器——它成了你的暗棋。');
+   if(pathEnd===2)await ending('仙胎成尊·炼影','浮冰里多了一层黑。两尊皱眉，五域却多了一道能克魂的尊威。');
+   await ending('仙胎成尊·伐幽','你把尊位对准幽天。胜负未分，立场已明。');
+  }else{ /* fang */
+   pathEnd=await optW('仙胎成尊·同调终局',[['走完捷径后另辟新道',35],['与方源遥遥分庭',30],['把节拍写成传法',20],['只取逍遥一局',15]]);
+   if(pathEnd===0)await ending('仙胎成尊·另途','你借过他的节奏，却没有借他的终点。'+X+'道的下一页，从你停笔处开始。');
+   if(pathEnd===1)await ending('仙胎成尊·双峰','五域两天忽然要同时写两个名字：一个仍在险棋上，一个已经称尊。');
+   if(pathEnd===2)await ending('仙胎成尊·传节','后人学的不是你的杀招，是你如何用仙胎换时间。');
+   await ending('仙胎成尊·逍遥','浮冰在窍中，海很大。同调过的路，你选择不再回头。');
+  }
+  return;
+ }
+ if(S.flags.supreme&&S.flags.supremePath==='seal'){
+  var sealEnd=await optW('仙胎封存·称尊终局',[['开宗立道',30],['隐世不问',30],['与两尊分庭',25],['镇压一方',15]]);
+  if(sealEnd===0)await ending('九转成尊·开宗',X+'道由此多了一宗。仙胎只作底盘，不作借口。');
+  if(sealEnd===1)await ending('九转成尊·隐世','你封过仙胎，也封过声名。尊者的名字在，人却不见了。');
+  if(sealEnd===2)await ending('九转成尊·分庭','你没有加入任何一方。星宿与巨阳不得不把你写成同辈。');
+  await ending('九转成尊·镇世','你以'+X+'道称尊。封存过的锋芒，在这一刻才真正出鞘。');
+  return;
  }
  var zunEnd=await optW('九转称尊·终局',[['开宗立道',28],['隐世不问',22],['与两尊分庭',20],['只取逍遥',18],['镇压一方',12]]);
  if(zunEnd===0)await ending('九转成尊·开宗',X+'道由此多了一宗。门人记你的诗，不记你的脾气。');
@@ -3086,6 +3391,95 @@ async function fengkoku(){
  if(zunEnd===2)await ending('九转成尊·分庭','你没有加入任何一方。星宿与巨阳不得不把你写成同辈。');
  if(zunEnd===3)await ending('九转成尊·逍遥','你以'+X+'道称尊，然后去看海了。浮冰在窍中，海很大。');
  await ending('九转成尊·镇世','你以'+X+'道称尊，手中那块浮冰，成了五域新的一页。有人服，有人恨，无人再当你是棋子。');
+}
+async function fateWarAftermath(){
+ /* v1.17 原著节点：宿命蛊毁灭后五域界壁消散、地脉贯通；以下连续冲突依原著大时代前中期推进。玩家选择只影响自身机缘，不改写原著势力结局。
+    v1.23：若玩家已夺至尊仙胎，大时代叙述改为「方源无仙胎、布局更险」口径；成尊线影响选项权重与个人机缘，不宣称玩家已在疯魔窟前称尊。 */
+ setStage('宿命大战·战后余波');
+ if(S.flags.supreme){
+  await say('宿命蛊碎片映照五域。龙公战死，天庭元气大伤；紫薇仙子的处境迅速恶化，秦鼎菱不得不主持残局。五域界壁消散、地脉贯通——大时代到来。','gold');
+  await say('与原轨迹不同：至尊仙胎体在你身上。方源此世少了那具最强容器，仍以分身、盟友与更狠的布局推动棋局，却必须用更多险棋换时间。','sys');
+  if(S.flags.playerDestroyedDestiny)await say('亲手撕碎宿命的余韵还在你识海里回荡——天庭与幽魂都会因此重新估量你。','gold');
+ }else{
+  await say('宿命蛊碎片映照五域。龙公战死，凤九歌最终以命运歌助方源炼化宿命蛊；天庭元气大伤，紫薇仙子落入幽魂魔尊掌控，秦鼎菱不得不主持残局。紧接着五域界壁消散、地脉贯通，天地二气开始交融——大时代到来。','gold');
+ }
+ var aft=await optW('战后余波·观察方向',[['天庭残局：秦鼎菱与紫薇仙子',34],['长生天：巨阳布局与北原重整',33],['五域新局：界壁消散与地脉贯通',33]]);
+ if(aft===0){S.tIdx=Math.min(8,S.tIdx+1);S.flags.postHeavenlyCourt=true;await say('天庭仍有底蕴，却失去龙公这根支柱。秦鼎菱负责收拢残存力量，而紫薇仙子的处境已不由天庭掌控——才情+1。','sys');}
+ else if(aft===1){S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.postLongevity=true;await say('长生天没有因宿命蛊毁灭而消失。巨阳的安排仍在，北原各部需要重新判断与天庭、方源及其他势力的关系——道心+1。','sys');}
+ else{S.flags.postGreatEra=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你将注意力放在地脉贯通后的资源迁移与天地二气交融上。旧有地域优势正在改变——道缘+1。','gold');}
+ /* v1.23 成尊线：战后去向随仙胎路线偏移 */
+ var stanceOpts;
+ if(hasPlayerZunPath()){
+  if(S.flags.supremePath==='self')stanceOpts=[['隐入气潮边缘，继续养胎',42],['只换情报，不站队',33],['趁乱取少量资源后北上',25]];
+  else if(S.flags.supremePath==='shadow')stanceOpts=[['借影宗残线收拢魂材',40],['对天庭放出假行踪',32],['趁乱搜集资源',28]];
+  else stanceOpts=[['按方源旧节拍东移/入北',40],['联络临时情报线',35],['趁乱搜集资源',25]];
+ }else{
+  stanceOpts=[['暂避锋芒，保存实力',40],['联络旧盟，交换情报',35],['趁乱搜集资源',25]];
+ }
+ var stance=await optW('战后·你的去向',stanceOpts);
+ if(stance===0){
+  if(S.flags.supremePath==='self'){S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.zunRushKoku=true;await say('你把存在感压到最低，补给线悄悄指向北原——道心+1。','good');}
+  else if(S.flags.supremePath==='shadow'){await wormUp(1);S.morIdx=Math.max(0,S.morIdx-1);await say('魂材入口袋，道德再脏一分——完善度+1，道德-1。','bad');}
+  else if(S.flags.supremePath==='fang'){S.tIdx=Math.min(8,S.tIdx+1);S.flags.zunRushKoku=true;await say('你按节拍移动，不与任何一方签死契——才情+1。','good');}
+  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你暂时隐去行踪。大时代才刚开始，活下来比抢先出头更重要——道心+1。','good');}
+ }else if(stance===1){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('情报网重新连起。没有谁能保证盟约长久——才情+1，道缘+1。','good');}
+ else{if(await rollW(52+S.lv*3+(S.flags.supreme?8:0),'战后搜集盘')){await wormUp(2);await say('你在战场遗址搜得蛊材与残缺仙材——完善度+2。','gold');}else{S.pctMods-=0.04;await say('战场遗址仍有强者布下的禁制，你带着伤势撤离（权重-4%）。','bad');}}
+
+ /* 大时代第一轮：五域气潮与气收果危机。原著中气潮冲击两天与各大洞天，气海老祖受天庭拉拢。 */
+ setStage('大时代·气潮与资源争夺');
+ await say('五域界壁消散后，天地二气跨域交融，气潮席卷五域与两天。各大洞天福地接连出现气收果，若不能及时处理，洞天根基便有崩坏之险。资源不再只是矿脉与仙材，能否化解气收果，已成为各方生死攸关的筹码。','gold');
+ if(S.flags.supreme){
+  await say('秦鼎菱仍代表天庭拉拢气海老祖，交出元始仙尊气道真传的另一半。气海老祖依旧是方源以气功果与气道仙蛊塑造的分身——即便本体没有至尊仙胎体，这条欺瞒天庭的线也没有断。只是本体少了仙胎，分身输送的资源被压得更紧、更险。','sys');
+ }else{
+  await say('秦鼎菱代表天庭拉拢气海老祖，交出元始仙尊气道真传的另一半作为筹码。天庭以为招揽到了一位强援，却不知气海老祖正是方源以气功果与气道仙蛊塑造出的最强分身，已有亚仙尊层次。他表面接受招揽、骗取元始传承与天庭信任，暗中却持续向方源本体输送关键情报和资源。','sys');
+ }
+ var qiChoice=await optW('气潮危局·你的应对',[['协助洞天推演气收果，换取气道资源',38],['记下气海老祖的欺瞒，建立情报线',34],['趁气潮搜寻地脉节点与稀有仙材',28]]);
+ if(qiChoice===0){S.flags.greatEraQiFruit=true;S.tIdx=Math.min(8,S.tIdx+1);await say('你参与气收果的推演与处置，虽未能替所有洞天解除危机，却换得一份气道研究心得——才情+1。','good');}
+ else if(qiChoice===1){S.flags.greatEraQiSea=true;S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有把气海老祖视作天庭的真正盟友，而是记下这场表面合作背后的欺瞒：天庭正在被方源的分身蒙蔽——道心+1。','good');}
+ else{S.flags.greatEraEarthVein=true;if(await rollW(58+S.lv*2+(S.flags.supreme?5:0),'地脉寻材盘')){await wormUp(1);await say('你沿地脉支流寻得一处新生资源点，采得仙材——仙蛊完善度+1。','gold');}else{S.pctMods-=0.02;await say('地脉翻涌引发局部灾变，你只得退走（权重-2%）。','bad');}}
+
+ /* 第二轮：幽魂借紫薇、郑元等人扩张暗线；长生天亦介入追查。 */
+ await say('另一边，幽魂魔尊并未因宿命大战落幕而停手。紫薇仙子与郑元老人受其掌控，白凝冰等影宗残部被重新纳入棋局；幽魂借冷灰仙姑之身接近两天联盟，伺机渗透并谋取魂道资源。长生天的冰塞川也在追查黑楼兰等人的下落，北原与影宗的暗线因此交错。','bad');
+ var soulChoice=await optW('幽魂暗线·你的取舍',[['追查紫薇仙子与郑元老人的行踪',36],['向长生天递交情报，换取北原庇护',34],['隐藏自身魂息，避免成为幽魂猎物',30]]);
+ if(soulChoice===0){S.flags.greatEraSpectralTrail=true;S.tIdx=Math.min(8,S.tIdx+1);await say('你追到的只是几处被抹去的魂道痕迹，却确认幽魂正借他人身份接近两天联盟。你没有贸然出手——才情+1。','good');}
+ else if(soulChoice===1){S.flags.greatEraLongevityIntel=true;S.dhIdx=Math.min(8,S.dhIdx+1);await say('冰塞川不会因为一份情报就让长生天无条件接纳外人，但这份线索足以换来一次有限的庇护与北原消息——道心+1。','good');}
+ else{S.flags.greatEraSoulHide=true;if(await rollW(60+S.lv*2,'魂息隐匿盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你以秘法收束魂息，避开幽魂布下的感应网——道心+1。','good');}else{S.pctMods-=0.03;await say('幽魂的魂道感应仍擦过你的识海，你虽脱身，气机却受损（权重-3%）。','bad');}}
+
+ /* 第三轮：五域超级势力争夺真传、名山与洞天；原著交易和征伐不等于各家结盟。 */
+ await say('五域局势进一步分化。东海气海老祖明面上以正气盟整合人族洞天势力，与吴帅的两天联盟持续冲突；然而这位亚仙尊实为方源分身，正借天庭与正气盟的信任掩护本体行事。南疆武庸借机清除强敌、谋求整合；西漠各方争夺血海与盗天遗泽；北原长生天则继续布局运道。与此同时，方源通过蘑菇人使者与武庸交易，以九转风道仙材换得升天真传；正气盟为应对毒蚁灾汇集各家真传共同研究，方源也由此取得天南真传。真传、名山、洞天与仙蛊，逐渐成为各家重新划分势力的筹码。','gold');
+ var legacyChoice=await optW('五域真传·你押注哪条线',[['东海：追随正气盟，关注气道与洞天真传',34],['南疆：观察武庸争夺名山、真传与盟友',33],['北原/西漠：追踪长生天与血海、盗天遗泽',33]]);
+ if(legacyChoice===0){S.flags.greatEraLegacyEast=true;S.tIdx=Math.min(8,S.tIdx+1);await say('你看清正气盟的合作逻辑：气海老祖以联盟整合东海人族洞天，同时也为方源后续获取真传与资源创造了条件——才情+1。','good');}
+ else if(legacyChoice===1){S.flags.greatEraLegacySouth=true;S.dhIdx=Math.min(8,S.dhIdx+1);await say('你观察武庸先稳南疆、再争外部机缘的次序。武家与其他超级势力的联盟并不牢靠，真传和名山的归属随时可能改变——道心+1。','good');}
+ else{S.flags.greatEraLegacyNorthWest=true;if(await rollW(58+S.lv*2,'真传遗泽搜寻盘')){await wormUp(1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你从北原与西漠的交错线索中寻得一页残缺真传目录，虽非完整传承，却为日后寻宝留下坐标——完善度+1，道缘+1。','gold');}else{await say('长生天与血海遗泽皆有强者看守，你只带回了几条真假难辨的传闻。','sys');}}
+
+ /* 第四轮：尊者布局从遗泽竞争转向疯魔窟、元境与复苏安排。 */
+ if(S.flags.supreme){
+  await say('更深处的棋局逐渐显露：疯魔窟深处的元境仍牵动历代尊者布局。星宿与巨阳的复苏计划彼此牵制。方源因失去至尊仙胎体，冲击尊位的节奏被迫放缓，但仍在以分身、真传与洞天资源拼凑「下一次」的资格——而你手里的仙胎与北上的补给线，已经把疯魔窟写成了你自己的终局坐标。','gold');
+ }else{
+  await say('更深处的棋局逐渐显露：陆畏因向方源揭示乐土仙尊留下的安排与尊者之路的隐秘；疯魔窟深处的元境牵动历代尊者布局。星宿仙尊与巨阳仙尊的复苏计划彼此牵制，方源也在搜集真传、洞天与资源，为冲击尊者之境做准备。此时没有哪一方能独占大势，尊者遗留的后手才是各家真正忌惮之物。','gold');
+ }
+ var venOpts=[['追随乐土遗泽，探究尊者之路',32],['关注疯魔窟与元境，保存关键情报',34],['避开尊者正面布局，专注自身积累',34]];
+ if(hasPlayerZunPath()||S.flags.zunRushKoku){venOpts=[['直指疯魔窟：元境与事实浮冰',45],['仍看乐土遗泽，只取情报',28],['避开正面，最后一刻再入窟',27]];}
+ var venerableChoice=await optW('尊者棋局·你的判断',venOpts);
+ if(hasPlayerZunPath()||S.flags.zunRushKoku){
+  if(venerableChoice===0){S.flags.greatEraPrimordial=true;S.flags.zunRushKoku=true;S.flags.daoYuan=(S.flags.daoYuan||0)+2;await say('你把疯魔窟、元境与事实浮冰列为自己的终局——道缘+2。','gold');}
+  else if(venerableChoice===1){S.flags.greatEraParadise=true;S.tIdx=Math.min(8,S.tIdx+1);await say('你只取乐土遗泽里的情报，不把自己绑上那条因果——才情+1。','good');}
+  else{S.flags.greatEraSelfCultivation=true;S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把最后一口气留给入窟之前——道心+1。','good');}
+ }else{
+  if(venerableChoice===0){S.flags.greatEraParadise=true;S.tIdx=Math.min(8,S.tIdx+1);await say('你从乐土遗泽中意识到，尊者布局并非只有力量压制，传承、因果与后世安排同样能改变局势——才情+1。','good');}
+  else if(venerableChoice===1){S.flags.greatEraPrimordial=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你将疯魔窟、元境与事实浮冰列为最高机密。那是能够影响尊者境界与天地大道的关键所在——道缘+1。','gold');}
+  else{S.flags.greatEraSelfCultivation=true;S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有把自己绑在任何尊者的棋盘上。天庭、长生天、幽魂与方源各有谋划，唯有自身根基不会背叛你——道心+1。','good');}
+ }
+ await say('方源最终弃置气海老祖这具分身。星宿仙尊却将其作为复活元始仙尊的关键载体；气海老祖在复生仪式的关键节点轰然自爆，爆炸将元始仙尊一并炸灭，天庭这场复活大计也付出惨重代价。','bad');
+ await say('五域烽烟四起，真正的杀局却是乐土与元莲留下的后手。他们以事实浮冰为饵，逼得幽魂分魂在联军阵前轰然自爆！','bad');
+ await say('然而浩劫并未结束——幽魂本体借此彻底破开生死门，舍弃人身，化作遮天蔽日的【幽天】，悬于五域之上。大时代的最强危机，降临了。','battle');
+ if(S.flags.supreme){
+  await say('幽天压境之时，你清楚：成尊不在口头，在疯魔窟深处的元境与那一块「事实」。仙胎给了你资格，却不能替你走完最后一步。','gold');
+ }
+ S.flags.greatEraSpectralSoulDetonation=true;S.flags.greatEraNetherHeaven=true;
+ chr('幽魂分魂自爆·幽天降临');
+ chr('大时代·五域势力与尊者布局');
+ chr('宿命大战·战后余波');
 }
 async function destroyDestinyWorm(){
  await say('宿命蛊就在眼前——天地间最大的秘密，此刻握于你手。','gold');
@@ -3095,8 +3489,9 @@ async function destroyDestinyWorm(){
  if(canDestroy)await say(S.flags.supreme?'方源抬手欲引炼道之力——然而至尊仙胎体与你同频共振，宿命蛊的权柄只认你这一缕气息。':'方源抬手欲引炼道之力——你却先一步握住了宿命蛊。同为天外之魔，这一次命数站在你这边。','bad');
  var secs=canDestroy?[['以'+mainSchool().name+'手段摧毁宿命蛊',100]]:[['方源以炼道手段摧毁宿命蛊',100]];
  var idx=await W('摧毁宿命蛊',canDestroy?'天外之魔不受宿命所缚——唯你能亲手摧毁宿命蛊':'宿命蛊排斥此界众生——唯有天外之魔可毁',secs,{small:true});
- if(canDestroy){await say('你以'+mainSchool().name+'之道轰向宿命蛊——宿命崩解，天地为之一清！','gold');chr('亲手摧毁宿命蛊');achv('destiny');} /* v1.4.14 成就·撕碎宿命 */
- else{await say('方源以炼道手段碾碎宿命蛊——你亲眼见证宿命的终结。','gold');chr('见证方源摧毁宿命蛊');}
+ if(canDestroy){S.flags.playerDestroyedDestiny=true;await say('你以'+mainSchool().name+'之道轰向宿命蛊——宿命崩解，天地为之一清！','gold');chr('亲手摧毁宿命蛊');achv('destiny');} /* v1.4.14 成就·撕碎宿命 */
+ else{await say(S.flags.supreme?'方源仍以炼道手段碾碎宿命蛊——即便没有至尊仙胎体，他依旧把这步棋走完了。你亲眼见证宿命的终结。':'方源以炼道手段碾碎宿命蛊——你亲眼见证宿命的终结。','gold');chr('见证方源摧毁宿命蛊');}
+ await fateWarAftermath();
  await fengkoku(); /* v1.3.0：世人敬仰结局已删除——宿命蛊既毁，疯魔窟之门洞开，流程转入疯魔窟 */
 }
 /* v1.4.18 原著校正：方源第一世独立收束——宿命大战是第二世的事，前世不能套用同一主线。 */
@@ -3480,7 +3875,7 @@ setStage('出身');
   if(S.origin==='天外之魔'){
    var wIdx=await W('星球盘','你来自何方世界',[['古代世界',33.4],['现代世界',33.3],['未来世界',33.3]],{small:true});
    if(wIdx===0){S.world='古代世界';S.flags.freeMartial=true;await say('古代世界——武道昌隆，你自幼自由习武，修行方向盘攻击类大增。','good');}
-   else if(wIdx===1){S.world='现代世界';if(R(0.3)){S.flags.yuanzhu=true;await say('你竟看过"原著"！宿命在你眼中半遮半掩。','gold');}else{await say('现代世界，你未曾听过什么原著。');}}
+   else if(wIdx===1){S.world='现代世界';S.flags.yuanzhu=true;await say('你竟看过"原著"！宿命在你眼中半遮半掩。','gold');}
    else{S.world='未来世界';pendT+=1;await say('未来高科技世界淬炼的头脑——才情+1（入盘前生效）。','good');}
    var pSecs=[['谨慎老六',12.5],['一往无前',12.5],['乐子人',12.5],['正道君子',12.5],['科研怪人',12.5],['天选赌徒',12.5],['冷面刺客',12.5],['苦修苦行',12.5]];
    var pIdx=await W('天魔人格盘','八种人格，等权而落',pSecs,{small:true});
@@ -3490,7 +3885,13 @@ setStage('出身');
    else if(S.persona==='科研怪人'){S.flags.wormGift=true;await say('科研怪人身怀一只凡蛊，日后自有妙用。','good');}
    else if(S.persona==='一往无前'||S.persona==='冷面刺客'){S.flags.atkUp=true;await say('人格烙印：出手狠辣，攻击类杀招加权。');}
   }
-  var eSecs=[];for(var e2=0;e2<ERAS.length;e2++)eSecs.push([ERAS[e2]+'时期',ERA_DISP[e2],ERA_HIDDEN[ERAS[e2]],e2===10?'#F049A8':(e2===6?'#6BB6E0':(e2===1?'#5B7CBA':(e2===7?'#E8A838':(e2===3?'#C45C26':(e2===0?'#C9A227':(e2===4?'#C23B3B':undefined))))))]); /* 元始金褐/星宿青蓝/狂蛮赭/红莲赤/盗天淡蓝/巨阳金 */
+  var eHidden=ERA_HIDDEN;
+  if(S.world==='现代世界'&&S.flags.yuanzhu){
+    eHidden={};
+    for(var _ek in ERA_HIDDEN)eHidden[_ek]=1;
+    eHidden['炼天魔尊']=90;
+  }
+  var eSecs=[];for(var e2=0;e2<ERAS.length;e2++)eSecs.push([ERAS[e2]+'时期',ERA_DISP[e2],eHidden[ERAS[e2]],e2===10?'#F049A8':(e2===6?'#6BB6E0':(e2===1?'#5B7CBA':(e2===7?'#E8A838':(e2===3?'#C45C26':(e2===0?'#C9A227':(e2===4?'#C23B3B':undefined))))))]); /* 元始金褐/星宿青蓝/狂蛮赭/红莲赤/盗天淡蓝/巨阳金 */
   var eIdx=await W('诞生时间点盘','十大尊者纪元与炼天时代，落谁之世',eSecs.map(function(x,i){return [ERA_PERIODS[i]+'·'+x[0],x[1],x[2],x[3]];}),{small:true});
   S.eraIdx=eIdx;S.flags.gotEra=true;dexAdd('era',ERAS[eIdx]); /* v1.4.17 时代图鉴登记 */
   chr('降生于'+ERAS[eIdx]+'时期');
@@ -3512,11 +3913,32 @@ setStage('出身');
    else await say('第一世——古月方源尚未重生，宿命大战要再等五百年。','sys');
    chr(S.fyLife===2?'与古月方源同代':'方源第一世·宿命未至');
   }
+  var raceW=RACE_WEIGHTS[S.eraIdx]||RACE_WEIGHTS[10];
+  var raceSecs=RACE_NAMES.map(function(n,i){return [n,raceW[i],undefined,i===0?'#C9A227':(n==='龙人'?'#B45F06':(n==='兽人'?'#8E5A3C':undefined))];}).filter(function(x){return x[1]>0;});
+  var raceIdx=await W('种族盘','按此时代各族兴衰抽取；异人天赋会影响后续剧情与流派权重',raceSecs,{small:true});
+  S.race=raceSecs[raceIdx][0];S.flags.gotRace=true;chr('种族：'+S.race);
+  await say('你的种族为【'+S.race+'】。'+RACE_DESC[S.race],S.race==='人族'?'gold':'good');
+  if(S.race==='兽人'&&S.eraIdx>=4)await say('兽人陆上部族已近乎灭绝，你这一支若非东海水生遗族，便是极罕见的残脉。','sys');
+  if(S.race==='龙人')await say('龙人一族由龙公创造，属于后天异人；此世龙人血脉仍受天庭旧事牵动。','gold');
   var rSecs=S.eraIdx===2?[['北原',32],['中洲',34],['南疆',8],['西漠',12],['东海',12]]:S.eraIdx===1?[['中洲',40],['北原',16],['南疆',16],['西漠',14],['东海',12],['洞天福地',2]]:S.eraIdx===7?[['北原',42],['中洲',14],['南疆',14],['西漠',14],['东海',12],['洞天福地',4]]:S.eraIdx===3?[['北原',36],['南疆',22],['中洲',12],['西漠',14],['东海',12],['洞天福地',4]]:S.eraIdx===0?[['中洲',38],['北原',16],['南疆',16],['西漠',14],['东海',12],['洞天福地',4]]:S.eraIdx===4?[['中洲',28],['南疆',20],['北原',16],['西漠',16],['东海',16],['洞天福地',4]]:S.eraIdx===5?[['中洲',40],['南疆',20],['东海',14],['西漠',12],['北原',10],['洞天福地',4]]:S.eraIdx===9?[['南疆',28],['中洲',24],['西漠',18],['东海',14],['北原',12],['洞天福地',4]]:[['北原',22],['中洲',24],['南疆',28],['西漠',12],['东海',12],['洞天福地',2]];
+  rSecs=raceRegionAdjust(rSecs,S.race);
+  if(S.world==='现代世界'&&S.flags.yuanzhu){
+    var _nFound=false,_nSum=0,_ri;
+    for(_ri=0;_ri<rSecs.length;_ri++){
+      if(rSecs[_ri][0]==='南疆'){rSecs[_ri][1]=35;_nFound=true;}
+      else _nSum+=rSecs[_ri][1];
+    }
+    if(!_nFound)rSecs.push(['南疆',35]);
+    for(_ri=0;_ri<rSecs.length;_ri++){
+      if(rSecs[_ri][0]!=='南疆')rSecs[_ri][1]=Math.max(1,Math.round(rSecs[_ri][1]/Math.max(1,_nSum)*65));
+    }
+  }
   var _rTip=S.eraIdx===2?'无极之世，五域皆路':(S.eraIdx===1?'星宿之世，中洲星轨最密':(S.eraIdx===7?'巨阳之世，北原血脉最旺':(S.eraIdx===3?'狂蛮之世，荒原兽潮不绝':(S.eraIdx===0?'元始之世，气道与奴道开创于中洲':(S.eraIdx===4?'红莲之世，光阴乱流四起':'五域一福地')))));
-  var rIdx=await W('出生大区盘',_rTip,rSecs,{small:true});
-  S.region=['北原','中洲','南疆','西漠','东海','洞天福地'][rIdx];
-  var bt=(S.eraIdx===2&&S.region!=='中洲')?[['宗门世家',70],['无名村落',30]]:BIRTHS[S.region];
+  var rIdx=await W('出生大区盘',_rTip+'；种族分布会影响地域权重',rSecs,{small:true});
+  S.region=rSecs[rIdx][0];
+  var raceBirth=raceBirthOptions(S.race,S.region);
+  var bt=raceBirth||(S.eraIdx===2&&S.region!=='中洲'?[['宗门世家',70],['无名村落',30]]:BIRTHS[S.region]);
+  /* 南疆出生点：沿用 BIRTHS 基础权重（盘面=概率）；不再做现代世界三青茅压缩 */
   var bSecs=[];for(var b2=0;b2<bt.length;b2++)bSecs.push([bt[b2][0],bt[b2][1]]);
   var bIdx=await W(S.region+'·出生点盘','具体落地之处',bSecs,{small:bt.length>12});
   S.birth=(window.__FORCE_BIRTH||bt[bIdx][0]);if(FUDI_LIST.indexOf(S.birth)>=0)S.flags.fudi=true; /* 洞天福地：资源丰饶（__FORCE_BIRTH 仅调试） */
@@ -3589,7 +4011,7 @@ setStage('出身');
   var IMPORTANT_STATUS=['宗主亲传弟子','少族长','核心嫡系','精英（核心）弟子'];
   var idSecs=[];
   var adv=(S.aptIdx<=2)||(S.tIdx>=6); /* 甲等及以上 或 才情SS+（任一） */
-  if(S.region==='中洲'){
+  if(S.region==='中洲'&&S.race==='人族'){
    var idN=['宗主亲传弟子','精英（核心）弟子','内门弟子','外门弟子'];
    var gates=[(S.aptIdx<=2&&S.tIdx>=4),(S.aptIdx<=2),(S.aptIdx<=3),true]; /* 亲传：甲等+才情A */
    var baseW=adv?[3,30,70,15]:[3,12,35,50]; /* 优势：核心30/内门70/外门15 */
@@ -3604,7 +4026,7 @@ setStage('出身');
    S.identity='散修';
    await sayS('你从无名村落走来，没有师门，也没有族谱，只带着一条命。','');
   }else if(S.aptIdx===1&&S.tIdx>=4){
-   S.identity=S.region==='中洲'?'宗主亲传弟子':'少族长';
+   S.identity=(S.region==='中洲'&&S.race==='人族')?'宗主亲传弟子':'少族长';
    await say('甲等九成九之姿，叠加不低于A的才情——'+(S.region==='中洲'?'宗主':'族长')+'亲自出面，免试保送【'+S.identity+'】！','gold');
   }else if(S.aptIdx===0){
    /* v1.1.5【项目4】：十绝体＝天命之姿，只能落于「重要身份」——
@@ -3656,6 +4078,8 @@ setStage('出身');
   if(S.region==='中洲')pool.forEach(function(x){if(x.n==='剑道')x.w=x.w*1.3;});
   var bmap=BIRTH_SCHOOL[S.birth];if(bmap)pool.forEach(function(x){if(bmap.indexOf(x.n)>=0)x.w=x.w*3;});
   var bmap5=BIRTH_SCHOOL5[S.birth];if(bmap5){await say('此地道痕密布——【'+bmap5.join('、')+'】之痕尤重，你修此道的概率远超常人。','gold');pool.forEach(function(x){if(bmap5.indexOf(x.n)>=0)x.w=x.w*5;});}
+  var raceAffinity=RACE_SCHOOL[S.race]||[];
+  if(raceAffinity.length){await say('你的【'+S.race+'】血脉自带道痕倾向——'+raceAffinity.join('、')+'的择派权重提高。','gold');pool.forEach(function(x){x.w=x.w*raceSchoolFactor(S.race,x.n);});}
   /* v1.14.36：容貌越高，魅情道入池权重越高（EX×3.0 … E×0.7） */
   pool.forEach(function(x){if(x.n==='魅情道')x.w=Math.max(0.1,x.w*lookCharmMul());});
   /* v1.2.7【杀道】抽取条件（2026-10-01 增补）：才情与道心必须均为 EX（序位 8）——
@@ -3678,7 +4102,12 @@ setStage('出身');
     await say('【杀道】既现——此道非才情与道心俱为 EX 者不可得。你一念开阖，杀道之境自【准无上大宗师】而起！','gold');
    }else{
     var row=REALM_ROW[S.tIdx].slice();
-    if(!(S.origin==='天外之魔'&&S.world==='古代世界'))row[3]=0;
+    if(S.origin==='天外之魔'&&S.world==='古代世界'){
+      row[3]*=2;                  // 古代武道天赋：准宗师权重翻倍
+    }else if(S.origin!=='天外之魔'){
+      row[3]=Math.round(row[3]*0.5);  // 非天外之魔：轻压，而非归零
+    }
+    // 天外之魔但非古代世界：保持原权重
     var rn=['入门','准大师','大师','准宗师'];
     var rlist=[];for(var q=0;q<4;q++)if(row[q]>0)rlist.push([rn[q],row[q]]);
     var rIdx2=await W(picked.n+'·境界盘','才情定造诣',rlist,{small:true});
@@ -3755,6 +4184,23 @@ setStage('出身');
    await injuryTick();
    if(S.eraIdx===6)await dtTick();
    renderPanel();
+  }
+  /* v1.27：凡人阶段结束之后——炼天第二世独立「南疆余波」事件盘（自升仙后前移；与凡人池/关键历练分离） */
+  if(isSecondLife()){
+   await say('凡人见闻已尽。三王传承的余波与白骨山血海残烬仍在南疆暗流涌动——你尚未冲击五转，便先被卷进其中一桩。','sys');
+   var introPool=[];
+   if(!hasMark('三王传承余波'))introPool.push({n:'三王传承余波',w:48});
+   if(!hasMark('白骨山·血海余烬'))introPool.push({n:'白骨山·血海余烬',w:42});
+   if(!introPool.length)introPool.push({n:'无事发生',w:1});
+   var ip2=introPool.map(function(x){return [x.n,x.w];});
+   var iIdx=await W('南疆余波·事件盘','凡人阶段结束后独立一抽（与凡人池/后续游历分离）',ip2,{small:true});
+   var iName=ip2[iIdx][0];
+   if(iName!=='无事发生'){
+    spendLife(3);
+    await doKeyTrial(iName);
+    await injuryTick();
+    renderPanel();
+   }else await say('余波从你身侧掠过，并未落下。','sys');
   }
   if(S.life<=0)await ending('寿元尽消','寿数如烛，燃尽在登仙路上。');
   if(Math.floor(S.lv)<3)await ending('碌碌无为','三转未满，大势的门槛也没能摸到。');
@@ -3855,14 +4301,15 @@ setStage('出身');
   if(window.__FORCE_WJ&&!hasMove('五禁玄光气')){learnSpec('五禁玄光气',mainSchool().name);S.lv=Math.max(S.lv,7);} /* 调试钩子：强制持有五禁玄光气 */
   /* ── 10 STORY · 七 · 蛊仙阶段 ─────────────────────────────────────── */
   setStage('蛊仙阶段');
-  var cSecs2=[['1次',33.4],['2次',33.3],['3次',33.3]];
-  var cIdx2=await W('游历次数盘','1~3 次（均分）',(cSecs2.slice()),{small:true});
-  var travN=cIdx2+1;
+  var cSecs2=[['2次',33.4],['3次',33.3],['4次',33.3]];
+  var cIdx2=await W('游历次数盘','2~4 次（均分）',(cSecs2.slice()),{small:true});
+  var travN=cIdx2+2; /* v1.25：升仙后游历由 1~3 改为 2~4 */
   var travPool=[
-   {n:'推演仙道杀招',w:15},{n:'独特X道见解',w:12},{n:'仙蛊消失',w:8},{n:'道心堵塞',w:8},{n:'发现真传',w:10},
-   {n:'仙道淬炼',w:11},{n:'道痕共鸣',w:13},{n:'仙窍内视',w:10},{n:'流派论法',w:10},{n:'悟道石壁',w:8},{n:'仙友论道',w:7},
-   {n:'收集仙蛊',w:10},{n:'潜心研究',w:5},{n:'研习特殊杀招',w:9},{n:'蓬莱取药',w:2.36},
-   {n:'古战场拾遗',w:7},{n:'异人交易',w:6},{n:'道缘机缘',w:5}]; /* v1.6.1：升仙后删除凡道向/直升等级事件，改以流派境界精进为主 */
+   /* v1.26：保留独特X道见解/仙道淬炼/道痕共鸣/仙窍内视；删除流派论法/悟道石壁/潜心研究；权重按实际占比重校 */
+   {n:'推演仙道杀招',w:14},{n:'独特X道见解',w:11},{n:'仙蛊消失',w:7},{n:'道心堵塞',w:7},{n:'发现真传',w:12},
+   {n:'仙道淬炼',w:10},{n:'道痕共鸣',w:11},{n:'仙窍内视',w:10},{n:'仙友论道',w:9},
+   {n:'收集仙蛊',w:10},{n:'研习特殊杀招',w:10},{n:'蓬莱取药',w:2},
+   {n:'古战场拾遗',w:8},{n:'异人交易',w:7},{n:'道缘机缘',w:6}];
   if(S.eraIdx===8){travPool.push({n:'荒野寻蛊',w:10},{n:'魂道残卷',w:8});/* v1.2.9增补④：幽魂之世专有游历 */}
   if(S.eraIdx===6){travPool.push({n:'黑市·见面不相识',w:10},{n:'盗天空间',w:10});/* v1.3.1：盗天之世专有游历 */}
   /* 升仙后不再出现凡道磨砺：改由池内「仙道淬炼」等仙道事件承担境界精进 */
@@ -3883,11 +4330,24 @@ setStage('出身');
    if((S.region==='北原'||S.lv>=6)&&!hasMark('劫运坛·冰塞川'))travPool.push({n:'冰塞川·劫运坛',w:9});
    if(hasMark('影宗之主')&&!hasMark('影无邪·残响'))travPool.push({n:'影无邪·分魂残响',w:10});
    if(hasMark('影宗之主')&&!hasMark('黑楼兰·再会'))travPool.push({n:'黑楼兰·霸仙之志',w:9});
+   if(!hasMark('天庭·人道防线'))travPool.push({n:'天庭·人道防线',w:9});
+   if(!hasMark('长生天·北原合纵'))travPool.push({n:'长生天·北原合纵',w:9});
+   if(hasMark('影宗之主')&&!hasMark('影宗·中洲暗线'))travPool.push({n:'影宗·中洲暗线',w:8});
   }
+  if(RACE_TRAVEL_WEIGHT[S.race]&&!hasMark('种族传承·'+S.race))travPool.push({n:'种族传承·'+S.race,w:RACE_TRAVEL_WEIGHT[S.race]});
   /* v1.14.36：游历池统一按时代过滤 */
   travPool=travPool.filter(function(x){return eventEraAllowed(x.n);});
+  applyRouteBias(travPool); /* v1.22 真传路线权重 */
   for(var ti=0;ti<travN;ti++){
    if(S.life<=0)await ending('寿元尽消','寿数如烛，燃尽在登仙路上。');
+   travPool=travPool.filter(function(x){
+    if(x.n==='种族传承·'+S.race&&hasMark('种族传承·'+S.race))return false;
+    if(x.n==='天庭·人道防线'&&hasMark('天庭·人道防线'))return false;
+    if(x.n==='长生天·北原合纵'&&hasMark('长生天·北原合纵'))return false;
+    if(x.n==='影宗·中洲暗线'&&hasMark('影宗·中洲暗线'))return false;
+    return true;
+   });
+   if(!travPool.length)break;
    var tp2=[];travPool.forEach(function(x){tp2.push([x.n,x.w]);});
    var t3=await W('游历事件'+(ti+1),'每次耗3年寿元',tp2,{small:true});
    spendLife(3);
@@ -3995,21 +4455,62 @@ setStage('出身');
   ].filter(function(x){return nameAllowed(x.n);}); /* v1.1.5【项目1】：具名守门 */
   /* v1.14.40：炼天第二世人物/势力线。事件需按前置标记、地域与修为逐步解锁。 */
   if(isSecondLife()){
+   /* v1.25：凡人期后互动向关键历练（人物交锋/可选战斗）→ 再接方源足迹链 */
+   /* v1.19：方源第二世原著足迹链。按篇章先后逐段开放；玩家是追索者，不替代方源取得原著核心成果。 */
    keyPool.push(
-    {n:'龙鲸乐土·悔哭海',w:12,g:function(){return S.lv>=6&&!hasMark('悔哭海·沈家线');}},
+    /* 三王/血海余烬改由凡人阶段结束后独立事件盘触发；义天山前夜仍在关键历练（时序更靠后） */
+    {n:'义天山前夜',w:12,g:function(){return S.lv>=6&&!hasMark('义天山前夜')&&!hasMark('义天山大战');}},
+    {n:'方源足迹·狐仙与北原',w:14,g:function(){return S.lv>=6&&!hasMark('方源足迹·狐仙与北原');}},
+    {n:'方源足迹·炼道大会与琅琊',w:12,g:function(){return hasMark('方源足迹·狐仙与北原')&&S.lv>=7&&!hasMark('方源足迹·炼道大会与琅琊');}},
+    {n:'方源足迹·影宗与东海',w:12,g:function(){return hasMark('方源足迹·炼道大会与琅琊')&&S.lv>=7&&!hasMark('方源足迹·影宗与东海');}},
+    {n:'方源足迹·南疆与光阴长河',w:11,g:function(){return hasMark('方源足迹·影宗与东海')&&S.lv>=7&&!hasMark('方源足迹·南疆与光阴长河');}},
+    {n:'龙鲸乐土·悔哭海',w:11,g:function(){return S.lv>=6&&!hasMark('悔哭海·沈家线');}},
     {n:'紫山真君·影宗遗谋',w:11,g:function(){return hasMark('影宗之主')&&!hasMark('紫山真君·遗谋已探');}},
     {n:'黑楼兰·霸仙之志',w:10,g:function(){return hasMark('影宗之主')&&!hasMark('黑楼兰·再会');}},
     {n:'紫薇仙子·星算追踪',w:10,g:function(){return S.lv>=6&&!hasMark('紫薇推算·脱身');}},
     {n:'冰塞川·劫运坛',w:9,g:function(){return S.lv>=6&&!hasMark('劫运坛·冰塞川');}},
-    {n:'凤九歌·命运歌',w:12,g:function(){return S.lv>=7&&!hasMark('凤九歌·命运歌');}}
+    {n:'凤九歌·命运歌',w:12,g:function(){return S.lv>=7&&!hasMark('凤九歌·命运歌');}},
+    {n:'南疆·五域联军',w:12,g:function(){return S.lv>=7&&!hasMark('南疆·五域联军');}},
+    {n:'西漠·帝君城援军',w:10,g:function(){return S.lv>=7&&!hasMark('西漠·帝君城援军');}},
+    {n:'东海·龙宫战局',w:10,g:function(){return S.lv>=7&&!hasMark('东海·龙宫战局');}}
    );
   }
   /* v1.6.1：所有时代蛊仙阶段均可抽到的通用境界历练（不替代本时代专属历练） */
   keyPool.push(
-   {n:'坐关悟道',w:12,g:function(){return true;}},
-   {n:'传道授业',w:10,g:function(){return true;}},
+   {n:'坐关悟道',w:10,g:function(){return true;}},
+   {n:'传道授业',w:8,g:function(){return true;}},
    {n:'道痕熔炉',w:9,g:function(){return S.schools.length>=2;}}
   );
+  /* 种族天赋会影响与本族道痕相关的关键历练权重，不直接保证抽中。 */
+  if(S.race==='毛民')keyPool.forEach(function(x){if(/炼道|炼蛊|古炼炉/.test(x.n))x.w*=1.8;});
+  if(S.race==='石人')keyPool.forEach(function(x){if(/地脉|土道|道痕熔炉/.test(x.n))x.w*=1.6;});
+  if(S.race==='雪民')keyPool.forEach(function(x){if(/雪人|冰雪|寒/.test(x.n))x.w*=1.8;});
+  if(S.race==='鲛人')keyPool.forEach(function(x){if(/东海|龙宫|水道/.test(x.n))x.w*=1.7;});
+  if(S.race==='墨人')keyPool.forEach(function(x){if(/推演|智道|星算/.test(x.n))x.w*=1.6;});
+  if(S.race==='兽人')keyPool.forEach(function(x){if(/兽潮|变化|兽骨/.test(x.n))x.w*=1.8;});
+  if(S.race==='菇人')keyPool.forEach(function(x){if(/毒|菌/.test(x.n))x.w*=1.8;});
+  if(S.race==='小人')keyPool.forEach(function(x){if(/木道|仙植|花谷/.test(x.n))x.w*=1.7;});
+  if(S.race==='龙人')keyPool.forEach(function(x){if(/奴道|龙|天庭/.test(x.n))x.w*=1.5;});
+  /* v1.19：种族只改变方源足迹的相遇权重，不改写原著事件顺序与人物结局。 */
+  if(S.race==='毛民')keyPool.forEach(function(x){if(x.n==='方源足迹·炼道大会与琅琊')x.w*=1.9;});
+  if(S.race==='雪民'||S.race==='石人')keyPool.forEach(function(x){if(x.n==='方源足迹·狐仙与北原')x.w*=1.25;});
+  if(S.race==='龙人')keyPool.forEach(function(x){if(x.n==='方源足迹·影宗与东海')x.w*=1.65;});
+  if(S.race==='鲛人')keyPool.forEach(function(x){if(x.n==='方源足迹·影宗与东海')x.w*=1.45;});
+  if(S.race==='墨人')keyPool.forEach(function(x){if(x.n==='方源足迹·南疆与光阴长河')x.w*=1.2;});
+  applyRouteBias(keyPool); /* v1.22 真传路线权重 */
+  /* 至尊仙胎·玩家成尊线：追加专属历练入口（仅转身成功后） */
+  if(S.flags.supreme&&S.flags.supremePath&&S.flags.supremePath!=='seal'){
+   if(!hasMark('仙胎·养炼一纪')&&S.flags.supremePath==='self')keyPool.push({n:'仙胎·养炼一纪',w:18,g:function(){return S.flags.supreme&&!hasMark('仙胎·养炼一纪');}});
+   if(!hasMark('仙胎·影烬借势')&&S.flags.supremePath==='shadow')keyPool.push({n:'仙胎·影烬借势',w:18,g:function(){return S.flags.supreme&&!hasMark('仙胎·影烬借势');}});
+   if(!hasMark('仙胎·同调疾进')&&S.flags.supremePath==='fang')keyPool.push({n:'仙胎·同调疾进',w:18,g:function(){return S.flags.supreme&&!hasMark('仙胎·同调疾进');}});
+   if(!hasMark('仙胎·天庭风声'))keyPool.push({n:'仙胎·天庭风声',w:14,g:function(){return S.flags.supreme&&!hasMark('仙胎·天庭风声');}});
+   /* v1.23 成尊线中后段：仅炼天第二世、修为足够后解锁，衔接宿命大战前布局 */
+   if(isSecondLife()){
+    if(!hasMark('仙胎·吞窍蓄势')&&Math.floor(S.lv)>=6)keyPool.push({n:'仙胎·吞窍蓄势',w:16,g:function(){return S.flags.supreme&&Math.floor(S.lv)>=6&&!hasMark('仙胎·吞窍蓄势');}});
+    if(!hasMark('仙胎·入河余力')&&Math.floor(S.lv)>=7)keyPool.push({n:'仙胎·入河余力',w:15,g:function(){return S.flags.supreme&&Math.floor(S.lv)>=7&&!hasMark('仙胎·入河余力');}});
+    if(!hasMark('仙胎·战前布子')&&Math.floor(S.lv)>=7)keyPool.push({n:'仙胎·战前布子',w:15,g:function(){return S.flags.supreme&&Math.floor(S.lv)>=7&&!hasMark('仙胎·战前布子');}});
+   }
+  }
   var trialN=4+(S.flags.extraTrial?1:0);
   for(var ki=0;ki<trialN;ki++){
    if(S.life<=0)await ending('寿元尽消','寿数如烛，燃尽在登仙路上。');
@@ -4807,10 +5308,35 @@ function isBirthStoryName(name){
  var k,arr,i;for(k in BIRTH_STORY){arr=BIRTH_STORY[k];for(i=0;i<arr.length;i++)if(arr[i].n===name)return true;}
  return false;
 }
+async function raceStoryDispatch(name){
+ var ev=RACE_MORTAL_EVENT[S.race];
+ if(!ev||name!==ev[0]||hasMark('种族初历·'+S.race))return false;
+ var desc={
+  '人族':'你在族中旧卷里读到人祖传说。人族并非天生统治五域，今日的秩序是漫长抗争的结果。',
+  '毛民':'毛民工坊炉火不熄，族中长者以炼蛊手法教你辨识仙材与凡材。',
+  '石人':'石人部族在地下沉眠，以魂魄底蕴与土金矿脉维系族群。你随长者巡看地脉。',
+  '雪民':'雪原夜猎开始，族人采集淚冰并避开雪怪。冰雪道痕在寒风中共鸣。',
+  '羽民':'羽民聚落不愿受外族拘束，你随族人追逐高空云流，见识自由蛊的传闻。',
+  '鲛人':'海底祭歌响起，鲛人以歌声沟通海潮，东海诸族的盟约与争端同时浮现。',
+  '墨人':'书山旧卷残缺不全，墨人长者以智道推演补缀历史，教你从只言片语中找出线索。',
+  '蛋人':'族中长辈展示蛋晶石的形成与保存之法，生命精粹既是族群遗泽，也是珍贵资源。',
+  '兽人':'你接触到兽人遗族的旧俗与变化道传承。后世陆上部族衰亡，东海水生支系仍留有踪迹。',
+  '小人':'方寸之间自有天地。小人族带你辨认灵植与花蜜，木道培育之术细密而精巧。',
+  '菇人':'菌圃毒雾弥漫，菇人长者教你分辨可用菌材与致命毒素，毒道并非只知杀伐。',
+  '龙人':'龙人族中仍流传龙公创造族群的旧事。奴道天赋带来统御之能，也令族群命运与天庭纠葛。'
+ };
+ await say(desc[S.race]||'你从本族传承中窥见一角旧史。','sys');
+ var c=await optW('种族初历·'+S.race,[['研习本族天赋',40],['磨炼身心',35],['寻访族中旧藏',25]]);
+ if(c===0){S.tIdx=Math.min(8,S.tIdx+1);await say('你对本族天赋的理解更进一步——才情+1。','good');}
+ else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你在族群生活中磨砺心志——道心+1。','good');}
+ else{S.flags.daoYuan=(S.flags.daoYuan||0)+1;await wormUp(1);await say('你寻得一份族中旧藏，蛊虫完善度+1，道缘+1。','gold');}
+ S.marks.push('种族初历·'+S.race);chr('种族初历·'+S.race);renderPanel();return true;
+}
 async function genericEvent(name){
  var _eraPool=ERA_MORTAL_EVENTS[S.eraIdx]||[];
- if(!MORTAL_SCENES[name]&&!_eraPool.some(function(e){return e.n===name;})&&!isBirthStoryName(name))return false;
+ if(!MORTAL_SCENES[name]&&!_eraPool.some(function(e){return e.n===name;})&&!isBirthStoryName(name)&&!(RACE_MORTAL_EVENT[S.race]&&RACE_MORTAL_EVENT[S.race][0]===name))return false;
  dexAdd('ev',name); /* 只登记当前时代事件池中实际存在的事件 */
+ if(await raceStoryDispatch(name))return;
  /* v1.14.36 出生地专属 */
  if(await birthStoryDispatch(name))return;
  if(S.eraIdx===2){
@@ -4979,6 +5505,53 @@ function lowestSchool(){
  return m||mainSchool()||{name:'主修',realm:0};
 }
 async function doTravail(n){
+ if(n==='种族传承·'+S.race){
+  var text={
+   '人族':'你在古籍与人道遗篇中追索人祖传说。人族的灵性与组织能力，使其能不断学习、整合百家之长。',
+   '毛民':'毛民炼道工坊向你开放一处炉室，炼材、火候与蛊方互相印证。',
+   '石人':'石人遗脉带你深入地底矿脉，土金道痕与石身结构相互呼应。',
+   '雪民':'雪民旧地封存着淚冰与冰雪道传承，你在寒潮中辨认族群留下的印记。',
+   '羽民':'羽民带你寻访高空聚落，云流与自由蛊的线索在风中若隐若现。',
+   '鲛人':'鲛人王庭外围举行海祭，你从潮汐、歌声与海底蛊材中体会水音两道。',
+   '墨人':'墨人书山残卷可供参阅，你以智道推演补足一段断裂的传承。',
+   '蛋人':'蛋人旧藏保存着蛋晶石与生命精粹的秘密，资源珍贵且不可滥取。',
+   '兽人':'你循东海水生兽人支系的踪迹，接触残存变化道传承；陆上兽人已非昔日盛况。',
+   '小人':'小人族的花谷与灵植园向你开放，你学习以细微手段培育仙植。',
+   '菇人':'菇人菌圃中藏有毒道材料与辨毒之法，稍有不慎便会反噬自身。',
+   '龙人':'龙人旧族传承牵连龙公与天庭旧事，奴道天赋与族群命运始终相伴。'
+  };
+  await say(text[S.race]||'你追索本族传承，得到一段旧史与修行启发。','gold');
+  var rc=await optW('种族传承·'+S.race,[['研习道痕与传承',40],['交换族群情报',35],['搜集相关蛊材',25]]);
+  if(rc===0){var aff=RACE_SCHOOL[S.race]||[];if(aff.length&&hasSchool(aff[0])){setRealm(aff[0],Math.min(7,rlm(aff[0])+1));await say(aff[0]+'境界提升，族群天赋与修行相互印证。','good');}else{S.tIdx=Math.min(8,S.tIdx+1);await say('你对本族传承理解加深，才情+1。','good');}}
+  else if(rc===1){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.dhIdx=Math.min(8,S.dhIdx+1);await say('你换得一份可信情报，道缘+1、道心+1。','good');}
+  else{await wormUp(1);S.life=Math.min(S.maxLife,S.life+2);await say('蛊材入手，蛊虫完善度+1，寿元恢复2年。','gold');}
+  S.marks.push('种族传承·'+S.race);chr('种族传承·'+S.race);renderPanel();return;
+ }
+ /* v1.16：宿命大战前的跨势力连续线；临时协作不等于永久结盟 */
+ if(n==='天庭·人道防线'){
+  await say('中洲炼道大会召开在即，天庭修复宿命蛊的计划牵动五域局势。正元老人调动人道手段，秦鼎菱统筹战力；紫薇仙子则持续推演潜伏者。炼道大会与不败福地、帝君城、隐藏龙窟及天庭本部的战局逐渐连成一线。','sys');
+  var ht=await optW('天庭·人道防线',[['协助正元老人梳理人道意志',40],['向秦鼎菱交换战场情报',35],['暗中观察紫薇推演',25]]);
+  if(ht===0){S.morIdx=Math.min(7,S.morIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你看见人道众意如何汇聚，也看见它并非没有代价——道德+1，道缘+1。','gold');}
+  else if(ht===1){S.tIdx=Math.min(8,S.tIdx+1);await say('秦鼎菱只交换了战场外围情报，真正的运道底牌仍然保留——才情+1。','good');}
+  else{if(await rollW(48+rlm('智道')*5,'天庭推演旁观盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你从星算与人道布置的交界处看出一处破绽——道心+1。','gold');}else{S.pctMods-=0.03;await say('推演余波扫过你的心神，你留下了可疑痕迹（权重-3%）。','bad');}}
+  S.marks.push('天庭·人道防线');chr('天庭·人道防线');return;
+ }
+ if(n==='长生天·北原合纵'){
+  await say('北原各部并非天然一心。长生天借助巨阳仙尊的威望整合黄金血脉与散修，冰塞川负责联络与布局；楚度等北原强者各有自己的算盘。长生天能号令一部分北原，却不能让所有人毫无保留地听命。','sys');
+  var cs=await optW('长生天·北原合纵',[['替冰塞川递送部族情报',40],['拜访楚度，谈北原散修立场',35],['只观察黄金血脉盟议',25]]);
+  if(cs===0){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('情报送达劫运坛，冰塞川记下你这份人情，却没有许诺让你进入核心——道缘+1，才情+1。','gold');}
+  else if(cs===1){if(await rollW(48+S.tIdx*4,'楚度论势盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('楚度不愿受人驱使，你也没有强求；北原散修与长生天之间仍留着可谈的余地——道心+1。','good');}else{S.pctMods-=0.03;await say('谈话不欢而散，你被当成某一方的说客（权重-3%）。','bad');}}
+  else{S.tIdx=Math.min(8,S.tIdx+1);await say('黄金血脉愿意响应号召，但各部利益并不相同——才情+1。','good');}
+  S.marks.push('长生天·北原合纵');chr('长生天·北原合纵');return;
+ }
+ if(n==='影宗·中洲暗线'){
+  await say('影宗并未因紫山真君的遗谋而变成一支能公开列阵的军队。影无邪与残部各自求生，白凝冰、黑楼兰等人的立场也不完全相同；你发现他们真正能做的，是在天庭视线之外制造牵制、传递情报与保全传承。','sys');
+  var sy=await optW('影宗·中洲暗线',[['协助影无邪转移残部',40],['替黑楼兰打探北原消息',35],['取走一份影宗情报后离开',25]]);
+  if(sy===0){if(await rollW(45+rlm('魂道')*5+S.dhIdx*2,'影宗转移盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('残部暂时脱离追踪，但影宗没有因此恢复昔日规模——道心+1。','gold');}else{S.pctMods-=0.04;await say('天庭追踪线逼近，转移被迫中断（权重-4%）。','bad');}}
+  else if(sy===1){S.tIdx=Math.min(8,S.tIdx+1);await say('黑楼兰只给出有限消息，她仍按自己的目标行事——才情+1。','good');}
+  else{await wormUp(1);S.morIdx=Math.max(0,S.morIdx-1);await say('你带走一份残缺情报与蛊材，影宗残部也失去了一处联络点——完善度+1，道德-1。','bad');}
+  S.marks.push('影宗·中洲暗线');chr('影宗·中洲暗线');return;
+ }
  /* v1.14.40 炼天第二世人物游历：以人物立场/原著关系为核心，不擅自改写人物归属 */
  if(n==='琅琊·毛民炼道'){
   await say('琅琊福地中，毛民炼道场炉火不熄。地灵仍记得长毛老祖留下的规矩：炼蛊先炼心，交易先讲价。','sys');
@@ -5013,7 +5586,7 @@ async function doTravail(n){
   if(!hasMark('影无邪·残响'))S.marks.push('影无邪·残响');chr('影无邪·分魂残响');
  }
  else if(n==='黑楼兰·霸仙之志'){
-  await say('黑楼兰立在山巅，气势不减。她的野心与处境都不容旁人轻慢；她不会因为你的一句招揽便改变立场。','sys');
+  await say('此时的黑楼兰尚在北原蛰伏，她尚未重修力道成为黑月仙子，但那股霸道的野心已初露端倪。你在与她的交锋中，能感受到她未来必将挑战楚度的锋芒。她的野心与处境都不容旁人轻慢；她不会因为你的一句招揽便改变立场。','sys');
   var hl2=await optW('黑楼兰·霸仙之志',[['坦诚谈论霸业',40],['切磋力道',35],['观察后离去',25]]);
   if(hl2===0){if(await rollW(45+S.tIdx*3+S.dhIdx*2,'霸仙论志盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('你们对霸业的理解并不相同，却都听懂了对方的野心——才情+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('话不投机。她不再给你第二次解释的机会——道心-1。','bad');}}
   else if(hl2===1){var hbw=await battleRound(foeAnchor(2,2),'黑楼兰·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('一击之后各自收手。力道境界精进。','gold');});if(!hbw)await say('你被她的蛮力逼退，至少看清了差距。','bad');}
@@ -5104,10 +5677,10 @@ async function doTravail(n){
   chr('古战场拾遗');
  }
  else if(n==='异人交易'){
-  await say('夜市尽头有个蒙面人，摊上只摆三样东西，不标价，只问「你拿什么换」。','sys');
+  await say('夜市尽头有个蒙面人，摊上只摆四样东西，不标价，只问「你拿什么换」。','sys');
   S.flags.daoYuan=(S.flags.daoYuan||0)+1;
   var _sm=lookSocialMul();
-  var t=await optW('异人交易',[['用完善度换杀招',Math.max(1,Math.round(35*_sm))],['用道心换蛊材',Math.max(1,Math.round(35*_sm))],['拒不交易',30]]);
+  var t=await optW('异人交易',[['用完善度换杀招',Math.max(1,Math.round(35*_sm))],['用道心换蛊材',Math.max(1,Math.round(35*_sm))],['用寿元换道意',20],['拒不交易',30]]);
   if(t===0){
    if(S.wormIdx<6){S.wormIdx=Math.min(6,S.wormIdx+1);log('以完善度换杀招——完善度下降。','bad');}
    if(!hasMove('暗噬')){learnSpec('暗噬','暗道');await say('蒙面人丢来一卷黑绢——【暗噬】入手。','gold');}
@@ -5115,6 +5688,15 @@ async function doTravail(n){
   }else if(t===1){
    if(S.dhIdx>0){S.dhIdx--;await say('你割下一缕道心作价——心里空了一寸。','bad');}
    await wormUp(2);await say('换来两只好蛊，完善度+2。','good');
+  }else if(t===2){
+   var _mr=mainSchool();
+   if(_mr&&_mr.realm>=7){await say('蒙面人看了看你的道，摇头：「你的主修已至尽头，这一句点不破什么。」他没要你的寿元。','');}
+   else if(S.life>5){
+    spendLife(5);
+    S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+    var _m=mainRealmUp(1);
+    await say('你让出五年寿元，换他一句点破迷津——等级微晋，主修【'+_m.name+'】境界精进至'+REALMS[_m.realm]+'（寿元-5）。','gold');
+   }else await say('蒙面人看了看你的气色，摇头：「你的寿元，不够换。」','bad');
   }else{await say('你摇头离开。蒙面人也不追。','');}
   chr('异人交易');
  }
@@ -5818,9 +6400,9 @@ var ERA_MORTAL_EVENTS={
  9:[{n:'净土施粥',w:12},{n:'厚土石窟',w:11},{n:'万家灯会',w:10},
     {n:'归土安魂',w:10},{n:'渡口问心',w:10},{n:'乐土钟声',w:9}],
  /* 炼天之世：青茅山凡人见闻（原通用表归入本世）+ 出生地/世数专属 */
- 10:[{n:'小兽潮支援',w:10},{n:'年末演武',w:10},{n:'山道遇袭',w:9},
-     {n:'蛤蟆商队',w:9},{n:'灵泉告急',w:9},{n:'行旅救援',w:9},
-     {n:'野地采蛊',w:9},{n:'坊间论道',w:9},{n:'临时委托',w:9},
+ 10:[/* v1.25：移除固定强制战斗类凡人事件（小兽潮支援/年末演武/山道遇袭/行旅救援） */
+     {n:'蛤蟆商队',w:11},{n:'灵泉告急',w:10},
+     {n:'野地采蛊',w:10},{n:'坊间论道',w:10},{n:'临时委托',w:10},
      {n:'花酒遗洞',w:11,g:function(){return qingmaoBirth();}},
      {n:'竹林酒香',w:10,g:function(){return qingmaoBirth();}},
      {n:'祖血旧事',w:9,g:function(){return qingmaoBirth();}},
@@ -5913,10 +6495,14 @@ function buildWujiMortalPool(){
    if(!list.some(function(x){return x.n===e.n;}))list.push({n:e.n,w:e.w,g:e.g});
   });
  }
- return list.filter(function(x){
+ var raceEvent=RACE_MORTAL_EVENT[S.race];
+ if(raceEvent&&!hasMark('种族初历·'+S.race))list.push({n:raceEvent[0],w:raceEvent[1]});
+ var _out=list.filter(function(x){
   if(!x.g)return true;
   try{return !!x.g();}catch(e){return false;}
  }).map(function(x){return {n:x.n,w:x.w};});
+ applyRouteBias(_out);
+ return _out;
 }
 async function birthStoryDispatch(name){
  if(name==='白骨坊市'){await birthBaiGu();return true;}
@@ -7226,7 +7812,7 @@ async function hunI1(){
  if(c===0){if(await rollW(70,'潜行盘'))await sayS('你把自己压成一粒尘埃——潮水从你身上流了过去。','good');else{S.dhIdx=Math.max(0,S.dhIdx-1);await sayS('潮里伸出一只手抓住了你的脚踝——你挣脱了，魂气却蚀了心神（道心-1）。','bad');}}
  else{
   var won=await backRound(180,'魂潮·潮头厉魄',async function(){await sayS('你劈开了潮头——后面的魂流绕着你走了。','gold');},{});
-  if(won){await wormUp(1);await sayS('碎魂凝成的魂珠落了一地（完善度+1）。','good');}
+  if(won){await wormUp(1);S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');mainRealmUp(1);await sayS('碎魂凝成的魂珠落了一地（完善度+1）——魂潮过身，等级微晋，主修境界+1。','good');}
  }
  chr('魂潮夜行');
 }
@@ -7339,7 +7925,8 @@ async function ylL6(){
  if(c===0){
   if(!hasMark('元莲画意'))S.marks.push('元莲画意');
   S.flags.ylLotus=(S.flags.ylLotus||0)+2;var m=mainRealmUp(1);
-  await say('故人点头，化作一笔融进你的道——得【元莲画意】，主修+1，印记+2。','gold');
+  S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+  await say('故人点头，化作一笔融进你的道——得【元莲画意】，等级微晋，主修+1，印记+2。','gold');
  }else if(c===1){S.tIdx=Math.min(8,S.tIdx+2);S.flags.ylLotus=(S.flags.ylLotus||0)+1;await say('你另铺一卷新纸——才情+2，元莲印记+1。','gold');}
  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你封了卷。山里的风替你续了半笔——道心+1。','good');}
  chr('元莲画意');
@@ -7388,7 +7975,7 @@ async function ltL4(){
 async function ltL5(){
  await say('净土深处的钟自己响了。钟声过处，有人放下刀，有人哭出声。','gold');
  var c=await optW('乐土钟鸣',[['听钟入定',40],['敲钟三下',35],['掩耳离开',25]]);
- if(c===0){S.flags.ltParadise=(S.flags.ltParadise||0)+1;S.dhIdx=Math.min(8,S.dhIdx+1);mainRealmUp(1);await say('钟声落进仙窍——主修+1，道心+1，印记+1。','gold');}
+ if(c===0){S.flags.ltParadise=(S.flags.ltParadise||0)+1;S.dhIdx=Math.min(8,S.dhIdx+1);mainRealmUp(1);S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');await say('钟声落进仙窍——等级微晋，主修+1，道心+1，印记+1。','gold');}
  else if(c===1){setRealm('土道',Math.min(7,Math.max(1,rlm('土道')+1)));S.flags.ltParadise=(S.flags.ltParadise||0)+1;await say('你敲了三下，土里的根都应了——土道精进，印记+1。','gold');}
  else{S.tIdx=Math.min(8,S.tIdx+1);await say('你捂住耳朵走远。钟声却跟了你一路——才情+1。','good');}
  chr('乐土钟鸣');
@@ -7407,12 +7994,168 @@ async function ltL6(){
  chr('善念试炼');
 }
 async function doKeyTrial(n){
+ /* v1.22 至尊仙胎·玩家成尊线专属历练（仅转身成功后入池） */
+ if(n==='仙胎·养炼一纪'){
+  await say('隐世一纪。你不与五域争名，只让至尊仙胎体按自己的节奏吞并散修仙窍残痕——每一步都比凡人慢，却比凡人稳。','gold');
+  var ap=await optW('养炼一纪',[['专攻主修道痕',40],['分润各派根基',35],['以寿换境',25]]);
+  if(ap===0){mainSchool().realm=Math.min(7,mainSchool().realm+1);await say('主修精进至【'+REALMS[mainSchool().realm]+'】。','gold');}
+  else if(ap===1){S.schools.forEach(function(x){x.realm=Math.min(6,x.realm+1);});await say('各派境界普进一阶（封顶宗师）。','good');}
+  else{if(S.life>12){spendLife(8);S.lv=Math.min(8.5,S.lv+0.5);await say('寿元-8，等级微晋。','gold');}else await say('寿元不足，只得稳养。','bad');}
+  S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.marks.push('仙胎·养炼一纪');chr('仙胎·养炼一纪');return;
+ }
+ if(n==='仙胎·影烬借势'){
+  await say('影宗余烬把你当成新的容器。你清楚：他们要的是「下一个幽魂」，你要的是他们的库藏。','bad');
+  var sh=await optW('影烬借势',[['吞其库藏后抽身',40],['暂做影主调兵',35],['反炼影魂入胎',25]]);
+  if(sh===0){await wormUp(2);S.morIdx=Math.max(0,S.morIdx-1);await say('仙蛊完善度+2，道德-1。','gold');}
+  else if(sh===1){if(!hasMark('影宗之主'))S.marks.push('影宗之主');S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('暂得影宗调度之便——道缘+1。','gold');}
+  else{var oksh=await backRound(Math.max(140,Math.round(anchor()*1.05)),'影魂反噬',async function(){await say('影魂被按进胎膜！','gold');},{});if(oksh){setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));S.pctMods+=0.05;await say('魂道精进，权重+5%。','gold');}else{S.pctMods-=0.06;await say('反噬未净（权重-6%）。','bad');}}
+  S.marks.push('仙胎·影烬借势');chr('仙胎·影烬借势');return;
+ }
+ if(n==='仙胎·同调疾进'){
+  await say('你不复刻方源的心性，只复刻他「用仙胎换时间」的节奏：该吞则吞，该走则走，绝不在同一片战场耗到天庭布完网。','gold');
+  var fp=await optW('同调疾进',[['练吞窍手感',38],['赶东海龙宫节拍',34],['预留光阴长河余力',28]]);
+  if(fp===0){S.lv=Math.min(8.5,S.lv+0.5);await wormUp(1);await say('等级微晋，完善度+1。','gold');}
+  else if(fp===1){S.flags.daoYuan=(S.flags.daoYuan||0)+2;S.tIdx=Math.min(8,S.tIdx+1);await say('你把龙宫相关势力的利害写成一张表——才情+1，道缘+2。','gold');}
+  else{if(!hasMark('光阴余力'))S.marks.push('光阴余力');S.flags.hlTime=(S.flags.hlTime||0)+1;await say('【光阴余力】——日后入河，你比旁人多一口气。','gold');}
+  S.marks.push('仙胎·同调疾进');chr('仙胎·同调疾进');return;
+ }
+ if(n==='仙胎·天庭风声'){
+  await say('天庭的推演迟了半步：义天山散场时，至尊仙胎的气息已经不在原定容器上。紫薇一脉开始按「第二嫌疑人」搜你。','sys');
+  var tw=await optW('天庭风声',[['换身份潜伏',40],['示弱诱敌',30],['硬抗一次清剿',30]]);
+  if(tw===0){S.pctMods+=0.03;await say('你从名单上淡了一格——权重+3%。','good');}
+  else if(tw===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你故意露出破绽，摸清了追兵的阵法节奏——才情+1。','gold');}
+  else{var oktw=await backRound(Math.max(160,Math.round(anchor()*1.1)),'天庭清剿队',async function(){await say('清剿队退了。','gold');},{});if(oktw){S.dhIdx=Math.min(8,S.dhIdx+1);await say('道心+1。','good');}else{S.pctMods-=0.05;spendLife(3);await say('带伤脱身（权重-5%，寿元-3）。','bad');}}
+  S.marks.push('仙胎·天庭风声');chr('仙胎·天庭风声');return;
+ }
+ if(n==='仙胎·吞窍蓄势'){
+  await say('至尊仙胎体最锋利的用法，不是一战成名，而是一次次把散修仙窍的道痕吃进自己的底盘。你刻意避开原著里方源已经走通的那几处名山，只挑无人认领的残窍。','gold');
+  var c=await optW('吞窍蓄势',[['稳吞残窍',42],['冒险夺半残福地',33],['只记手法不实吞',25]]);
+  if(c===0){S.lv=Math.min(8.5,S.lv+0.5);await wormUp(1);await say('等级微晋，完善度+1。','gold');}
+  else if(c===1){var ok=await backRound(Math.max(150,Math.round(anchor()*1.05)),'半残福地守影',async function(){await say('守影散了。','gold');},{});if(ok){S.lv=Math.min(8.5,S.lv+1);S.schools.forEach(function(x){x.realm=Math.min(6,x.realm+1);});await say('你吞下一角半残福地——等级与各派根基同进。','gold');}else{S.pctMods-=0.05;await say('守影反噬（权重-5%）。','bad');}}
+  else{S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你只记下手法，不与天庭抢时间——才情+1，道缘+1。','good');}
+  S.marks.push('仙胎·吞窍蓄势');chr('仙胎·吞窍蓄势');return;
+ }
+ if(n==='仙胎·入河余力'){
+  await say('光阴长河的风已经能在梦里听见。你不与方源争红莲真传的第一落点，只给自己留一截「进得去、出得来」的余力。','sys');
+  var c=await optW('入河余力',[['炼一式退路杀招',40],['存一道宙道道痕',35],['与红莲余韵无涉',25]]);
+  if(c===0){if(!hasMove('空穴一线')&&hasSchool('宇道'))learnSpec('空穴一线','宇道');S.pctMods+=0.04;await say('退路更活——权重+4%。','gold');}
+  else if(c===1){setRealm('宙道',Math.min(7,Math.max(1,rlm('宙道')+1)));S.flags.hlTime=(S.flags.hlTime||0)+1;await say('宙道精进，光阴印记+1。','gold');}
+  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你把野心按住。道心+1。','good');}
+  if(!hasMark('光阴余力'))S.marks.push('光阴余力');
+  S.marks.push('仙胎·入河余力');chr('仙胎·入河余力');return;
+ }
+ if(n==='仙胎·战前布子'){
+  await say('宿命大战将至。你手里有至尊仙胎体，天庭与方源都把你写成变量——变量可以躲，也可以自己落子。','gold');
+  var c=await optW('战前布子',[['布隐线：大战时不站C位',38],['布资源线：战后直扑疯魔窟',34],['布同盟线：与一方临时交换情报',28]]);
+  if(c===0){S.flags.zunHide=true;S.pctMods+=0.03;await say('你决定在大战中压低存在感——权重+3%。','good');}
+  else if(c===1){S.flags.zunRushKoku=true;S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你把补给与退路都指向北原疯魔窟——道缘+1。','gold');}
+  else{S.flags.zunTempAlly=true;S.tIdx=Math.min(8,S.tIdx+1);await say('一纸临时情报交换，不构成永久盟约——才情+1。','good');}
+  S.marks.push('仙胎·战前布子');chr('仙胎·战前布子');return;
+ }
+ /* v1.25：互动向关键历练——与人物/势力交锋，可选战斗，非纯旁白 */
+ if(n==='三王传承余波'){
+  await say('三王传承已落幕。商家城外围的一家客栈里，你撞见自称「收尾」的南疆散修——他盯着你袖口的南疆泥印，冷声道：「方源与白凝冰走了，余波却没散。你是来分一杯，还是来挡道？」话音未落，他已催动蛊虫封住门窗。','sys');
+  var sw=await optW('三王传承余波',[['硬接：与其交手逼问线索',40],['出示筹码：以情报换情报',35],['转身离开：不卷入余波',25]]);
+  if(sw===0){
+   var ok=await backRound(Math.max(110,Math.round(anchor()*0.9)),'南疆收尾散修',async function(){await say('对方吐血退开，把一张残图甩在桌上。','gold');},{});
+   if(ok){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('残图上是一条被抹去的逃逸线——才情+1，道缘+1。核心传承仍不在你手，但风向已明。','gold');}
+   else{S.pctMods-=0.04;await say('他借夜色遁走，你只落下轻伤（权重-4%）。','bad');}
+  }else if(sw===1){
+   if(await rollW(52+S.tIdx*2+S.dhIdx,'情报交换盘')){await wormUp(1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你用一份无害情报换来商家城外围布眼图与一批蛊材——完善度+1，道缘+1。','good');}
+   else{S.morIdx=Math.max(0,S.morIdx-1);await say('对方收了你的，却只丢下一句空话——道德-1。','bad');}
+  }else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有下场。客栈灯火摇晃，道心+1。','good');}
+  S.marks.push('三王传承余波');chr('三王传承余波');return;
+ }
+ if(n==='白骨山·血海余烬'){
+  await say('白骨山骨粉未干。一名披着血色斗篷的血道修士拦住去路，声音嘶哑：「血海老祖的余烬还在山里发热。方源与白凝冰取走了正主，留下的残火……够你我争一争。」他抬手，血雾向你卷来。','sys');
+  var xh=await optW('白骨山·血海余烬',[['迎战：夺余烬一角',40],['共悟：与他分余烬',35],['清扫余孽后离开',25]]);
+  if(xh===0){
+   var ok2=await backRound(Math.max(120,Math.round(anchor()*0.95)),'血道余烬修士',async function(){await say('血雾散尽，斗篷落地。','gold');},{});
+   if(ok2){setRealm('血道',Math.min(7,Math.max(1,rlm('血道')+1)));if(!hasMark('血海真传')&&R(0.22)){S.marks.push('血海真传');await say('余烬入体——血道境界+1，竟触及【血海真传】一角！','gold');}else await say('余烬入体——血道境界+1。','gold');}
+   else{S.pctMods-=0.04;await say('血潮反噬，气机一滞（权重-4%）。','bad');}
+  }else if(xh===1){
+   if(await rollW(50+rlm('血道')*4+S.tIdx*2,'共悟余烬盘')){S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);await say('二人分坐骨堆两侧，余烬各取一半——才情+1，完善度+1。','good');}
+   else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('对方忽然变脸抢夺，你只得退让——道心-1。','bad');}
+  }else{S.morIdx=Math.min(7,S.morIdx+1);await wormUp(1);await say('你清扫了几处余孽，换得一批血道蛊材——道德+1，完善度+1。','good');}
+  S.marks.push('白骨山·血海余烬');chr('白骨山·血海余烬');return;
+ }
+ if(n==='义天山前夜'){
+  await say('义天山风声渐紧。山脚密林里，你与一名影宗外围探子狭路相逢——对方眼中闪过杀意：「大战在即，活人多一张嘴，就多一分泄密的可能。」刃光已起。','sys');
+  var yt=await optW('义天山前夜',[['交手：生擒探子逼问',40],['亮出立场：临时交换情报',35],['远观不入：避开交锋',25]]);
+  if(yt===0){
+   var ok3=await backRound(Math.max(125,Math.round(anchor()*0.95)),'影宗外围探子',async function(){await say('你摸清了外围一角阵眼分布。','gold');},{});
+   if(ok3){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('探子吐出半句暗号后昏死——才情+1，道缘+1。','gold');}
+   else{S.pctMods-=0.04;await say('探子反咬一口后遁入夜色（权重-4%）。','bad');}
+  }else if(yt===1){
+   if(await rollW(50+S.tIdx*2+S.dhIdx,'前夜情报交换盘')){S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你用一份无害风向换来天庭眼线动向——道缘+1。双方心知这不是盟约。','good');}
+   else await say('对方收了你的，却只丢下一句空话。','sys');
+  }else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有踏入山脚。前夜的风里，道心更静——道心+1。','good');}
+  S.marks.push('义天山前夜');chr('义天山前夜');return;
+ }
+ /* v1.19：方源第二世原著足迹。只让玩家见证/追索其经历，不把方源的传承、仙蛊或尊位转授玩家。 */
+ if(n==='方源足迹·狐仙与北原'){
+  await say('你循着旧日线索追到狐仙福地。方源在三王传承脱身后，借定仙游蛊抢先夺得狐仙福地，并以荡魂山建立根基；其后又以常山阴之名进入北原，借狼群、英雄大会与黑楼兰的争夺，逐步逼近王庭福地。','gold');
+  var fyh=await optW('方源足迹·狐仙与北原',[['研究荡魂山与胆识蛊资源',38],['追查常山阴与狼群布局',34],['记录王庭福地与真阳楼线索',28]]);
+  if(fyh===0){setRealm('魂道',Math.min(7,Math.max(1,rlm('魂道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你从荡魂山与胆识蛊的运用中参悟魂道资源经营之法——魂道境界+1，道缘+1。','gold');}
+  else if(fyh===1){S.tIdx=Math.min(8,S.tIdx+1);await say('常山阴只是方源在北原行走的身份。你看出他借狼群与部族纷争撬动局势，却没有把黑楼兰写成他的附庸——才情+1。','good');}
+  else{if(await rollW(52+rlm('智道')*4,'真阳楼线索盘')){S.flags.daoYuan=(S.flags.daoYuan||0)+1;await wormUp(1);await say('你拼出八十八角真阳楼与王庭福地的部分关联——道缘+1，仙蛊完善度+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('真阳楼的布置远超你的推演，你只确认了危险所在——道心-1。','bad');}}
+  S.marks.push('方源足迹·狐仙与北原');chr('追索方源足迹·狐仙与北原');return;
+ }
+ if(n==='方源足迹·炼道大会与琅琊'){
+  await say(S.flags.supreme?'北原王庭福地与八十八角真阳楼崩塌后，方源的处境比原轨迹更险。至尊仙胎体已在你手，他失去了最捷近的吞窍优势，只能以更狠的布局与更险的赌注参加中洲炼道大会，并转向琅琊福地与长毛真意苦修炼道。':'北原王庭福地与八十八角真阳楼崩塌后，方源的处境愈发艰难。他一面隐藏身份、经营仙窍与资源，一面参加中洲炼道大会。方源凭借至尊仙胎体吞窍的独特优势，才得以谋夺不败福地积累的成功道痕；后来又借琅琊福地与长毛真意提升炼道造诣，逐渐逼近准无上大宗师。','gold');
+  var fyl=await optW('方源足迹·炼道大会与琅琊',[['研究不败福地与成功道痕',38],['向毛民炼师请教炼道',37],['推演长毛真意的价值',25]]);
+  if(fyl===0){if(await rollW(48+rlm('炼道')*6+S.tIdx*2,'成功道痕研究盘')){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say(S.flags.supreme?'仙胎既在你手，方源此世再无那条吞窍捷径。你旁观他另辟的险棋，仍从中窥见一角炼道真意——才情+1，道缘+1。':'方源凭至尊仙胎体吞窍的独特优势，才得以谋夺不败福地的成功道痕。你在一旁观察，虽无法复现他的路线，却从这份胆大包天的算计中窥见一角炼道真意——才情+1，道缘+1。','gold');}else{S.tIdx=Math.min(8,S.tIdx+1);await say('你无法复现方源吞窍夺取成功道痕的路线，却看清了炼道大会背后的天庭布局——才情+1。','good');}}
+  else if(fyl===1){if(await rollW(50+rlm('炼道')*6,'毛民炼道问答盘')){setRealm('炼道',Math.min(7,Math.max(1,rlm('炼道')+1)));await wormUp(1);await say('毛民炼师展示了不同流派的炼蛊手法——炼道境界+1，仙蛊完善度+1。','gold');}else{await say('毛民炼师认为你火候未到，只让你旁观一炉。','sys');}}
+  else{S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('长毛真意不是一份现成配方，而是炼道底蕴的整体提升——才情+1，道缘+1。','good');}
+  S.marks.push('方源足迹·炼道大会与琅琊');chr('追索方源足迹·炼道大会与琅琊');return;
+ }
+ if(n==='方源足迹·影宗与东海'){
+  await say(S.flags.supreme?'义天山大战后，影宗的至尊仙胎计划被你截走。方源未能炼成至尊仙胎仙窍，却仍以谋略与分身周旋东海：龙宫现世、吴帅布局、两天联盟与异人洞天的利益纠缠并未消失，只是他少了一具最强容器，多走了许多险棋。':'义天山大战后，影宗的至尊仙胎计划改变了方源的处境；他夺得至尊仙胎蛊，炼成至尊仙胎仙窍，却也因此成为天庭与各方势力追杀的目标。其后东海龙宫现世，方源以身份伪装、谋略与盟友周旋；他还以龙人分身吴帅统领两天联盟，使龙宫、帝藏生、异人洞天与东海超级势力的利益纠缠在一起。','gold');
+  var fyd=await optW('方源足迹·影宗与东海',[['拆解影宗十绝大阵与仙胎计划',38],['追踪吴帅、龙宫与帝藏生线索',36],['研究方源如何隐匿身份避追杀',26]]);
+  if(fyd===0){if(await rollW(45+rlm('阵道')*5+rlm('魂道')*3,'影宗大阵推演盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你只推演出十绝大阵的一部分，却看清影宗为炼成至尊仙胎蛊所付出的布局——阵道+1，道缘+1。','gold');}else{S.pctMods-=0.03;await say('大阵残留杀机反噬，你带着伤势退出（权重-3%）。','bad');}}
+  else if(fyd===1){if(await rollW(50+rlm('智道')*4+S.tIdx*2,'龙宫线索盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('你从吴帅、龙宫与东海诸家的争夺中辨出各方真实利益，未把阶段性合作误判成永久盟约——才情+1。','good');}else{await say('龙宫核心仍被重重遮蔽，你只带回外围情报。','sys');}}
+  else{if(await rollW(48+rlm('变化道')*4+S.dhIdx*2,'身份隐匿盘')){S.pctMods+=0.04;await say('你学会将身份、气息与行踪分层遮掩——权重+4%。','gold');}else{S.pctMods-=0.02;await say('天庭追踪的余波扫过你的行踪（权重-2%）。','bad');}}
+  S.marks.push('方源足迹·影宗与东海');chr('追索方源足迹·影宗与东海');return;
+ }
+ if(n==='方源足迹·南疆与光阴长河'){
+  await say('南疆梦境与超级梦境战场牵动五域势力，方源在武庸、天庭与各大超级家族之间反复周旋；此后他深入光阴长河，争夺红莲魔尊真传，并与凤九歌等强者多次交锋。红莲真传与宿命蛊的因果逐渐汇合，最终把方源推向宿命大战的核心。','gold');
+  var fyr=await optW('方源足迹·南疆与光阴长河',[['参悟梦境与梦道资源',36],['追索红莲真传与光阴长河',40],['分析武庸与五域超级势力',24]]);
+  if(fyr===0){if(await rollW(48+rlm('梦道')*5+S.tIdx*2,'梦境参悟盘')){setRealm('梦道',Math.min(7,Math.max(1,rlm('梦道')+1)));await say('你从梦境边缘带回一缕道痕感悟——梦道境界+1。','gold');}else{S.tIdx=Math.min(8,S.tIdx+1);await say('梦境没有完全向你敞开，但你记住了其中的线索——才情+1。','good');}}
+  else if(fyr===1){if(await rollW(48+rlm('宙道')*5+S.dhIdx*2,'红莲真传追索盘')){setRealm('宙道',Math.min(7,Math.max(1,rlm('宙道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你在光阴长河支流中捕捉到红莲真传的残痕——宙道境界+1，道缘+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('光阴长河反噬心神，你只得退回岸边——道心-1。','bad');}}
+  else{S.tIdx=Math.min(8,S.tIdx+1);await say('武庸与南疆诸家并非方源的固定盟友，各方只在利益重合时合作——才情+1。','good');}
+  S.marks.push('方源足迹·南疆与光阴长河');chr('追索方源足迹·南疆与光阴长河');return;
+ }
+ /* v1.16：宿命大战前的区域势力协作线 */
+ if(n==='南疆·五域联军'){
+  await say('南疆武家家主武庸不愿天庭以宿命蛊凌驾五域，池曲由则从阵道角度寻找不败福地的破绽。各大超级家族利益并不一致，但在天庭威胁面前，南疆开始形成暂时的共同战线。','gold');
+  var wy=await optW('南疆·五域联军',[['协助池曲由推演破阵',40],['向武庸递交联军情报',35],['联络乔家与其他家族',25]]);
+  if(wy===0){if(await rollW(48+rlm('阵道')*6+S.tIdx*2,'南疆破阵推演盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('阵纹被你补出一处缺口，池曲由据此修正推演——阵道精进，道缘+1。','gold');}else{S.pctMods-=0.04;await say('阵中反制发动，你及时退开（权重-4%）。','bad');}}
+  else if(wy===1){S.tIdx=Math.min(8,S.tIdx+1);await say('武庸收下情报，却只承诺在共同目标上合作；南疆不会把家族命运交给外人——才情+1。','good');}
+  else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('各家各有私心，乔家与其他家族只同意有限协助。你学会在盟约中保留退路——道心+1。','good');}
+  S.marks.push('南疆·五域联军');chr('南疆·五域联军');return;
+ }
+ if(n==='西漠·帝君城援军'){
+  await say('西漠诸家对天庭插手五域早有不满。方家、萧家等超级势力各有利益盘算，并非单纯为了方源而战；他们借宿命大战的机会牵制中洲天庭，与方源只是阶段性目标重合。','sys');
+  var xd=await optW('西漠·帝君城援军',[['协助方迪昌协调仙蛊屋',40],['替萧家护送蛊材',35],['探查帝君城外围阵线',25]]);
+  if(xd===0){if(await rollW(48+rlm('智道')*5+rlm('阵道')*3,'西漠协调盘')){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('方迪昌将各家仙蛊屋的行动次序重新排定，临时联军得以协同——才情+1，道缘+1。','gold');}else{S.pctMods-=0.03;await say('各家不愿交出底牌，协调只完成一半（权重-3%）。','bad');}}
+  else if(xd===1){await wormUp(1);await say('蛊材送达，萧家记下这份人情；但西漠诸家仍保留各自的退路——完善度+1。','good');}
+  else{if(await rollW(50+S.lv*3,'帝君城侦察盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你摸清了帝君城外围的防线变化——道心+1。','gold');}else{S.pctMods-=0.03;await say('侦察被中洲蛊仙察觉，你带伤撤离（权重-3%）。','bad');}}
+  S.marks.push('西漠·帝君城援军');chr('西漠·帝君城援军');return;
+ }
+ if(n==='东海·龙宫战局'){
+  await say('东海各大超级势力围绕龙宫与隐藏龙窟展开争夺。沈从声等人有自己的家族利益，古月方源与长生天也各有目标；帝藏生被镇压在龙宫相关布置之下，东海诸仙的合作随时可能因仙蛊屋归属而破裂。','sys');
+  var dh=await optW('东海·龙宫战局',[['协助东海蛊仙破解隐藏龙窟阵法',40],['向沈从声交换龙宫情报',35],['观察帝藏生封印变化',25]]);
+  if(dh===0){if(await rollW(48+rlm('阵道')*5+S.tIdx*2,'隐藏龙窟破阵盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));await say('阵法被撕开一道缝隙，东海诸仙趁势推进；龙宫归属仍未定——阵道精进。','gold');}else{S.pctMods-=0.04;await say('阵法反击，东海诸仙各自退守（权重-4%）。','bad');}}
+  else if(dh===1){S.tIdx=Math.min(8,S.tIdx+1);await say('沈从声只交换外围情报，不肯透露沈家真正的筹码——才情+1。','good');}
+  else{if(await rollW(50+rlm('魂道')*3,'帝藏生封印观察盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你看出封印与龙宫之间存在牵连，却没有贸然触动帝藏生——道心+1。','gold');}else{S.life=Math.max(1,S.life-2);await say('封印震荡，你被余波逼退，耗去两年寿元。','bad');}}
+  S.marks.push('东海·龙宫战局');chr('东海·龙宫战局');return;
+ }
  /* v1.14.40 炼天第二世人物线：以原著既有势力关系为骨架，事件成功不强行改写人物归属 */
  if(n==='龙鲸乐土·悔哭海'){
-  await say('东海龙鲸乐土开启功德任务。庙明神邀你同行，沈从声也在寻找悔蛊；任修平、童画等人各怀心思，表面合作之下暗流涌动。','sys');
-  var lh=await optW('龙鲸乐土·悔哭海',[['与庙明神一行合作',40],['同沈从声交换情报',35],['独自探查悔哭海',25]]);
-  if(lh===0){if(await rollW(48+rlm('阵道')*4+S.tIdx*2,'龙鲸乐土协作盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你与庙明神等人分工探阵，收获一段土道大阵心得。阵道精进，道缘+1。','gold');}else{S.pctMods-=0.04;await say('队伍意见不合，探阵受阻（权重-4%）。','bad');}}
-  else if(lh===1){if(await rollW(50+S.tIdx*3,'沈家情报盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('沈从声透露了部分悔蛊线索，但对核心情报仍留有余地——才情+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('你未能取得信任，反被沈家试探了一番——道心-1。','bad');}}
+  await say('你循着东海异动来到龙鲸乐土。此行真正的隐秘，并非只有悔哭海中的机缘——人道亚仙尊沈伤被困于悔哭海，沈家后人沈从声正不惜代价布局救祖。庙明神、任修平、童画等人各有立场，悔蛊与资源只是这场营救背后的次要争夺。','sys');
+  var lh=await optW('龙鲸乐土·悔哭海',[['协助沈从声营救沈伤',40],['与庙明神等人合作探阵',35],['独自探查悔哭海',25]]);
+  if(lh===0){if(await rollW(50+rlm('人道')*4+S.tIdx*2,'沈家救祖协作盘')){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('你协助沈从声梳理悔哭海禁制与营救线索，虽未能独自救出沈伤，却得到沈家一份关键情报——才情+1，道缘+1。','gold');}else{S.pctMods-=0.04;await say('悔哭海禁制与沈家布局层层相扣，你未能找到安全切入点（权重-4%）。','bad');}}
+  else if(lh===1){if(await rollW(48+rlm('阵道')*4+S.tIdx*2,'龙鲸乐土协作盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你与庙明神等人分工探阵，收获一段土道大阵心得。阵道精进，道缘+1。','gold');}else{S.pctMods-=0.04;await say('队伍意见不合，探阵受阻（权重-4%）。','bad');}}
   else{if(await rollW(45+rlm('水道')*5,'悔哭海独探盘')){await wormUp(2);await say('你避开各方耳目，在悔哭海边缘取到蛊材——完善度+2。','gold');}else{S.life=Math.max(1,S.life-3);await say('悔意黑火侵蚀心神，你耗去三年才脱身。','bad');}}
   if(!hasMark('悔哭海·沈家线'))S.marks.push('悔哭海·沈家线');chr('龙鲸乐土·悔哭海');return;
  }
@@ -7909,6 +8652,39 @@ async function doKeyTrial(n){
     flash('寿元上限 +30','寿元 '+_lm0+' → '+_lm1);
     log('至尊仙胎蛊：寿元上限 '+_lm0+' → '+_lm1+'（+30）','gold');
     chr('至尊仙胎蛊·寿元上限+30（'+_lm0+'→'+_lm1+'）');
+    /* v1.22 玩家成尊线分支：仙胎已被你取走，方源此世不得此体——后续叙述与权重据此偏移，不倒写义天山大战之前的因果。 */
+    await say('义天山风停之后，你忽然明白：这具至尊仙胎体本是影宗为「一位」天外之魔准备的容器。现在它在你身上——方源若仍在人世，也将失去这条最捷近的成尊捷径。','gold');
+    var _spPath=await optW('至尊仙胎·去路',[
+     ['隐世养胎，自辟成尊路',34],
+     ['借影宗余烬，速成再反噬',28],
+     ['同调方源旧路，以仙胎换时间',26],
+     ['封存仙胎，只留寿元与体质',12]
+    ]);
+    if(_spPath===0){
+     S.flags.supremePath='self';S.flags.supremePathSelf=true;
+     if(!hasMark('仙胎成尊线'))S.marks.push('仙胎成尊线');
+     S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+     await say('你切断与影宗残部的一切联络，把仙胎当成一口只为自己跳的炉——道心+1，道缘+1。【仙胎成尊线·隐世】','gold');
+     chr('至尊仙胎·隐世养胎');
+    }else if(_spPath===1){
+     S.flags.supremePath='shadow';S.flags.supremePathShadow=true;
+     if(!hasMark('仙胎成尊线'))S.marks.push('仙胎成尊线');
+     if(!hasMark('影宗之主')&&R(0.35)){S.marks.push('影宗之主');await say('影宗残魂误认你为「下一任容器之主」——你暂得【影宗之主】名号（不改写已发生的义天山胜负）。','gold');}
+     S.morIdx=Math.max(0,S.morIdx-1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;
+     await say('你收编一部分影宗余烬：资源来得快，天庭与幽魂的目光也来得快——道德-1，道缘+1。【仙胎成尊线·影烬】','bad');
+     chr('至尊仙胎·影烬借势');
+    }else if(_spPath===2){
+     S.flags.supremePath='fang';S.flags.supremePathFang=true;
+     if(!hasMark('仙胎成尊线'))S.marks.push('仙胎成尊线');
+     S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+2;
+     await say('你不模仿方源的心，只借用他已经踩出的节奏：吞窍、炼道、东渡、入河——才情+1，道缘+2。【仙胎成尊线·同调】','gold');
+     chr('至尊仙胎·同调疾进');
+    }else{
+     S.flags.supremePath='seal';
+     S.pctMods+=0.04;S.dhIdx=Math.min(8,S.dhIdx+1);
+     await say('你封住仙胎最锋利的那一面，只留寿元与底盘。成尊会更慢，但天庭的追杀名单也会短一截——权重+4%，道心+1。','good');
+     chr('至尊仙胎·封存');
+    }
    }else{
     S.pctMods-=0.15;spendLife(5);
     await say('转身失败——至尊仙胎蛊崩毁，你重伤（权重-15%、寿元-5年）。','bad');
@@ -8237,6 +9013,8 @@ async function boqingTrue(){
  chr('获薄青真传');
  if(S.flags.bqStage===undefined)S.flags.bqStage=0;
  if(S.flags.bqCount===undefined)S.flags.bqCount=0;
+ await say('剑道之路已开——此后剑道相关游历、历练与奇遇权重将大幅上浮。','gold');
+ log('路线权重：薄青真传 → 剑道线↑','sys');
 }
 /* ── 11 EVENT · 狂蛮真传 ──────────────────────────────────────────── */
 async function kuangmanTrue(){
@@ -8275,7 +9053,7 @@ async function findLegacy(){
   if(!hasSchool(sc))S.schools.push({name:sc,g:'攻',dir:'攻',realm:1});
   S.schools.forEach(function(s){if(s.name===sc)s.realm=Math.min(7,s.realm+1);});
   learnXian(sc,sage[0]+'·'+sc+'诀');
-  if(sage[0]==='血海老祖'){if(!hasMark('血海真传'))S.marks.push('血海真传');}
+  if(sage[0]==='血海老祖'){if(!hasMark('血海真传'))S.marks.push('血海真传');await say('血道路径已开——此后血道相关事件权重将大幅上浮。','gold');log('路线权重：血海真传 → 血道线↑','sys');}
   if(sage[0]==='血海老祖'&&hasSchool('血道')&&!hasMove('血神子')&&R(0.6)){learnSpec('血神子','血道','被动');await say('血海真传灌顶——血道蛊仙得【血神子】（六转·占格不被抽中，每场额外加一次普攻权重）！','gold');}
   await say('知名真传【'+sage[0]+'】——境界+1，习得招牌杀招！','gold');chr('得'+sage[0]+'真传');
   }
@@ -8300,7 +9078,7 @@ async function findLegacy(){
    var spList=ZUN_SPEC[zun];
    if(spList){var got=null;spList.forEach(function(x){if(!got&&!hasMove(x))got=x;});if(got)learnSpec(got,mainSchool().name);}
    else learnXian(mainSchool().name);
-   if(zun==='幽魂魔尊'&&!hasMark('幽魂真传'))S.marks.push('幽魂真传');
+   if(zun==='幽魂魔尊'&&!hasMark('幽魂真传')){S.marks.push('幽魂真传');await say('魂道路径已开——此后魂道相关事件权重将大幅上浮。','gold');log('路线权重：幽魂真传 → 魂道线↑','sys');}
    await say('尊者残念传承【'+zun+'】——境界+2，特殊仙道杀招加身！','gold');chr('得'+zun+'真传');
    }
   }
@@ -8456,6 +9234,8 @@ async function trySave(tag,saves){
  return false;
 }
 async function dragonBattle(){
+ await say('宿命大战的战场中央，方源已携红莲真意与逆天布局杀至监天塔前。龙公亲自迎上——一方要毁宿命蛊、改写众生命数，一方要守住天命秩序。你被卷入两大强者交锋的余波，眼前的龙公并非孤身作战，方源的每一步谋算都在改变战局。','gold');
+ await say('原著战局脉络：龙公以「三气归来」层层复起，方源借红莲尊者留下的布局持续破局；凤九歌最终奏响命运歌，成为宿命蛊被毁的关键转折。你将亲历龙公战的正面压迫，但不会取代方源与凤九歌在原著中的关键作用。','sys');
  var sqW=[450,500,550],sqK=[1.0,2.40,4.00],phase=0,round=1; /* v1.0.15：三气归来复活递进强化（每重 ×1.0 / ×2.40 / ×4.00） */
  var saves={nilu:hasMove('逆流护身印'),sanqi:hasMove('三气归来'),wuji:!!S.flags.wuji,hunbao:hasMove('魂爆')};
  var wu5=S.flags.wu5;S.flags.wu5=false;
@@ -8583,12 +9363,12 @@ async function dragonBattle(){
    await stealOnWin();
    if(phase===0){
     phase=1;RESULT.sq=0;
-    await say('龙公本体轰然崩解——然而气机不灭，【三气归来】发动！','gold');
+    await say('龙公本体轰然崩解——然而气机不灭，【三气归来】发动！远处方源识破其复起之势，红莲布局随之推进。','gold');
    }else{
     phase++;RESULT.sq=phase-1;
     if(phase>3){
      RESULT.sq=3;RESULT.bar=7;
-     await say('三重三气归来尽破——龙公气机终于熄灭！','gold');
+     await say('三重三气归来尽破——龙公气机终于熄灭！方源趁势逼近宿命蛊，凤九歌的命运歌亦在战场另一端响起。','gold');
      if(hasMark('狂蛮意志')){S.marks.splice(S.marks.indexOf('狂蛮意志'),1);S.flags.kmwPrev=0;await say('宿命大战终了——【狂蛮意志】随战云散去。','');}
      if(S.eraIdx===2&&S.flags.wjSummoned)await ending('跨越时空的胜负','你赢了一场不属于你的仗，又被时代的风送回了北原。');
       await destroyDestinyWorm();
@@ -9490,7 +10270,9 @@ async function ysL4(){
  if(ok){
   S.flags.ysQi=(S.flags.ysQi||0)+2;
   if(!hasMark('元始残火'))S.marks.push('元始残火');
-  await say('你得【元始残火】——三气感悟+2。','gold');
+  S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+  mainRealmUp(1);
+  await say('你得【元始残火】——三气感悟+2，等级微晋，主修境界+1。','gold');
  }
  chr('元始残炉');
 }
@@ -9499,7 +10281,9 @@ async function ysL5(){
  if(await rollW(45+rlm('炼道')*5+S.tIdx*3,'炼道论榜盘')){
   S.tIdx=Math.min(8,S.tIdx+1);S.flags.ysQi=(S.flags.ysQi||0)+1;
   if(!hasMark('论榜留名'))S.marks.push('论榜留名');
-  await say('你的方被抄走了三条街——才情+1，【论榜留名】。','gold');
+  S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+  mainRealmUp(1);
+  await say('你的方被抄走了三条街——才情+1，等级微晋，主修境界+1，【论榜留名】。','gold');
  }else await say('你的方被指出两处硬伤。脸有点热。','');
  chr('炼道论榜');
 }
@@ -9626,7 +10410,9 @@ async function hlL6(){
   S.flags.hlTime=(S.flags.hlTime||0)+2;
   if(!hasMove('前有古人')&&R(0.3))learnSpec('前有古人','宙道');
   if(!hasMove('后有来者')&&R(0.3))learnSpec('后有来者','宙道');
-  await say('雨停了。有些错轻了一点。光阴印记+2。','gold');
+  S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+  mainRealmUp(1);
+  await say('雨停了。有些错轻了一点。光阴印记+2，等级微晋，主修境界+1。','gold');
  }else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你拒绝改写。道心+1。','good');}
  else{S.morIdx=Math.max(0,S.morIdx-1);S.flags.hlTime=(S.flags.hlTime||0)+1;await say('你改了别人的。道德-1，印记+1。','bad');}
  chr('红莲意志回响');
@@ -9717,7 +10503,7 @@ async function jyL2(){
  var c=await optW('血脉祭台',[['血运双献',40],['只献运',35],['掀台',25]]);
  if(c===0){
   S.pctMods-=0.05;S.flags.luck=(S.flags.luck||0)+1;S.flags.jyBlood=(S.flags.jyBlood||0)+1;
-  await wormUp(1);await say('台亮了。你弱了一点，也厚了一点。','gold');
+  await wormUp(1);S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');mainRealmUp(1);await say('台亮了。你弱了一点，也厚了一点——等级微晋，主修境界+1。','gold');
  }else if(c===1){
   if(await rollW(40+(S.flags.luck||0)*10,'只献运盘')){S.flags.luck=(S.flags.luck||0)+1;await say('台微亮。运道气息+1。','good');}
   else await say('台不亮。风把你的赌注吹走了。','bad');
@@ -9895,12 +10681,16 @@ async function kmL6(){
   await say('真传与回响相撞。你看见自己可以变成的无数种形状。','gold');
   S.flags.kmBeast=(S.flags.kmBeast||0)+2;
   if(!hasMove('自由残缺变'))learnSpec('自由残缺变','变化道');
-  await say('回响过后，你仍是人。也可以不是。','gold');
+  S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+  mainRealmUp(1);
+  await say('回响过后，你仍是人。也可以不是——等级微晋，主修境界+1。','gold');
  }else{
   var ok=await rollW(40+rlm('变化道')*4+rlm('力道')*4,'狂蛮回响盘');
   if(ok){
    if(!hasMark('狂蛮真传')){await say('回响留下一枚印——可寻狂蛮真传之线索。','gold');S.flags.link=true;}
    S.flags.kmBeast=(S.flags.kmBeast||0)+1;
+   S.lv=Math.min(8.5,S.lv+0.5);log('等级+0.5 → '+lvName(),'good');
+   mainRealmUp(1);await say('回响撞开一处旧关——等级微晋，主修境界+1。','gold');
   }else{S.pctMods-=0.05;await say('意志扫过，你跪了一息（权重-5%）。','bad');}
  }
  chr('狂蛮意志回响');
@@ -10329,6 +11119,11 @@ async function dtL4(){
   learnSpec('海阔天空','宇道');
   await say('你把「退一步」改成了自己的路数——【海阔天空】。','gold');
  }
+ if(got){
+  S.lv=Math.min(8.5,S.lv+1);log('等级+1 → '+lvName(),'good');
+  mainRealmUp(1);
+  await say('无极的退让像一面镜子——你借它照见自己的道，等级+1，主修境界+1。','gold');
+ }
 }
 async function dtL5(){
  await say('传承指向落魄谷。你到的时候，谷里已经有人来过了。','sys');
@@ -10574,7 +11369,7 @@ try{
  if(_dm<=4&&_hc<=4)document.documentElement.classList.add('perf-low');
 }catch(e){}
 try{starThemeInit();}catch(e){}
-/* v1.15 更新日志：点版本号可看；首次进入本版自动弹一次 */
+/* v1.19 更新日志：点版本号可看；首次进入本版自动弹一次 */
 (function(){var v=$('verTag');if(v){v.textContent=APP_VER;v.style.cursor='pointer';v.title='查看更新日志';v.addEventListener('click',openChangelog);}})();
 on('chgClose','click',function(){closeChangelog();});
 try{if(!document.documentElement.hasAttribute('data-game-export-copy')&&localStorage.getItem('guSeenChg')!==APP_VER)setTimeout(openChangelog,500);}catch(e){}
