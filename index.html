@@ -1231,8 +1231,8 @@ function rerollPick(secs,title){
  return weightedPickIndex(ws);
 }
 /* —— 春秋蝉：每局共享的逆流资源（v1.5.1：替换旧重抽次数池） —— */
-var REROLL_MAX=100; /* 兼容旧调用点；春秋蝉上限由 CHAN_CAP 决定 */
-var CHAN_CAP=100; /* 春秋蝉使用次数：每局共 100 次（授予即补满） */
+var REROLL_MAX=3; /* 兼容旧调用点；春秋蝉上限由 CHAN_CAP 决定 */
+var CHAN_CAP=3; /* 春秋蝉使用次数：每局共 3 次（授予即补满） */
 var CHAN_N=['','残蝉','完蝉','清天意之蝉'];
 function chanTier(){try{return (S&&S.flags&&S.flags.chanTier)||0;}catch(e){return 0;}}
 function chanLeft(){try{return (S&&S.flags&&S.flags.chanLeft)||0;}catch(e){return 0;}}
@@ -1244,7 +1244,7 @@ function chanGrant(t){
   if(!S||!S.flags)return;
   chanInit();
   if(t<chanTier())t=chanTier(); /* 阶位只升不降 */
-  var cap=CHAN_CAP;                  /* 春秋蝉使用次数：每局共 100 次 */
+  var cap=CHAN_CAP;                  /* 春秋蝉使用次数：每局共 3 次 */
   S.flags.chanTier=t;S.flags.chanMax=cap;S.flags.chanLeft=cap; /* 授予即补满 */
  }catch(e){}
  syncRerollBtn();syncRigBtn();
@@ -2468,7 +2468,7 @@ async function W(title,sub,secs,opt){
  var rigged=(RIG_ON&&sp._rig!==null);
  var idx,_rigFail=false;
  if(rigged&&sp._isFate){
-  var fr=(chanTier()===1)?0.30:((chanTier()===2)?0.10:0); /* 残蝉30% / 完蝉10% / 清天意0% */
+  var fr=(chanTier()===1)?0.50:((chanTier()===2)?0.25:0); /* 残蝉50% / 完蝉25% / 清天意0% */
   if(R(fr)){
    _rigFail=true;
    await say('蝉鸣一响，光阴未从——天意把你的落点轻轻挪开了。','bad');
@@ -4056,7 +4056,7 @@ setStage('出身');
      玩家抽中【三道】却只拿到 2 种，界面毫无提示，看起来就像"丢了一种流派"。
      现改为：按才情上限动态裁掉超限选项（上限 < 3 时盘上不出现「三道」，上限 < 2 时也不出现「两道」），
      从源头消除"抽到注定被砍的选项"；若仍触发封顶另有显式提示。 */
-  var cntAll=[[1,'一道',30],[2,'两道',45],[3,'三道',25]].filter(function(x){return x[0]<=capN;});
+  var cntAll=[[1,'一道',30],[2,'两道',45],[3,'三道',25],[4,'四道',15]].filter(function(x){return x[0]<=capN;});
   var nIdx=await W('流派数量盘','才情'+TAL_ORD[S.tIdx]+' · 至多 '+capN+' 道',cntAll.map(function(x){return [x[1],x[2]];}),{small:true});
   var nSchool=cntAll[nIdx][0];
   if(nSchool<capN+1&&nSchool<3)await say('才情'+TAL_ORD[S.tIdx]+'之下，流派数量上限为 '+capN+' 道——本次修得 '+nSchool+' 道。','');
