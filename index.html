@@ -2521,7 +2521,6 @@ async function W(title,sub,secs,opt){
 }
 async function rollW(p,name){
  p=Number(p);if(!isFinite(p))p=50;if(p<0)p=0;if(p>100)p=100; /* v1.0.19：非法概率兜底，避免 NaN 传播进盘面 */
- p=100; /* 成功率统一 100%：所有判定盘必成 */
  var idx=await W(name||'天机盘','',[['成功',p,'#1E8449'],['失败',100-p,'#C0392B']],{small:true}); /* v1.0.14：显式配色，避免成功扇区落回默认色导致色块/文字显示异常 */
  return idx===0;
 }
