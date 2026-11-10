@@ -11414,5 +11414,35 @@ try{
   本站总访问量 <span id="vercount_value_site_pv" style="color:#E8C56A;font-weight:700">Loading</span> 次<br>
   本站总访客数 <span id="vercount_value_site_uv" style="color:#E8C56A;font-weight:700">Loading</span> 人
 </div>
-<script defer="" src="https://events.vercount.one/js"></script>
+<script>
+(function() {
+  var s = document.createElement('script');
+  // 加时间戳防止被浏览器缓存了坏的结果
+  s.src = 'https://events.vercount.one/js?t=' + new Date().getTime();
+  
+  s.onerror = function() {
+    setToError();
+  };
+  
+  s.onload = function() {
+    // 如果脚本加载完了，但 2 秒内还没把 Loading 替换掉，说明接口挂了或超时
+    setTimeout(function() {
+      var pv = document.getElementById('vercount_value_page_pv');
+      if (pv && pv.innerText === 'Loading') {
+        setToError();
+      }
+    }, 2000);
+  };
+  
+  function setToError() {
+    var pv = document.getElementById('vercount_value_page_pv');
+    if (pv && pv.innerText === 'Loading') {
+      document.getElementById('vercount_value_page_pv').innerText = '—';
+      document.getElementById('vercount_value_site_pv').innerText = '—';
+      document.getElementById('vercount_value_site_uv').innerText = '—';
+    }
+  }
+  document.body.appendChild(s);
+})();
+</script>
 </body></html>
