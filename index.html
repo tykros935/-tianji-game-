@@ -1,4 +1,44 @@
+
+
 <!DOCTYPE html>
+<!--
+AI 开发规范 · 新增杀招（v1.30）
+1. 新增杀招只向 SPEC_LIB.entries 追加一条记录，字段依次为：id / name / school / type / grade / dir / effectKey / trigger / effect / limit / holder / source / status；可选扩展字段按既有条目需要添加。
+2. 玩家可获得：holder:'玩家'，图鉴自动收录。敌方专属：holder:'敌方'，默认不进图鉴；确需收录时在该条目增加 dex:true。
+3. trigger 使用自然语言写清习得/触发路径（如“在某处习得”），不要写“——”“不可获得”等占位文字。
+4. 必须确认实际授予路径：learnSpec / addMove / grantBatchSpec / DREAM_SPEC_POOL 等；仅有数据登记不等于玩家可获得。
+5. 后续新增杀招只改 SPEC_LIB.entries.push(...)；不要再维护 SPEC_NAMES，也不要为单条新增手动修改 dexStatics、dexHint 或敌方过滤规则。
+
+AI 开发规范 · 新增结局（v1.33 起）
+规则：新增结局只需【一句 ending(...)】，图鉴自动收录。
+不要再手动改 DEX_ENDINGS / END_META / LINE_ORDER / dexStatics / dexHint / dexRender。
+
+【写法一 · 最简（推荐大多数情况）】
+  await ending('新结局名', '一句谶语');
+  → 图鉴自动收录；谶语即图鉴 hint。
+  → 分组：名字含「·」时取前缀（且 LINE_NAME 已登记），否则归 other。
+
+【写法二 · 精确声明】
+  await ending('新结局名', '结局弹窗长谶语', {
+    line: '剑道',                   // 分组 key，需在 LINE_NAME 已登记
+    tier: 3,                        // 1 死亡/失败 · 2 普通 · 3 高光/成尊
+    hint: '图鉴里显示的短谶语'      // 省略则用第 2 参数 quote
+  });
+
+【新增分组】
+  先在 LINE_NAME 加一行：'新线':'新线中文名'
+  再在 LINE_ORDER 数组里插入 '新线'（放在 other 之前）。
+  然后在 ending() 的 opts.line 里使用。
+
+【禁止】
+  × 不要再往 DEX_ENDINGS 里手动 push 结局名。
+  × 不要再往 END_META 里手动写单条结局元数据（永久固定且需覆盖运行时兜底除外）。
+  × 不要用「其他/other」以外的占位分组名。
+
+【兜底行为】
+  - 未登记进 END_META 的结局，运行时自动写入 _endingDynamic，图鉴仍可见。
+  - 静态 END_META 优先于动态区；冲突时静态胜。
+-->
 <html class="theme-star" data-page-node-id="MHUAzqWWh27n7pajmfScjd" lang="zh-CN" data-game-export-copy="1"><head data-page-node-id="oj2fWBR43inVolY8tbBoxn">
 <meta data-page-node-id="rhkEoL8euuI9smTiCpd9kd" charset="utf-8">
 <meta data-page-node-id="sVi0sq63sgumNQyHbDwJjQ" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
@@ -78,6 +118,9 @@ html,body{max-width:100%;overflow-x:hidden}body{-webkit-tap-highlight-color:tran
 #achvCard .achvLine b,#dexCard .achvLine b{flex:none}
 #achvCard .achvLine span,#dexCard .achvLine span{color:#8C8C8C;font-size:12.5px}
 #achvCard .achvLine.lock,#dexCard .achvLine.lock{opacity:.38}
+#dexCard .dexGroupHead{font-size:13px;font-weight:800;letter-spacing:2px;color:#6B6455;margin:12px 0 4px;padding:4px 0 2px;border-bottom:1px solid var(--line)}
+#dexCard .dexGroupHead:first-child{margin-top:0}
+.theme-star #dexCard .dexGroupHead{color:var(--gold);border-bottom-color:rgba(212,175,55,.22)}
 #dexTabs{display:flex;gap:8px;margin:2px 0 8px}
 #dexTabs button{border:1px solid var(--line);background:#FFF;border-radius:999px;padding:6px 14px;font-size:13px;color:#6B6455;cursor:pointer}
 #dexTabs button.on{background:#3A3A3A;color:#FFF;border-color:#3A3A3A}
@@ -709,7 +752,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.20</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.33</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -891,7 +934,7 @@ var __EXPORT_SOURCE_DOCTYPE=document.doctype?'<!DOCTYPE '+document.doctype.name+
             ③ 「商心慈·危城夜」——定约或同盟后火攻商城，守门/断补给/撤离；
             ④ 游历「商家城一游」按标记优先级可直接切入长线幕；门控防重复。
    v1.14.31 容貌联动三件套：
-            ① 社交类凡人事件（蛤蟆商队/坊间论道/临时委托/行旅救援等）仅抬「好结果」扇区权重 lookSocialMul；
+            ① 社交类凡人事件（蛤蟆商队/坊间论道/临时委托等）仅抬「好结果」扇区权重 lookSocialMul；
             ② 天外之魔暴露率 += lookExposePP（EX+8…E-6），clamp 5~95；
             ③ 择派盘「魅情道」权重 × lookCharmMul（EX×3.0…E×0.7）；初识印象盘「好」同乘社交倍率。
    v1.14.32 出生地专属剧情分层（原著素材厚度）：
@@ -987,10 +1030,33 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.29';
+var APP_VER='v1.33';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+ {v:'v1.33',items:[
+  ['new','结局图鉴自动兜底注册：ending() 运行时写入 _endingDynamic；getAllEndingNames / getEndMeta 合并静态表与动态区。'],
+  ['new','ending(name, quote, opts?) 支持可选 line / tier / hint；存量调用零改动。'],
+  ['new','文件头补充「新增结局」AI 开发规范；禁止再手改 DEX_ENDINGS / END_META 做增量。'],
+  ['fix','版本号统一升级为 v1.33。']
+ ]},
+ {v:'v1.32',items:[
+  ['fix','移除 6 个因升仙后等级≥6 而永假的凡人结局：未入仙途者、星下凡尘、未识星轨、未乱之人、草间凡人、潮边活口；同步清理 DEX_ENDINGS 与 END_META。'],
+  ['new','剑道番外结局独立分组（剑源/薄青合剑/薄青见剑/剑下留道/雷下收剑/剑折），并补谶语。'],
+  ['new','补天庭客卿、长生天客卿、疯魔窟隐者、真传入匣、真传继声等 hint。'],
+  ['fix','清理 LINE_ORDER 中无效的炼天/仙胎键；版本号统一升级为 v1.32。']
+ ]},
+ {v:'v1.31',items:[
+  ['new','结局图鉴接入 END_META：显示谶语提示；按路线分组、按 tier 排序渲染。'],
+  ['new','补全战斗死亡/成尊等关键结局元数据（剑下亡魂、客死他乡、安享晚年、九转/仙胎成尊等）。'],
+  ['fix','版本号统一升级为 v1.31。']
+ ]},
+ {v:'v1.30',items:[
+  ['new','杀招图鉴、播报与判定改为从 SPEC_LIB.entries 惰性派生；新增/删除条目后名称索引自动刷新，不再维护静态名称快照。'],
+  ['new','敌方杀招改用条目 dex:true 声明是否进入图鉴；光阴飞刃、五指拳心剑补充显式收录标记。'],
+  ['fix','补充后续 AI 新增杀招标准规范，并完成 85 条杀招（含 36 条批量条目）的授予路径只读审计。'],
+  ['fix','版本号统一升级为 v1.30。']
+ ]},
  {v:'v1.29',items:[
   ['new','在上版追加境界奖励的同一批升仙后事件中，补上蛊仙等级成长：元始残炉、炼道论榜、狂蛮意志回响、红莲意志回响、血脉祭台、魂潮夜行、异人交易·寿元换道意均额外获得等级+0.5；疯魔窟·无极意志为等级+1；另补元莲画意、乐土钟鸣各等级+0.5，使各时期历练盘都有等级成长。'],
   ['bal','等级成长统一封顶八转巅峰（8.5），不会借事件直接跨入九转/成尊。'],
@@ -1509,9 +1575,9 @@ var SPEC_LIB = {
   {id:'wujinxuanguangqi', name:'五禁玄光气', school:'mainSchool()', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'陶铸真传·毁山 / 超级蛊阵 10% / 调试钩子', effect:'释放当回合敌方权重 ×0.9', limit:'每场战斗限一次（wjUsed）', holder:'玩家', source:'219,1824,1863,2073,2098', status:'live'},
   {id:'xueshenzi',      name:'血神子',     school:'血道', type:'spec', grade:'六转→八转（随血道境界）', dir:'被动', effectKey:'passive', trigger:'血道蛊仙 + 血海真传（血海老祖）· 概率获得', effect:'占杀招盘但权重恒 0（永不被抽中）；每场战斗结算额外 +1 次对应等级普攻权重', limit:'仅血道蛊仙可得；实际可用杀招只剩 7 格', holder:'玩家', source:'SPEC_LIB新增', status:'live'},
   /* ---- 限次类 once ---- */
-  {id:'guangyinfieRen', name:'光阴飞刃',   school:'宙道', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'once', trigger:'红莲魔尊残念传承 / BOSS 方源杀招池', effect:'每使用一次 +20', limit:'终身限 3 次', holder:'玩家/敌方', source:'221,2388,2334', status:'live'},
+  {id:'guangyinfieRen', name:'光阴飞刃',   school:'宙道', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'once', trigger:'红莲魔尊残念传承 / BOSS 方源杀招池', effect:'每使用一次 +20', limit:'终身限 3 次', holder:'玩家/敌方', source:'221,2388,2334', status:'live', dex:true},
   /* ---- 改规则类 swap ---- */
-  {id:'wuzhiquanxinjian', name:'五指拳心剑', school:'剑道', type:'wu', grade:'动态判定', dir:'攻', effectKey:'swap', trigger:'集齐【薄青真传/幽魂真传】任一；或古梦杀招库抽取；或薄青真传·奖励库（残缺版·剑道大宗师可自行推全）（v1.2.9）', effect:'每次使出时五重连判：剑形90→剑意70→剑势50→剑魂30→剑心15；每重权重递增 30→60→100→150→220 / 全成 560（残缺版仅前四重，上限 340；剑道大宗师后自行推全；剑心无我者第五重 +5pp）', limit:'不吃 futureVal 亚仙尊替换；敌方（方源）版本仍为定值 280', holder:'玩家/敌方', source:'562,2299-2316 / v1.2.5', status:'live'},
+  {id:'wuzhiquanxinjian', name:'五指拳心剑', school:'剑道', type:'wu', grade:'动态判定', dir:'攻', effectKey:'swap', trigger:'集齐【薄青真传/幽魂真传】任一；或古梦杀招库抽取；或薄青真传·奖励库（残缺版·剑道大宗师可自行推全）（v1.2.9）', effect:'每次使出时五重连判：剑形90→剑意70→剑势50→剑魂30→剑心15；每重权重递增 30→60→100→150→220 / 全成 560（残缺版仅前四重，上限 340；剑道大宗师后自行推全；剑心无我者第五重 +5pp）', limit:'不吃 futureVal 亚仙尊替换；敌方（方源）版本仍为定值 280', holder:'玩家/敌方', source:'562,2299-2316 / v1.2.5', status:'live', dex:true},
   {id:'tianmingpo', name:'天命破', school:'力道', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'amp', trigger:'梦境探索·第三重古梦（仙道杀招库抽取）', effect:'每次被抽到时权重按上一次的 1.2 倍叠加（初值 100，可无限叠加）', limit:'—', holder:'玩家', source:'v1.2.5 新增', status:'live'},
   {id:'xunmengjian', name:'寻梦剑', school:'梦道', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'amp', trigger:'超级梦境·古梦层仙道杀招库（随机获取）/ 彩蛋梦境（自动获得）', effect:'基础权重=100+梦道境界×10+剑道境界×10（入门为零起点）', limit:'梦道与剑道双加成分别累加', holder:'玩家', source:'v1.2.6 新增', status:'live'},
   {id:'wuzhiquanxinjianFull', name:'五指全心剑', school:'剑道', type:'wu', grade:'动态判定（完整版）', dir:'攻', effectKey:'swap', trigger:'薄青真传·奖励库（v1.2.9）', effect:'五重连判：剑形90→剑意70→剑势50→剑魂30→剑心15；每重权重递增 30→60→100→150→220 / 全成 560；剑心无我者第五重 +5pp', limit:'—', holder:'玩家', source:'v1.2.9 新增', status:'live'},
@@ -1593,9 +1659,19 @@ SPEC_LIB.batchEntries = SPEC_LIB.entries.filter(function(e){return e.batch===tru
   if(bad.length)console.warn('[SPEC_LIB] 字段缺失：'+bad.join(' / '));
  }catch(e){}
 })();
+/* SPEC_NAMES 惰性派生：entries.length 变化后失效重算；敌方专属需 dex:true 才进入图鉴 */
+var _specNamesCache = null;
+var _specNamesLen = -1;
+function specNames(){
+ if(_specNamesCache && _specNamesLen === SPEC_LIB.entries.length) return _specNamesCache;
+ _specNamesLen = SPEC_LIB.entries.length;
+ _specNamesCache = SPEC_LIB.entries.concat(SPEC_LIB.batchEntries)
+  .filter(function(e){ return e.holder !== '敌方' || e.dex === true; })
+  .map(function(e){ return e.name; });
+ return _specNamesCache;
+}
 /* 特殊仙道杀招规范库：判断某名称是否为"特殊仙道杀招"（用于播报 / 入库 / 检索） */
-var SPEC_NAMES = SPEC_LIB.entries.concat(SPEC_LIB.batchEntries).filter(function(e){return e.holder!=='敌方'||e.id==='guangyinfieRen'||e.id==='wuzhiquanxinjian';}).map(function(e){return e.name;});
-function isSpecName(n){return SPEC_NAMES.indexOf(n)>=0;}
+function isSpecName(n){return specNames().indexOf(n)>=0;}
 /* ===== v1.3.1 盗天之世专属杀招 ===== */
 SPEC_LIB.entries.push(
  {id:'shenbuzhi', name:'神不知', school:'宇道', type:'spec', grade:'特殊仙道·宇道',
@@ -1664,10 +1740,6 @@ SPEC_LIB.entries.push(
   effect:'算尽敌手：敌方本回合权重 ×0.82', limit:'—',
   holder:'玩家', source:'原著·星宿「算无遗策」之评', status:'live'}
 );
-/* 刷新名称索引（播报/判定用） */
-SPEC_NAMES = SPEC_LIB.entries.concat(SPEC_LIB.batchEntries).filter(function(e){return e.holder!=='敌方'||e.id==='guangyinfieRen'||e.id==='wuzhiquanxinjian';}).map(function(e){return e.name;});
-
-
 function specEntry(n){var all=SPEC_LIB.entries.concat(SPEC_LIB.batchEntries);for(var i=0;i<all.length;i++){if(all[i].name===n)return all[i];}return null;}
 /* ===== v1.1.6【接线】批量杀招：数据驱动落账与授予 ===== */
 /* 取某批量杀招的登记记录（含接线数值字段） */
@@ -1754,12 +1826,6 @@ function legacyGatePass(n){
 /* 原「通用事件」已删除：下列凡尘场景只属于炼天之世的青茅山一地，
    其余十个时代各自拥有独立的凡人事件池（见 ERA_MORTAL_EVENTS）。 */
 var MORTAL_SCENES={
- '小兽潮支援':{
-  opening:'夜哨铜铃接连响起，山道尽头扬起一片尘雾。低阶野兽冲散了前哨，村寨的火把在风里忽明忽暗。',
-  context:'你被编入接应队，沿着留下的血迹和折断的树枝赶往前线。夜战里，每个人都必须看清同伴的位置。',
-  combat:[0,1],foe:'兽群前锋',battle:'一头凶兽撞开林木，后面还有兽影不断逼近。你必须护住队伍侧翼，争取让前线撤下来的族人通过。',
-  victory:'你与同伴合围击退兽群，没有贸然追进黑暗。战场暂时安静下来，清点伤员和战利品的工作随即开始。'
- },
  '花酒遗洞':{
   opening:'山雨冲开一处被藤蔓遮住的石缝，潮湿的岩壁间飘出一缕陈年酒气。',
   context:'附近山民提过前辈蛊师留下的遗迹。洞中只剩残缺刻痕和旧物，能否从中读出门道，全看你如何探查。',
@@ -1770,12 +1836,6 @@ var MORTAL_SCENES={
   failed:'你踉跄着逃出石缝，身心都被这次冒进拖累。',
   records:['寻得遗藏线索','采得洞口蛊材','惊动守洞蛊']
  },
- '年末演武':{
-  opening:'一年一度的年末考核设在演武场。场边挤满同辈与家老，成绩册上每一笔都关系到来年的修行机会。',
-  context:'轮到你上台时，对手已经催动蛊虫占住了先手。你必须在有限真元里找出破绽。',
-  combat:[0,0],foe:'同辈蛊师',battle:'对手先以蛊虫试探，随后抢身近攻。台下喝彩与嘘声混在一起，容不得你分神。',
-  victory:'最后一次交锋尘埃落定。执考家老将胜负记入册中，同辈的目光也随之改变；你收起蛊虫，走下擂台。'
- },
  '竹林酒香':{
   opening:'月色落在青竹林间，风过时竹叶相击，送来一阵清冽的酒香。',
   context:'香气沿着山溪忽远忽近，像是从猎户歇脚处或某个隐蔽水洼传来。林中也有野兽活动，你得边找线索边留意退路。',
@@ -1785,12 +1845,6 @@ var MORTAL_SCENES={
   recover:'你屏息绕过巢径，借竹影遮掩退回山溪。酒香散去，所幸你和随身蛊虫都安然无恙。',
   failed:'你在竹林里狼狈脱身，惊惧与疲惫久久不能散去。',
   records:['循香寻得机缘','采得青竹酒露','误入野兽巢径']
- },
- '山道遇袭':{
-  opening:'你独自穿过山道时，前方忽然滚下几块碎石。路旁的灌木里有人影掠过，退路已被截住。',
-  context:'对方自称散修，却把目光落在你的蛊虫和元石上。几句试探之后，谈判已经没有余地。',
-  combat:[1,1],foe:'截路蛊师',battle:'对方从侧面发起突袭，蛊虫攻势直奔你的空窍与随身行囊。你必须挡住第一轮，不能让其夺走先机。',
-  victory:'截路者被迫退开，散落的蛊材与元石留在路边。你没有继续追杀，而是确认周围安全后迅速离开。'
  },
  '蛤蟆商队':{
   opening:'山寨外支起一顶顶商帐，驼兽和巨型蛊虫拖着货箱缓缓入场。叫卖声、讨价声与驮兽的鼻息混成一片。',
@@ -1821,12 +1875,6 @@ var MORTAL_SCENES={
   recover:'你把旧册交还祠堂，并用平和言语止住争执。家族旧事没有替你决定道路，但你避免了冲突扩大。',
   failed:'争执升级后，你被家老斥退。心绪难平，连日修行也受到影响。',
   records:['查得旁支旧谱','听闻古月旧事','卷入族中争执']
- },
- '行旅救援':{
-  opening:'你经过一段远离聚居点的山路时，听见前方传来急促的求救声。一支行旅队伍被蛊兽逼到岩坡边，退路只剩一条窄道。',
-  context:'领队已受伤，几名同行者护着货物不敢妄动。蛊兽正要扑向落在最后的人，你得先压住它的攻势，给众人争取撤退时间。',
-  combat:[0,1],foe:'拦路蛊兽',battle:'蛊兽从坡上俯冲而下，碎石随之滚落。你迎上前去牵制它，让行旅队伍有机会沿窄道撤离。',
-  victory:'蛊兽负伤退入林间。行旅众人扶起伤者，向你道谢后匆匆离去；你没有追进陌生地形，只检查战场后继续赶路。'
  },
  '野地采蛊':{
   opening:'一场骤雨过后，野地里浮起潮湿的土腥味。你发现几道新鲜的蛊虫爬痕，附近散落着被啃碎的药草。',
@@ -2588,7 +2636,7 @@ function specVoice(m,v){
 /* 播报覆盖自检（调试钩子）：列出表中但从未定义播报路径的名字，正常情况下应为空 */
 function specVoiceAudit(){
  var missing=[];
- SPEC_NAMES.forEach(function(n){
+ specNames().forEach(function(n){
   /* 特殊仙道杀招表内具名杀招均经 learnSpec（t=spec）或 spec 名匹配入库，均可播报 */
   if(!specEntry(n))missing.push(n);
  });
@@ -2822,12 +2870,6 @@ async function tryEraZun(eraKey){
     if(await jianZunAfter())return true;
    }
    if(conf.onWin)await conf.onWin(X);
-   else{
-    var c=await optW('称尊之后',[['开宗传道',40],['隐名逍遥',35],['与当世尊者分庭',25]]);
-    if(c===0)await ending(conf.eraName+'成尊·开宗','你以'+X+'道在'+conf.eraName+'之世立宗。');
-    if(c===1)await ending(conf.eraName+'成尊·逍遥','尊位落在你身上，你却去了没有碑的地方。');
-    await ending(conf.eraName+'成尊·分庭','当世已有'+conf.eraName+'，又多了你。天道勉强记下两个名字。');
-   }
    return true;
   }
 
@@ -9990,7 +10032,20 @@ async function bqEnc3(){
  await say('剑鸣散尽。','sys');
  chr('薄青·斩情');
 }
-async function ending(name,quote){
+/* ===== 签名扩展（v1.33）=====
+   ending(name, quote, opts?)
+   opts 可选：{ line, tier, hint }
+   - line：分组 key（见 LINE_NAME）；缺省用 inferEndingLine(name)
+   - tier：1 死亡/失败、2 普通、3 高光/成尊；缺省 2
+   - hint：图鉴谶语；缺省用 quote
+*/
+async function ending(name,quote,opts){
+ opts=opts||{};
+ registerEnding(name,{
+  line:opts.line||inferEndingLine(name),
+  tier:(opts.tier!=null)?opts.tier:2,
+  hint:opts.hint||quote||''
+ });
  RESULT.end=name;dexAdd('end',name);achvFin(); /* v1.4.14 成就终局结算；v1.4.17 结局图鉴登记 */
  log('═══ 终局：'+name+' ═══','gold');
  VOICE.say('终局，'+name,{priority:true,vol:0.75});
@@ -10108,25 +10163,179 @@ function achvFin(){
    静态表外的新名字（变量结局名等）动态补录。 */
 var DEX_ENDINGS=['一事入微','一只手的传说','一台星守','一线通幽','万魂之臣','三气护生','与世无争','与潮同去','两空之间','乐土世·净土尊','乐土世·凡人善终','乐土世·无名慈悲尊',
  '乐土世·人道尊','九虚阵眼','九转成尊·分庭','九转成尊·开宗','九转成尊·逍遥','九转成尊·镇世','九转成尊·隐世','买卖不公','争食者','以名换星','以真传抗真','以身补天',
- '以运代血','以魂赎身','会留的人','低潮善人','借星另途','借约称孤','借魂归途','偷天者','偷道宗师','偷道继声','元始世·三气成尊','元始世·冷炉尊',
- '元莲世·平凡余生','元莲世·生机尊','元莲世·画道成尊','元莲世·留白尊','光阴中人','入城藏形','养料的一部分','再偷一缝','冷炉余生','净土守望者','准尊之姿',
+ '以运代血','以魂赎身','会留的人','低潮善人','借星另途','借约称孤','借魂归途','偷天者','偷道宗师','偷道继声','元始世·三气尊',
+ '元莲世·平凡余生','元莲世·生机尊','元莲世·画道成尊','元莲世·留白尊','光阴中人','入城藏形','养料的一部分','再偷一缝','净土守望者','准尊之姿',
  '凡人的一生','力压一方','化入虚无','化兽入荒','化星入道','北原血裔','半兽名号','半窃之身','半页真意','南下避血','历史留名','双界之贼',
  '另辟星轨','只留人力','史笔残页','同烬一角','名册逆笔','墨名入册','外门走卒','夜未真正过去','天庭客卿','天庭棋子','天意照星','契断北原',
- '宇道缝匠','守住一瞬','安享晚年','安度北原','安度星世','安度此生','安度炉畔','安度荒原','安度魂世','宙道行者','定游未定','宿命终毁',
+ '宇道缝匠','守住一瞬','安享晚年','安度北原','安度星世','安度此生','安度荒原','安度魂世','宙道行者','定游未定','宿命终毁',
  '寻无缝土','寻无魂土','寻门人','寿元尽消','封传不启','封盘之算','封缝人','封而复开','尊路未及','尊路未竟','巨阳世·分庭日','巨阳世·血道成尊',
  '巨阳世·运道成尊','帝爆一身','幽魂世·分食之尊','幽魂世·换命尊','幽魂世·魂道成尊','弃名远行','弃籍归星','形无定相','心不被窃','我去，这是彩蛋！','才倾星海','折腰客卿',
  '推演入微','携兽迁徙','改变历史','散怨人','散星归人','斩断循环','无名小卒','无极世·律道成尊','无极世·无中尊','无极世·无名尊','无面过客','时痕深重',
- '星下凡尘','星下善念','星下天魔','星下隐士','星宿世·入微成尊','星宿世·外谱之尊','星宿世·天庭之尊','星尘远游','星术随身','星轨改道','智星同辉','有问之偷',
- '未乱之人','未开炉的人','未被选中的人','未识星轨','枕兽骨眠','枕日而眠','枕星而眠','枕炭而眠','枕缝而眠','枕雨而眠','枕骨而眠','林间留白',
- '榜上人','止戈之算','残图补全','残火持有者','毁约西风','毁钥者','气运承载体','洗手帖','海阔行人','渡劫失败','游方传方','游而不定',
- '满注视逃','潮边活口','炉边一生','气道传人','爆者余生','狂蛮世·力道成尊','狂蛮世·半兽尊','狂蛮世·变化成尊','独行收魂','猎魂人','献祭未成','瓣上余生',
+ '星下善念','星下天魔','星下隐士','星宿世·入微成尊','星宿世·外谱之尊','星宿世·天庭之尊','星尘远游','星术随身','星轨改道','智星同辉','有问之偷',
+ '未被选中的人','枕兽骨眠','枕日而眠','枕星而眠','枕缝而眠','枕雨而眠','枕骨而眠','林间留白',
+ '止戈之算','残图补全','毁约西风','毁钥者','气运承载体','洗手帖','海阔行人','渡劫失败','游方传法','游而不定',
+ '满注视逃','气道传人','爆者余生','狂蛮世·力道成尊','狂蛮世·半兽尊','狂蛮世·变化成尊','独行收魂','猎魂人','献祭未成','瓣上余生',
  '画道传人','留白之算','留窃五域','白骨过客','皮上人生','盗亦有道','盗天世·偷天尊','盗天世·封门尊','盗天世·无面尊','盟约金页','真传入匣','真传继声',
  '真意封匣','破洞行人','碌碌无为','碎事实者','碑与风','磷火边的人','空城隐名','空门之外','窃而有愧','窃运不休','立碑人','红莲世·一瞬尊',
- '红莲世·斩循环尊','红莲世·长河尊','纯盗','缘深不取','缝中归途','背缝余生','自愿的养料','草间凡人','荒原小酋','血日不落','行脚慈悲者','裂隙逃命',
+ '红莲世·斩循环尊','红莲世·长河尊','纯盗','缘深不取','缝中归途','背缝余生','自愿的养料','荒原小酋','血日不落','行脚慈悲者','裂隙逃命',
  '装死度世','谱上人','谷卷持有者','谷底蛰伏','谷浅难藏','赌徒余烬','跨越时空的胜负','路边一条','身死道消','归途引路人','过大的漏洞','追回昨日',
  '逃无可逃','逃离开裂','道心不噬','道心如衡','钥落他人','长住疯魔','长生天客卿','长眠窟中','门匙在握','问道无答','阎名游世','青莲续世',
  '非人之夜','魂宗初祖','前世传灯','前世无名','前世微尘',
-'雷下收剑','剑折','剑下留道','剑源','剑源·薄青合剑','剑源·薄青见剑',]; /* 由源码 ending('…') 字面量静态生成，共 233 个 */
+'雷下收剑','剑折','剑下留道','剑源','剑源·薄青合剑','剑源·薄青见剑',
+ '三气归一','仙胎成尊·伐幽','仙胎成尊·传节','仙胎成尊·分庭','仙胎成尊·双峰','仙胎成尊·另途','仙胎成尊·弃影','仙胎成尊·影主','仙胎成尊·无名尊','仙胎成尊·炼影','仙胎成尊·逍遥','仙胎成尊·镇关','仙胎成尊·隐宗','元始世·奴道辅世','元始世·气道成尊','元始遗泽','劫后余生','天意弃命','守道传承','归隐山野','气道一生','疯魔窟隐者','道场留名','重伤退场','客死他乡','剑下亡魂',]; /* 由源码 ending('…') 字面量静态生成，共 227 个；已剔除 6 个等级门槛永假结局 */
+/* 结局元数据：line=路线分组 key，tier=1 通用/死亡/失败 · 2 普通 · 3 高光/成尊/真传，hint=一句谶语 */
+/* 结局元数据：line=路线分组 key，tier=1 通用/死亡/失败 · 2 普通 · 3 高光/成尊/真传，hint=一句谶语 */
+var END_META={
+ '寿元尽消':{line:'common',tier:1,hint:'寿数如烛，燃尽在登仙路上。'},
+ '身死道消':{line:'common',tier:1,hint:'力竭之际，天地俱寂，道亦随之而散。'},
+ '碌碌无为':{line:'common',tier:1,hint:'一生奔忙，终未在世上留下半笔。'},
+ '凡人的一生':{line:'common',tier:1,hint:'不曾问道，也不曾问天，只把日子过完。'},
+ '无名小卒':{line:'common',tier:1,hint:'名不入册，骨不入碑，风过无痕。'},
+ '路边一条':{line:'common',tier:1,hint:'倒在无人经过的路边，连野狗都不屑一顾。'},
+ '天意弃命':{line:'common',tier:1,hint:'天意既弃，纵有千般算计也换不回一口气。'},
+ '重伤退场':{line:'common',tier:1,hint:'血尽而退，从此江湖再无此名。'},
+ '渡劫失败':{line:'common',tier:1,hint:'雷落九重，人成焦土，劫数从不讲情面。'},
+ '长眠窟中':{line:'common',tier:1,hint:'窟深无光，一睡便是永年。'},
+ '化入虚无':{line:'common',tier:1,hint:'连尸骨都化作了虚无，仿佛从未存在。'},
+ '养料的一部分':{line:'common',tier:1,hint:'你成了别人的养料，连名字都被消化干净。'},
+ '自愿的养料':{line:'common',tier:1,hint:'明知是养料，仍笑着把自己递了上去。'},
+ '逃无可逃':{line:'common',tier:1,hint:'四面皆墙，退路早被自己堵死。'},
+ '满注视逃':{line:'common',tier:1,hint:'满场目光之下仓皇而逃，从此抬不起头。'},
+ '献祭未成':{line:'common',tier:1,hint:'祭台已立，祭品却先一步断了气。'},
+ '问道无答':{line:'common',tier:1,hint:'问了一辈子道，道始终没有回头。'},
+ '同烬一角':{line:'common',tier:1,hint:'大火烧尽一切，你只是灰烬里的一角。'},
+ '谷浅难藏':{line:'common',tier:1,hint:'谷太浅，藏不住人，也藏不住命。'},
+ '过大的漏洞':{line:'common',tier:1,hint:'你算尽了天下，却漏算了自己这一处。'},
+ '再偷一缝':{line:'common',tier:1,hint:'再偷一缝，缝后不是生路，是深渊。'},
+ '封而复开':{line:'common',tier:1,hint:'封了又开，开了又封，终究封不住人心。'},
+ '背缝余生':{line:'common',tier:1,hint:'背着那道缝活完余生，夜里总听见风声。'},
+ '半窃之身':{line:'common',tier:1,hint:'偷来半身，剩下半身永远不属于自己。'},
+ '钥落他人':{line:'common',tier:1,hint:'钥匙落在别人手里，门便再不由你开。'},
+ '未被选中的人':{line:'common',tier:1,hint:'天意翻过名册，从头到尾没有念到你。'},
+ '赌徒余烬':{line:'common',tier:1,hint:'押上全部身家，只赢回一把余烬。'},
+ '外门走卒':{line:'common',tier:1,hint:'外门走卒，连山门都没能踏进去一步。'},
+ '折腰客卿':{line:'common',tier:1,hint:'客卿之名，换的是一辈子的折腰。'},
+ '碎事实者':{line:'common',tier:1,hint:'把真相掰碎了说，听的人只当是疯话。'},
+ '长住疯魔':{line:'common',tier:1,hint:'疯魔窟里住久了，疯魔便成了家。'},
+ '尊路未及':{line:'common',tier:1,hint:'尊路就在眼前，你却差最后一步。'},
+ '尊路未竟':{line:'common',tier:1,hint:'尊路走到一半，灯灭了。'},
+ '与世无争':{line:'common',tier:1,hint:'不争不抢，于是什么也没留下。'},
+ '买卖不公':{line:'common',tier:1,hint:'这世上的买卖，从来不曾公平过。'},
+ '争食者':{line:'common',tier:1,hint:'与兽争食，与天争命，最后只争到一口冷气。'},
+ '以魂赎身':{line:'common',tier:1,hint:'拿魂魄去赎身子，赎回来的只是一具空壳。'},
+ '装死度世':{line:'common',tier:1,hint:'装死装了一辈子，最后真的死了也没人信。'},
+ '谷底蛰伏':{line:'common',tier:1,hint:'蛰伏谷底，等来的不是春雷，是落石。'},
+ '裂隙逃命':{line:'common',tier:1,hint:'从裂隙里爬出来，命是捡的，人是废的。'},
+ '万魂之臣':{line:'common',tier:1,hint:'万魂之上称臣，万魂之下无我。'},
+ '帝爆一身':{line:'common',tier:1,hint:'一身修为尽数爆开，只照亮了别人的路。'},
+ '爆者余生':{line:'common',tier:1,hint:'爆过一次的人，余生都在余震里发抖。'},
+ '阎名游世':{line:'common',tier:1,hint:'名字已入阎册，人还在世上游荡。'},
+ '猎魂人':{line:'common',tier:1,hint:'猎了一辈子魂，最后被自己的影子猎走。'},
+
+ '剑下亡魂':{line:'common',tier:1,hint:'剑光过处，连惨叫都来不及留下。'},
+ '客死他乡':{line:'common',tier:1,hint:'故乡的土没能盖上你，异乡的风替你收了尸。'},
+ '安享晚年':{line:'common',tier:2,hint:'刀兵远去，你把余年过成了普通人的样子。'},
+ '历史留名':{line:'common',tier:2,hint:'史书翻到你那一页，墨迹还未干。'},
+ '改变历史':{line:'common',tier:3,hint:'你改写了既定的一笔，后世从此分叉。'},
+ '宿命终毁':{line:'common',tier:3,hint:'宿命的线在你手里断了，再无人能续上。'},
+ '劫后余生':{line:'common',tier:2,hint:'劫火熄了，你还在，灰里仍有温度。'},
+ '准尊之姿':{line:'common',tier:3,hint:'差一步便是尊，这一步却隔着整片天。'},
+ '九转成尊·开宗':{line:'九转成尊',tier:3,hint:'九转之上开一宗，门人记诗不记人。'},
+ '九转成尊·分庭':{line:'九转成尊',tier:3,hint:'另立一庭，与旧尊分庭而立。'},
+ '九转成尊·逍遥':{line:'九转成尊',tier:3,hint:'成尊之后，你选择不被任何名册钉住。'},
+ '九转成尊·镇世':{line:'九转成尊',tier:3,hint:'以尊位压住一方乱局，人安，你不安。'},
+ '九转成尊·隐世':{line:'九转成尊',tier:3,hint:'尊名入册，真身入山，再无音讯。'},
+ '仙胎成尊·隐宗':{line:'仙胎成尊',tier:3,hint:'尊位在，真名不写匾上。'},
+ '仙胎成尊·分庭':{line:'仙胎成尊',tier:3,hint:'仙胎落位，另起一庭，不承旧账。'},
+ '仙胎成尊·逍遥':{line:'仙胎成尊',tier:3,hint:'胎气化尊，你把逍遥留给自己。'},
+ '仙胎成尊·无名尊':{line:'仙胎成尊',tier:3,hint:'成了尊，却坚持不留姓名。'},
+ '仙胎成尊·传节':{line:'仙胎成尊',tier:3,hint:'把节令与规矩传下去，比传名更久。'},
+ '仙胎成尊·影主':{line:'仙胎成尊',tier:3,hint:'影子里的尊，比灯下的更难防。'},
+ '仙胎成尊·炼影':{line:'仙胎成尊',tier:3,hint:'以影为炉，炼出的不是人，是位格。'},
+ '仙胎成尊·镇关':{line:'仙胎成尊',tier:3,hint:'一尊守一关，关外风雨与你无关。'},
+ '仙胎成尊·伐幽':{line:'仙胎成尊',tier:3,hint:'挥尊伐幽，幽深之处也要见光。'},
+ '仙胎成尊·双峰':{line:'仙胎成尊',tier:3,hint:'双峰并峙，谁也不肯先低头。'},
+ '仙胎成尊·另途':{line:'仙胎成尊',tier:3,hint:'不走旧路，胎气开出第三条道。'},
+ '仙胎成尊·弃影':{line:'仙胎成尊',tier:3,hint:'把影子弃了，只留一具干净的尊。'},
+ '剑源':{line:'剑道',tier:3,hint:'成尊那天，五域的剑都朝更高处低鸣。'},
+ '剑源·薄青合剑':{line:'剑道',tier:3,hint:'薄青在你剑里闭了眼，五域剑鸣同向。'},
+ '剑源·薄青见剑':{line:'剑道',tier:3,hint:'斩了剑道，也带着那句没落款的遗言。'},
+ '剑下留道':{line:'剑道',tier:3,hint:'收剑不斩道，你是最锋利的一代主人。'},
+ '雷下收剑':{line:'剑道',tier:2,hint:'成尊而不接那一剑，剑道不怪你。'},
+ '剑折':{line:'剑道',tier:1,hint:'成尊之后，拔剑总会慢半拍。'},
+ '天庭客卿':{line:'common',tier:2,hint:'交出浮冰，活得安稳，再无人问你想要什么。'},
+ '长生天客卿':{line:'common',tier:2,hint:'北原的风很大，你的名字排在别人后面。'},
+ '疯魔窟隐者':{line:'common',tier:2,hint:'得了元境却不出山，雾都终于有了主人。'},
+ '真传入匣':{line:'common',tier:2,hint:'钥匙在，门不开——最干净的贼不再出手。'},
+ '真传继声':{line:'common',tier:2,hint:'没有成为他，只把回声多传了一代。'},
+};
+var LINE_NAME={
+ common:'通用 / 死亡',
+ other:'其他',
+ '元始世':'元始之世',
+ '星宿世':'星宿之世',
+ '狂蛮世':'狂蛮之世',
+ '红莲世':'红莲之世',
+ '乐土世':'乐土之世',
+ '元莲世':'元莲之世',
+ '盗天世':'盗天之世',
+ '巨阳世':'巨阳之世',
+ '幽魂世':'幽魂之世',
+ '无极世':'无极之世',
+ '九转成尊':'九转成尊',
+ '仙胎成尊':'仙胎成尊',
+ '剑道':'剑道番外'
+};
+var LINE_ORDER=['common','元始世','星宿世','狂蛮世','红莲世','乐土世','元莲世','盗天世','巨阳世','幽魂世','无极世','九转成尊','仙胎成尊','剑道','other'];
+/* ══ 14.6 DEX · 结局动态兜底区（v1.33） ═══════════════════════════
+   ending() 每次调用都会尝试 registerEnding(name, meta)。
+   - 若 name 已在 END_META 声明 → 忽略（静态优先，不覆盖）。
+   - 若已在 _endingDynamic → 忽略（幂等）。
+   - 否则写入动态区，图鉴立即可见。
+   仅存于内存，不落 localStorage —— 结局名表是「游戏内容」，不是「玩家存档」。 */
+var _endingDynamic=Object.create(null); /* name -> {line, tier, hint} */
+function registerEnding(name,meta){
+ if(!name)return;
+ var n=String(name);
+ if(END_META[n])return; /* 静态已声明，不覆盖 */
+ if(_endingDynamic[n])return; /* 已兜底，幂等 */
+ _endingDynamic[n]={
+  line:(meta&&meta.line)||'other',
+  tier:(meta&&meta.tier!=null)?meta.tier:2,
+  hint:(meta&&meta.hint)||''
+ };
+}
+function getEndMeta(id){
+ if(END_META[id])return END_META[id];
+ if(_endingDynamic[id])return _endingDynamic[id];
+ return null;
+}
+function getAllEndingNames(){
+ var base=DEX_ENDINGS.slice();
+ var dyn=Object.keys(_endingDynamic);
+ for(var i=0;i<dyn.length;i++){
+  if(base.indexOf(dyn[i])<0)base.push(dyn[i]);
+ }
+ return base;
+}
+/* 兜底推断：名字含「·」时取前缀，前缀若在 LINE_NAME 里就归该线；否则 other。
+   ⚠ 不再按 S.eraIdx 推断 —— 时代不等于路线。想要精确分组，传 opts.line。 */
+function inferEndingLine(name){
+ var s=String(name||'');
+ var p=s.indexOf('·');
+ if(p>0){
+  var prefix=s.slice(0,p);
+  if(LINE_NAME[prefix])return prefix;
+ }
+ return 'other';
+}
+function endLineOf(id){
+ var m=getEndMeta(id);
+ if(m&&m.line)return m.line;
+ return inferEndingLine(id);
+}
+function lineLabel(line){return LINE_NAME[line]||line||'其他';}
+
 var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与原著年代一致） */
  '气墙初试','天地人三气论','借气修行','气道晨课','气道残篇','三气异动', /* 远古·元始 */
  '观星夜课','棋盘残局','天庭招贤','星象异变','智道论道','星轨刻石', /* 远古·星宿 */
@@ -10140,6 +10349,23 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  '净土施粥','厚土石窟','万家灯会','归土安魂','渡口问心','乐土钟声', /* 近古·乐土 */
  '青茅山祭祖','古月学舍','白家冰心','熊家猎场','春秋蝉蜕','方源同门','白凝冰·月下','白凝冰·竹林试剑','古月方正','古月青书','贾金生·赌石','酒仙遗踪','商心慈·账房','商睚·比宝','商家夜宴','商城拍卖','商家城一游','商心慈·密谈','商心慈·联姻局','商心慈·危城夜','白骨坊市','武家差遣','铁家风波','三叉山旧影','义天山风闻','黑家议事','王庭阴影','刘家余烬','雪原夜话','灵缘听雨','仙鹤门下','战仙演武','沈家海盟','诗情海域','狐仙福地·初临','地灵三问','狐仙真传·认主','鹤门压境','福地稳固','琅琊地灵','星象观台','黑凡残局','铁鹰旧主' /* 出生地专属+青茅山 */
 ];
+/* 游历/历练事件静态清单：从 doTravail / doKeyTrial 的 if 分支提取
+ 一次性维护，加新游历时往这里补一行 */
+var DEX_TRAVEL_EVENTS = [
+ /* 炼天第一世/通用关键历练 */
+ '剑冢一夜','观星台','光阴长河探索','龙鲸·悔蛊','超级蛊阵争夺战','五界山脉混战','仙蛊拍卖会','义天山大战','东方长凡夺舍','梦境探索','天意垂青','逆流河历练','北原兽灾','星宿棋局','问剑台','剑心试炼','万剑朝宗',
+ /* 炼天第二世·人物线 */
+ '琅琊·毛民炼道','紫薇仙子·星算追踪','冰塞川·劫运坛','影无邪·分魂残响','黑楼兰·霸仙之志','龙鲸乐土·悔哭海','紫山真君·影宗遗谋','凤九歌·命运歌','天庭·人道防线','长生天·北原合纵','影宗·中洲暗线','南疆·五域联军','西漠·帝君城援军','东海·龙宫战局',
+ /* 方源足迹链 */
+ '方源足迹·狐仙与北原','方源足迹·炼道大会与琅琊','方源足迹·影宗与东海','方源足迹·南疆与光阴长河',
+ /* v1.25 南疆余波 */
+ '三王传承余波','白骨山·血海余烬','义天山前夜',
+ /* 各时代专属关键历练（元始/星宿/无极/狂蛮/红莲/盗天/巨阳/幽魂/元莲/乐土） */
+ '三气初炼','开炉试蛊','气道问心','元始残炉','炼道论榜','三气归来迹','天庭外门试炼','定仙游遗迹','推演一劫','天庭残图','星宿意志','疯魔窟·初探','元境初封','魔尊落子','九虚反噬','光阴浮冰','兽潮前锋','变化试形','力道斗场','荒原遗骨','血皮之兆','狂蛮意志回响','光阴裂隙','昨日重逢','飞刃试锋','红莲残瓣','定命一掷','红莲意志回响','长毛老祖·三次炼蛊','遁空蛊之败','推杯换盏','疯魔窟·无极意志','落魄谷','无间道','真阳遗影','血脉祭台','运道赌局','黄金族盟约','北原王庭','巨阳余晖','魂潮夜行','无主福地','白骨帝座','万魂谷','幽魂回望','空城夺宝','青莲入画','木心问根','画道夺锋','枯木逢春','莲池论笔','元莲画意','净土立约','厚土问心',
+ /* 通用蛊仙历练 */
+ '渡魂长夜','人道辨难','乐土钟鸣','善念试炼','坐关悟道','传道授业','道痕熔炉','仙道淬炼','道痕共鸣','仙窍内视','仙友论道'
+];
+
 var DEX_TABS=[['spec','杀招'],['end','结局'],['ev','事件'],['era','时代']];
 var DEX_TAB='spec';
 function dexGet(){try{var d=JSON.parse(localStorage.getItem('guDex')||'{}');if(d&&typeof d==='object')return d;}catch(e){}return {};}
@@ -10154,23 +10380,67 @@ function dexAdd(k,id){
 }
 function dexStatics(k){
  var r=[];
- if(k==='spec')r=SPEC_NAMES.slice();
- else if(k==='end')r=DEX_ENDINGS.slice();
- else if(k==='ev')r=Object.keys(MORTAL_SCENES).concat(RAND_EVENTS.map(function(e){return e.n;}),DEX_ERA_EVENTS);
+ if(k==='spec')r=specNames().slice();
+ else if(k==='end')r=getAllEndingNames();
+ else if(k==='ev')r=Object.keys(MORTAL_SCENES).concat(RAND_EVENTS.map(function(e){return e.n;}),DEX_ERA_EVENTS,DEX_TRAVEL_EVENTS);
  else if(k==='era')r=ERAS.slice();
  var o={},out=[];r.forEach(function(x){if(x&&!o[x]){o[x]=1;out.push(x);}});
  return out;
 }
 function dexHint(k,id){
- if(k==='spec'){var e=specEntry(id)||batchEntry(id);if(!e)return '';var sc=e.school||'';if(sc.indexOf('(')>=0)sc=''; /* 数据表个别条目 school 为函数字样串，提示位不显示 */
+ if(k==='spec'){var e=specEntry(id)||batchEntry(id);if(!e)return '';
+  var t=String(e.trigger||'');
+  /* 敌方专属/不可获得的，不显示触发，退回流派·方向 */
+  if(t&&t!=='——'&&t.indexOf('专属')<0&&t.indexOf('不可获得')<0&&t.indexOf('玩家不可')<0)return t;
+  var sc=e.school||'';if(sc.indexOf('(')>=0)sc=''; /* 数据表个别条目 school 为函数字样串，提示位不显示 */
   return (sc?sc:'')+(e.dir?(sc?' · ':'')+e.dir:'');}
- if(k==='ev')return MORTAL_SCENES[id]?'炼天·青茅山见闻':(DEX_ERA_EVENTS.indexOf(id)>=0?'时代异闻':(RAND_EVENTS.some(function(x){return x.n===id;})?'途中奇遇':'异闻'));
+ if(k==='ev')return MORTAL_SCENES[id]?'炼天·青茅山见闻':(DEX_ERA_EVENTS.indexOf(id)>=0?'时代异闻':(RAND_EVENTS.some(function(x){return x.n===id;})?'途中奇遇':(isBirthStoryName(id)?'故乡见闻':(DEX_TRAVEL_EVENTS.indexOf(id)>=0?'游历/历练':'异闻'))));
+ if(k==='end'){
+  var m=getEndMeta(id);
+  if(m&&m.hint)return m.hint;
+  var line=(m&&m.line)||inferEndingLine(id);
+  if(line&&line!=='other')return '【'+lineLabel(line)+'】线，尚未探明。';
+  return '一桩尚未被记下的终局。';
+ }
  return '';
 }
 function dexRender(){
  var list=dexStatics(DEX_TAB);var got=dexGet()[DEX_TAB]||[];
  got.forEach(function(id){if(list.indexOf(id)<0)list.push(id);}); /* 动态补录并入展示 */
  var cnt=0;
+ if(DEX_TAB==='end'){
+  var groups={},order=[];
+  list.forEach(function(id){
+   var m=getEndMeta(id);
+   var line=(m&&m.line)||inferEndingLine(id);
+   if(!groups[line]){groups[line]=[];order.push(line);}
+   groups[line].push(id);
+  });
+  order.sort(function(a,b){
+   var ia=LINE_ORDER.indexOf(a),ib=LINE_ORDER.indexOf(b);
+   if(ia<0)ia=900;if(ib<0)ib=900;
+   if(ia!==ib)return ia-ib;
+   return String(a).localeCompare(String(b),'zh');
+  });
+  var html='';
+  order.forEach(function(line){
+   html+='<div class="dexGroupHead">'+lineLabel(line)+'</div>';
+   groups[line].sort(function(a,b){
+    var ma=getEndMeta(a),mb=getEndMeta(b);
+    var ta=(ma&&ma.tier)||2,tb=(mb&&mb.tier)||2;
+    if(ta!==tb)return ta-tb;
+    return String(a).localeCompare(String(b),'zh');
+   });
+   groups[line].forEach(function(id){
+    var un=got.indexOf(id)>=0;if(un)cnt++;
+    html+='<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+(un?id:'？？？')+'</b><span>'+dexHint('end',id)+'</span></div>';
+   });
+  });
+  $('dexList').innerHTML=html;
+  $('dexCnt').textContent=cnt+'/'+list.length;
+  $('dexTabs').innerHTML=DEX_TABS.map(function(t){return '<button data-dextab="'+t[0]+'"'+(t[0]===DEX_TAB?' class="on"':'')+'>'+t[1]+'</button>';}).join('');
+  return;
+ }
  $('dexList').innerHTML=list.map(function(id){
   var un=got.indexOf(id)>=0;if(un)cnt++;
   return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+(un?id:'？？？')+'</b><span>'+dexHint(DEX_TAB,id)+'</span></div>';
@@ -10313,7 +10583,6 @@ async function ysFinale(){
  if(hasMark('元始残火'))await ending('元始遗泽','那点遗泽足以照亮你的修行，也提醒你勿忘人族来路。');
  if(hasMark('论榜留名'))await ending('道场留名','你的名字留在道场名册中，后来者仍会循着它求道。');
  if((S.flags.ysQi||0)>=2||rlm('气道')>=4||rlm('奴道')>=4)await ending('气道一生','你以气道立身，见证人族从弱小走向兴盛。');
- if(Math.floor(S.lv)<3)await ending('未入仙途者','你未能跻身高阶蛊师，却在这个人族立足的时代平安活过一生。');
  var d=await optW('元始世收束',[['守道传承',40],['游方传法',35],['归隐山野',25]]);
  if(d===0)await ending('守道传承','你将气道与天地人三气之理传给后辈。');
  if(d===1)await ending('游方传法','你把所学传遍五域，为后来的人族修行者留下根基。');
@@ -10428,7 +10697,6 @@ async function hlFinale(){
  if(hasMark('红莲残瓣'))await ending('瓣上余生','残瓣终于用掉的那天，你重来了三息。三息改变了一生。');
  if((S.flags.hlTime||0)>=3)await ending('时痕深重','你的影子有时比你本人先到。');
  if(rlm('宙道')>=4)await ending('宙道行者','别人问你年纪，你要先问：按哪一条时间算？');
- if(Math.floor(S.lv)<3)await ending('未乱之人','光阴乱流里，你只是偶尔迟到早退。');
  var d=await optW('红莲世收束',[['安度此生',40],['追回昨日',30],['枕雨而眠',30]]);
  if(d===0)await ending('安度此生','你只活了一次。在这个时代，这是福气。');
  if(d===1)await ending('追回昨日','你还在路上。昨日很近，也永远差一步。');
@@ -10576,7 +10844,6 @@ async function jyFinale(){
   await ending('北原血裔','不是黄金正支，也够在草原上换一口热酒。');
  }
  if(hasMark('族谱有名'))await ending('谱上人','族谱不会写你的全部，只会写你没有被勾掉。');
- if(Math.floor(S.lv)<3)await ending('草间凡人','日头很大，你很小。你活过了这个时代，这就不容易。');
  var d=await optW('巨阳世收束',[['安度北原',40],['南下避血',35],['枕日而眠',25]]);
  if(d===0)await ending('安度北原','你活过了血脉最热的那些年。风仍干，酒仍烈。');
  if(d===1)await ending('南下避血','你去了血脉不值钱的地方。夜里偶尔还会发热。');
@@ -10717,7 +10984,6 @@ async function kmFinale(){
  if(rlm('力道')>=5){
   await ending('力压一方','没有复杂的称号。人们只说：别跟他比力气。');
  }
- if(Math.floor(S.lv)<3)await ending('潮边活口','兽潮来过三次。你还在。这就算赢。');
  var d=await optW('狂蛮世收束',[['安度荒原',40],['入城藏形',35],['枕骨而眠',25]]);
  if(d===0)await ending('安度荒原','你活过了兽吼最响的那些年。草会再长，骨会再白。');
  if(d===1)await ending('入城藏形','城里不准露兽相。你学着只用一双人手拿筷。');
@@ -10920,8 +11186,6 @@ async function xxFinale(){
  }
 
  /* —— 低等级 / 凡人底色 —— */
- if(Math.floor(S.lv)<3)await ending('星下凡尘','你认过几颗星，也忘过几颗。这就够了。');
- if(Math.floor(S.lv)<5&&!hasZhiXing())await ending('未识星轨','别人谈仙尊，你只记得今年雨多。也不是什么坏事。');
 
  /* —— 默认 —— */
  var def=await optW('星世收束',[['安度星世',40],['远游五域',35],['枕星而眠',25]]);
