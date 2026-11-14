@@ -9,8 +9,15 @@ AI 开发规范 · 新增杀招（v1.30）
 4. 必须确认实际授予路径：learnSpec / addMove / grantBatchSpec / DREAM_SPEC_POOL 等；仅有数据登记不等于玩家可获得。
 5. 后续新增杀招只改 SPEC_LIB.entries.push(...)；不要再维护 SPEC_NAMES，也不要为单条新增手动修改 dexStatics、dexHint 或敌方过滤规则。
 
+AI 开发规范 · 终局控制流（v1.35 起）
+规则：ending() 使用 END_SENTINEL 结束当前异步链；新增 catch 时必须先判断 e&&e.end 并原样 throw，
+不得把终局信号当作普通错误吞掉。finally 可用于释放锁，但不得阻断异常继续传播。
+
 AI 开发规范 · 新增结局（v1.33 起）
 规则：新增结局只需【一句 ending(...)】，图鉴自动收录。
+DEX_ENDINGS 是未触发结局的静态占位表，由 gen-endings.js 从 ending() 字面量及
+战斗配置 deathName 字面量自动生成；新增结局后重跑脚本，不手工维护列表。
+END_META 仍由人工维护分组 / tier / hint 覆盖；不要自动生成或覆盖 END_META。
 不要再手动改 DEX_ENDINGS / END_META / LINE_ORDER / dexStatics / dexHint / dexRender。
 
 【写法一 · 最简（推荐大多数情况）】
@@ -752,7 +759,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.33</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.34</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -1030,10 +1037,25 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.33';
+var APP_VER='v1.35';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+ {v:'v1.35',items:[
+  ['fix','P0：随机奇遇与薄青线捕获异常时透传终局信号，避免战败身死后继续推进剧情；薄青线 finally 仍释放锁。'],
+  ['fix','终局信号统一为 END_SENTINEL，启动入口按哨兵识别正常终局。'],
+  ['fix','saveImport 增加存档版本/schema、Base64 大小、字段类型、条目数量、字符串长度及已知 ID 校验。'],
+  ['fix','调试钩子 __FORCE_BIRTH / __FORCE_WJ / __G / __audioState / __audioTest 仅在 localStorage.debug=1 或 URL debug=1 时启用。'],
+  ['fix','SPEC_LIB 增加全量 id 唯一性断言，覆盖后续 push 的条目。'],
+  ['fix','版本号统一升级为 v1.35。']
+ ]},
+ {v:'v1.34',items:[
+  ['fix','specNames / specEntry 统一只遍历 SPEC_LIB.entries，避免 batchEntries 派生视图导致批量杀招重复。'],
+  ['fix','duel / dragonBattle 战前统一调用 ensureBasicMove；升仙后补仙道攻击，不再回填凡道普攻。'],
+  ['fix','图鉴与成就列表渲染统一转义 HTML，防止导入存档中的恶意内容注入页面。'],
+  ['new','新增 gen-endings.js 自动生成 DEX_ENDINGS 静态占位表；END_META 继续手工维护。'],
+  ['fix','版本号统一升级为 v1.34。']
+ ]},
  {v:'v1.33',items:[
   ['new','结局图鉴自动兜底注册：ending() 运行时写入 _endingDynamic；getAllEndingNames / getEndMeta 合并静态表与动态区。'],
   ['new','ending(name, quote, opts?) 支持可选 line / tier / hint；存量调用零改动。'],
@@ -1363,6 +1385,12 @@ function rerollReset(){}
 function pick(arr){return arr[ri(0,arr.length-1)];}
 var Q='';try{Q=location.search||'';}catch(e){}
 var AUTO=/auto=1/.test(Q),FAST=/fast=1/.test(Q);
+/* v1.35：调试能力默认关闭；显式 localStorage.debug=1 或 ?debug=1 才开放。 */
+var DEBUG_ENABLED=(function(){try{return /(?:^|[?&])debug=1(?:&|$)/.test(Q)||localStorage.getItem('debug')==='1';}catch(e){return /(?:^|[?&])debug=1(?:&|$)/.test(Q);}})();
+if(DEBUG_ENABLED){
+ try{var _fb=(Q.match(/[?&]forceBirth=([^&]+)/)||[])[1];if(_fb&&!window.__FORCE_BIRTH)window.__FORCE_BIRTH=decodeURIComponent(_fb.replace(/\+/g,' '));}catch(e){}
+ if(/(?:^|[?&])forceWJ=1(?:&|$)/.test(Q))window.__FORCE_WJ=true;
+}
 var LOGS=[];
 var tick=function(fn){if(typeof requestAnimationFrame==='function'){requestAnimationFrame(function(){fn(performance.now());});}else{setTimeout(function(){fn(Date.now());},16);}};
 function nowMs(){return (typeof performance!=='undefined'&&performance.now)?performance.now():Date.now();}
@@ -1665,7 +1693,9 @@ var _specNamesLen = -1;
 function specNames(){
  if(_specNamesCache && _specNamesLen === SPEC_LIB.entries.length) return _specNamesCache;
  _specNamesLen = SPEC_LIB.entries.length;
- _specNamesCache = SPEC_LIB.entries.concat(SPEC_LIB.batchEntries)
+ /* v1.34 修复：batchEntries 是 entries.filter(batch===true) 的派生视图，
+    再 concat 会让批量杀招名出现两次。单表即可。 */
+ _specNamesCache = SPEC_LIB.entries
   .filter(function(e){ return e.holder !== '敌方' || e.dex === true; })
   .map(function(e){ return e.name; });
  return _specNamesCache;
@@ -1740,7 +1770,18 @@ SPEC_LIB.entries.push(
   effect:'算尽敌手：敌方本回合权重 ×0.82', limit:'—',
   holder:'玩家', source:'原著·星宿「算无遗策」之评', status:'live'}
 );
-function specEntry(n){var all=SPEC_LIB.entries.concat(SPEC_LIB.batchEntries);for(var i=0;i<all.length;i++){if(all[i].name===n)return all[i];}return null;}
+/* v1.35：在全部 entries.push 完成后做全量 id 唯一性检查。 */
+(function(){
+ try{
+  var ids=Object.create(null),dups=[];
+  SPEC_LIB.entries.forEach(function(e,i){
+   if(!e||typeof e.id!=='string'||!e.id.trim()){dups.push('空 id @'+i);return;}
+   if(ids[e.id])dups.push(e.id);else ids[e.id]=1;
+  });
+  if(dups.length)console.error('[SPEC_LIB] id 不唯一或缺失：'+dups.join(' / '));
+ }catch(e){try{console.error('[SPEC_LIB] id 唯一性断言失败',e);}catch(_){}}
+})();
+function specEntry(n){var all=SPEC_LIB.entries;for(var i=0;i<all.length;i++){if(all[i].name===n)return all[i];}return null;}
 /* ===== v1.1.6【接线】批量杀招：数据驱动落账与授予 ===== */
 /* 取某批量杀招的登记记录（含接线数值字段） */
 function batchEntry(n){var b=SPEC_LIB.batchEntries;for(var i=0;i<b.length;i++){if(b[i].name===n)return b[i];}return null;}
@@ -3982,7 +4023,7 @@ setStage('出身');
   /* 南疆出生点：沿用 BIRTHS 基础权重（盘面=概率）；不再做现代世界三青茅压缩 */
   var bSecs=[];for(var b2=0;b2<bt.length;b2++)bSecs.push([bt[b2][0],bt[b2][1]]);
   var bIdx=await W(S.region+'·出生点盘','具体落地之处',bSecs,{small:bt.length>12});
-  S.birth=(window.__FORCE_BIRTH||bt[bIdx][0]);if(FUDI_LIST.indexOf(S.birth)>=0)S.flags.fudi=true; /* 洞天福地：资源丰饶（__FORCE_BIRTH 仅调试） */
+  S.birth=((DEBUG_ENABLED&&window.__FORCE_BIRTH)||bt[bIdx][0]);if(FUDI_LIST.indexOf(S.birth)>=0)S.flags.fudi=true; /* 洞天福地：资源丰饶（__FORCE_BIRTH 仅调试） */
   if(BIRTH_LINK.indexOf(S.birth)>=0){S.flags.link=true;await say(S.birth+'——此地与一位原著要角渊源颇深，你日后的际遇将更为频密。','gold');}
   chr('出身'+S.region+S.birth);
   await say('你在'+S.region+S.birth+'呱呱坠地。');
@@ -4339,7 +4380,7 @@ setStage('出身');
   renderPanel();
   await say('仙蛊完善度'+wormName()+'，主修境界'+REALMS[mainSchool().realm]+'，仙道推演'+S.deducX+'。');
 
-  if(window.__FORCE_WJ&&!hasMove('五禁玄光气')){learnSpec('五禁玄光气',mainSchool().name);S.lv=Math.max(S.lv,7);} /* 调试钩子：强制持有五禁玄光气 */
+  if(DEBUG_ENABLED&&window.__FORCE_WJ&&!hasMove('五禁玄光气')){learnSpec('五禁玄光气',mainSchool().name);S.lv=Math.max(S.lv,7);} /* 调试钩子：强制持有五禁玄光气 */
   /* ── 10 STORY · 七 · 蛊仙阶段 ─────────────────────────────────────── */
   setStage('蛊仙阶段');
   var cSecs2=[['2次',33.4],['3次',33.3],['4次',33.3]];
@@ -4720,7 +4761,7 @@ setStage('出身');
   await say('关底Boss现身——龙公，龙御上宾之态，亚仙尊之威！一命通关，力竭即死。','gold');
   await dragonBattle();
   /* v1.3.0：龙公线终点不再是结局——摧毁宿命蛊时已转入疯魔窟（见 destroyDestinyWorm） */
- }catch(ex){if(!ex||!ex.end)throw ex;}
+ }catch(ex){if(ex!==END_SENTINEL&&(!ex||!ex.end))throw ex;}
 }
 
 /* ══ 11 EVENT · 凡人事件 ═══════════════════════════════════════════ */
@@ -4989,6 +5030,7 @@ async function maybeRandEvent(phase){
   return true;
  }catch(e){
   try{S.flags._randLock=false;}catch(_){}
+  if(e===END_SENTINEL||(e&&e.end))throw e; /* v1.35 P0：终局信号不可降级为普通奇遇失败 */
   try{console.error('[随机奇遇]',e);}catch(_){}
   return false;
  }
@@ -6176,7 +6218,7 @@ function futureShift(){
 }
 async function duel(eT,label,opts){
  opts=opts||{};
- if(!hasMove('普攻'))S.moves.unshift({name:'普攻',t:'basic',dir:'攻',school:mainSchool().name});
+ ensureBasicMove(); /* v1.34 修复：升仙后不应再补凡道「普攻」，统一走 ensureBasicMove（仙道攻击） */
  S.flags.wjUsed=false; /* v1.0.20：每场战斗重置五禁玄光气次数 */
  S.flags.batchSaveUsed=false; /* v1.1.6【接线】每场重置批量保命 */
  S.flags.gjUsed=false;S.flags.baimengUsed=false; /* v1.2.6：鬼不觉/白日梦每场重置 */
@@ -9286,7 +9328,7 @@ async function dragonBattle(){
  S.flags.batchSaveUsed=false; /* v1.1.6【接线】每场重置批量保命 */
  S.flags.gjUsed=false;S.flags.baimengUsed=false; /* v1.2.6：鬼不觉/白日梦每场重置 */
  S.flags.kmwPrev=0; /* v1.2.9 增补：狂蛮意志追打基准——每场战斗重置 */
- if(!hasMove('普攻'))S.moves.unshift({name:'普攻',t:'basic',dir:'攻',school:mainSchool().name});
+ ensureBasicMove(); /* v1.34 修复：同 duel，升仙后补「仙道攻击」而非凡道「普攻」 */
  var enemyFirst=!!S.flags.firstStrike;
  while(true){
   if(round>30){await say('久持不下，气机先散——你力竭而退。','bad');await ending('身死道消','力竭之际，天地俱寂。');}
@@ -9828,6 +9870,7 @@ async function checkBoqingLine(){
   else if(st===1)await bqEnc2();
   else if(st===2)await bqEnc3();
  }catch(e){
+  if(e===END_SENTINEL||(e&&e.end))throw e; /* v1.35 P0：终局信号继续向上层传播 */
   try{console.error('[薄青线]',e);}catch(_){}
  }finally{
   S.flags._bqLock=false;
@@ -10039,6 +10082,7 @@ async function bqEnc3(){
    - tier：1 死亡/失败、2 普通、3 高光/成尊；缺省 2
    - hint：图鉴谶语；缺省用 quote
 */
+var END_SENTINEL=Object.freeze({end:true}); /* v1.35：终局控制流哨兵（当前仍以 throw 短路，所有局部 catch 必须透传） */
 async function ending(name,quote,opts){
  opts=opts||{};
  registerEnding(name,{
@@ -10059,7 +10103,7 @@ async function ending(name,quote,opts){
  var _ec=$('endCard');
  if(_ec){_ec.classList.remove('flipIn');void _ec.offsetWidth;_ec.classList.add('flipIn');}
  window.__DONE=true;
- throw {end:true};
+ throw END_SENTINEL;
 }
 
 /* ══ 14.5 ACHV · 成就系统（v1.4.14 新增） ═══════════════════════════════
@@ -10107,23 +10151,47 @@ function achvRender(){
  $('achvCnt').textContent=ul.length+'/'+ACHV_DEF.length;
  $('achvList').innerHTML=ACHV_DEF.map(function(d){
   var un=ul.indexOf(d[0])>=0;
-  return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'●':'○')+' '+d[1]+'</b><span>'+d[2]+'</span></div>';
+  return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'●':'○')+' '+escHtml(d[1])+'</b><span>'+escHtml(d[2])+'</span></div>';
  }).join('');
 }
 /* v1.14.37 跨文件迁移：成就+图鉴导出/导入（Base64 JSON） */
 function saveExport(){
  try{
-  var data={achv:achvGet(),dex:dexGet(),v:'1.14.37'};
+  var data={achv:achvGet(),dex:dexGet(),v:APP_VER,schema:1};
   var s=JSON.stringify(data);
   return btoa(unescape(encodeURIComponent(s)));
  }catch(e){return '';}
 }
 function saveImport(str){
  try{
-  var s=decodeURIComponent(escape(atob(String(str).trim())));
+  var raw=String(str==null?'':str).trim();
+  if(!raw||raw.length>1000000)return false; /* Base64 输入上限，避免超大文本拖垮主线程 */
+  var s=decodeURIComponent(escape(atob(raw)));
+  if(s.length>750000)return false;
   var data=JSON.parse(s);
-  if(data.achv&&Array.isArray(data.achv))localStorage.setItem('guAchv',JSON.stringify(data.achv));
-  if(data.dex&&typeof data.dex==='object')localStorage.setItem('guDex',JSON.stringify(data.dex));
+  if(!data||typeof data!=='object'||Array.isArray(data))return false;
+  if(typeof data.v!=='string'||!/^v?\d+(?:\.\d+){1,2}$/.test(data.v))return false;
+  if(data.schema!==undefined&&data.schema!==1)return false;
+  if(data.achv!==undefined){
+   if(!Array.isArray(data.achv)||data.achv.length>ACHV_DEF.length)return false;
+   var knownAchv=Object.create(null),seenAchv=Object.create(null);
+   ACHV_DEF.forEach(function(x){knownAchv[x[0]]=1;});
+   for(var ai=0;ai<data.achv.length;ai++){var aid=data.achv[ai];if(typeof aid!=='string'||aid.length>80||!knownAchv[aid]||seenAchv[aid])return false;seenAchv[aid]=1;}
+  }
+  if(data.dex!==undefined){
+   if(!data.dex||typeof data.dex!=='object'||Array.isArray(data.dex))return false;
+   var dexLimits={spec:2000,end:5000,ev:3000,era:100},dexKeys=Object.keys(data.dex);
+   for(var dk=0;dk<dexKeys.length;dk++){
+    var key=dexKeys[dk],arr=data.dex[key];
+    if(!Object.prototype.hasOwnProperty.call(dexLimits,key)||!Array.isArray(arr)||arr.length>dexLimits[key])return false;
+    var seenDex=Object.create(null);
+    for(var di=0;di<arr.length;di++){var item=arr[di];if(typeof item!=='string'||!item.trim()||item.length>200||seenDex[item])return false;seenDex[item]=1;}
+   }
+  }
+  if(data.achv===undefined&&data.dex===undefined)return false;
+  /* 完成全部校验后再写入，避免无效数据污染现有存档。 */
+  if(data.achv!==undefined)localStorage.setItem('guAchv',JSON.stringify(data.achv));
+  if(data.dex!==undefined)localStorage.setItem('guDex',JSON.stringify(data.dex));
   return true;
  }catch(e){return false;}
 }
@@ -10161,28 +10229,8 @@ function achvFin(){
    事件（genericEvent + maybeRandEvent 统一登记，含各时代异闻）/时代（降生定时代时登记）。
    跨局累计存 localStorage（guDex）；未收录条目显示「？？？」并保留流派/来源提示；
    静态表外的新名字（变量结局名等）动态补录。 */
-var DEX_ENDINGS=['一事入微','一只手的传说','一台星守','一线通幽','万魂之臣','三气护生','与世无争','与潮同去','两空之间','乐土世·净土尊','乐土世·凡人善终','乐土世·无名慈悲尊',
- '乐土世·人道尊','九虚阵眼','九转成尊·分庭','九转成尊·开宗','九转成尊·逍遥','九转成尊·镇世','九转成尊·隐世','买卖不公','争食者','以名换星','以真传抗真','以身补天',
- '以运代血','以魂赎身','会留的人','低潮善人','借星另途','借约称孤','借魂归途','偷天者','偷道宗师','偷道继声','元始世·三气尊',
- '元莲世·平凡余生','元莲世·生机尊','元莲世·画道成尊','元莲世·留白尊','光阴中人','入城藏形','养料的一部分','再偷一缝','净土守望者','准尊之姿',
- '凡人的一生','力压一方','化入虚无','化兽入荒','化星入道','北原血裔','半兽名号','半窃之身','半页真意','南下避血','历史留名','双界之贼',
- '另辟星轨','只留人力','史笔残页','同烬一角','名册逆笔','墨名入册','外门走卒','夜未真正过去','天庭客卿','天庭棋子','天意照星','契断北原',
- '宇道缝匠','守住一瞬','安享晚年','安度北原','安度星世','安度此生','安度荒原','安度魂世','宙道行者','定游未定','宿命终毁',
- '寻无缝土','寻无魂土','寻门人','寿元尽消','封传不启','封盘之算','封缝人','封而复开','尊路未及','尊路未竟','巨阳世·分庭日','巨阳世·血道成尊',
- '巨阳世·运道成尊','帝爆一身','幽魂世·分食之尊','幽魂世·换命尊','幽魂世·魂道成尊','弃名远行','弃籍归星','形无定相','心不被窃','我去，这是彩蛋！','才倾星海','折腰客卿',
- '推演入微','携兽迁徙','改变历史','散怨人','散星归人','斩断循环','无名小卒','无极世·律道成尊','无极世·无中尊','无极世·无名尊','无面过客','时痕深重',
- '星下善念','星下天魔','星下隐士','星宿世·入微成尊','星宿世·外谱之尊','星宿世·天庭之尊','星尘远游','星术随身','星轨改道','智星同辉','有问之偷',
- '未被选中的人','枕兽骨眠','枕日而眠','枕星而眠','枕缝而眠','枕雨而眠','枕骨而眠','林间留白',
- '止戈之算','残图补全','毁约西风','毁钥者','气运承载体','洗手帖','海阔行人','渡劫失败','游方传法','游而不定',
- '满注视逃','气道传人','爆者余生','狂蛮世·力道成尊','狂蛮世·半兽尊','狂蛮世·变化成尊','独行收魂','猎魂人','献祭未成','瓣上余生',
- '画道传人','留白之算','留窃五域','白骨过客','皮上人生','盗亦有道','盗天世·偷天尊','盗天世·封门尊','盗天世·无面尊','盟约金页','真传入匣','真传继声',
- '真意封匣','破洞行人','碌碌无为','碎事实者','碑与风','磷火边的人','空城隐名','空门之外','窃而有愧','窃运不休','立碑人','红莲世·一瞬尊',
- '红莲世·斩循环尊','红莲世·长河尊','纯盗','缘深不取','缝中归途','背缝余生','自愿的养料','荒原小酋','血日不落','行脚慈悲者','裂隙逃命',
- '装死度世','谱上人','谷卷持有者','谷底蛰伏','谷浅难藏','赌徒余烬','跨越时空的胜负','路边一条','身死道消','归途引路人','过大的漏洞','追回昨日',
- '逃无可逃','逃离开裂','道心不噬','道心如衡','钥落他人','长住疯魔','长生天客卿','长眠窟中','门匙在握','问道无答','阎名游世','青莲续世',
- '非人之夜','魂宗初祖','前世传灯','前世无名','前世微尘',
-'雷下收剑','剑折','剑下留道','剑源','剑源·薄青合剑','剑源·薄青见剑',
- '三气归一','仙胎成尊·伐幽','仙胎成尊·传节','仙胎成尊·分庭','仙胎成尊·双峰','仙胎成尊·另途','仙胎成尊·弃影','仙胎成尊·影主','仙胎成尊·无名尊','仙胎成尊·炼影','仙胎成尊·逍遥','仙胎成尊·镇关','仙胎成尊·隐宗','元始世·奴道辅世','元始世·气道成尊','元始遗泽','劫后余生','天意弃命','守道传承','归隐山野','气道一生','疯魔窟隐者','道场留名','重伤退场','客死他乡','剑下亡魂',]; /* 由源码 ending('…') 字面量静态生成，共 227 个；已剔除 6 个等级门槛永假结局 */
+/* 由 gen-endings.js 从 ending() 字面量及 deathName 字面量自动生成，勿手改；新增结局后重跑脚本。 */
+var DEX_ENDINGS=['安度北原','安度此生','安度荒原','安度魂世','安度星世','安享晚年','白骨过客','半窃之身','半兽名号','半页真意','瓣上余生','爆者余生','碑与风','北原血裔','背缝余生','才倾星海','残图补全','纯盗','盗天世·封门尊','盗天世·偷天尊','盗天世·无面尊','盗亦有道','道场留名','道心不噬','道心如衡','低潮善人','帝爆一身','定游未定','独行收魂','赌徒余烬','渡劫失败','凡人的一生','非人之夜','封传不启','封而复开','封缝人','封盘之算','疯魔窟隐者','缝中归途','改变历史','谷底蛰伏','谷卷持有者','谷浅难藏','光阴中人','归途引路人','归隐山野','过大的漏洞','海阔行人','红莲世·一瞬尊','红莲世·斩循环尊','红莲世·长河尊','化入虚无','化兽入荒','化星入道','画道传人','荒原小酋','毁钥者','毁约西风','会留的人','魂宗初祖','剑下留道','剑下亡魂','剑源','剑源·薄青合剑','剑源·薄青见剑','剑折','劫后余生','借魂归途','借星另途','借约称孤','净土守望者','九虚阵眼','九转成尊·分庭','九转成尊·开宗','九转成尊·逍遥','九转成尊·隐世','九转成尊·镇世','巨阳世·分庭日','巨阳世·血道成尊','巨阳世·运道成尊','客死他乡','空城隐名','空门之外','跨越时空的胜负','狂蛮世·半兽尊','狂蛮世·变化成尊','狂蛮世·力道成尊','乐土世·凡人善终','乐土世·净土尊','乐土世·人道尊','乐土世·无名慈悲尊','雷下收剑','力压一方','历史留名','立碑人','两空之间','猎魂人','裂隙逃命','林间留白','磷火边的人','另辟星轨','留白之算','留窃五域','碌碌无为','路边一条','买卖不公','满注视逃','门匙在握','盟约金页','名册逆笔','墨名入册','南下避血','皮上人生','破洞行人','谱上人','气道传人','气道一生','气运承载体','弃籍归星','弃名远行','契断北原','前世传灯','前世微尘','前世无名','窃而有愧','窃运不休','青莲续世','入城藏形','三气归一','三气护生','散星归人','散怨人','身死道消','时痕深重','史笔残页','守道传承','守住一瞬','寿元尽消','双界之贼','宿命终毁','碎事实者','逃离开裂','逃无可逃','天庭客卿','天庭棋子','天意弃命','天意照星','同烬一角','偷道继声','偷道宗师','偷天者','推演入微','外门走卒','万魂之臣','未被选中的人','问道无答','我去，这是彩蛋！','无极世·律道成尊','无极世·无名尊','无极世·无中尊','无面过客','无名小卒','洗手帖','仙胎成尊·传节','仙胎成尊·伐幽','仙胎成尊·分庭','仙胎成尊·炼影','仙胎成尊·另途','仙胎成尊·弃影','仙胎成尊·双峰','仙胎成尊·无名尊','仙胎成尊·逍遥','仙胎成尊·隐宗','仙胎成尊·影主','仙胎成尊·镇关','献祭未成','携兽迁徙','心不被窃','星尘远游','星轨改道','星术随身','星宿世·入微成尊','星宿世·天庭之尊','星宿世·外谱之尊','星下善念','星下天魔','星下隐士','行脚慈悲者','形无定相','血日不落','寻门人','寻无缝土','寻无魂土','阎名游世','养料的一部分','钥落他人','夜未真正过去','一事入微','一台星守','一线通幽','一只手的传说','以魂赎身','以名换星','以身补天','以运代血','以真传抗真','幽魂世·分食之尊','幽魂世·换命尊','幽魂世·魂道成尊','游而不定','游方传法','有问之偷','与潮同去','与世无争','宇道缝匠','元莲世·画道成尊','元莲世·留白尊','元莲世·平凡余生','元莲世·生机尊','元始世·奴道辅世','元始世·气道成尊','元始世·三气尊','元始遗泽','缘深不取','再偷一缝','斩断循环','长眠窟中','长生天客卿','长住疯魔','折腰客卿','真传继声','真传入匣','真意封匣','枕缝而眠','枕骨而眠','枕日而眠','枕兽骨眠','枕星而眠','枕雨而眠','争食者','止戈之算','只留人力','智星同辉','重伤退场','宙道行者','装死度世','追回昨日','准尊之姿','自愿的养料','尊路未及','尊路未竟'];
 /* 结局元数据：line=路线分组 key，tier=1 通用/死亡/失败 · 2 普通 · 3 高光/成尊/真传，hint=一句谶语 */
 /* 结局元数据：line=路线分组 key，tier=1 通用/死亡/失败 · 2 普通 · 3 高光/成尊/真传，hint=一句谶语 */
 var END_META={
@@ -10368,6 +10416,12 @@ var DEX_TRAVEL_EVENTS = [
 
 var DEX_TABS=[['spec','杀招'],['end','结局'],['ev','事件'],['era','时代']];
 var DEX_TAB='spec';
+/* v1.34 安全：图鉴/成就的 innerHTML 拼接统一转义，防导入存档注入 */
+function escHtml(s){
+ return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+ });
+}
 function dexGet(){try{var d=JSON.parse(localStorage.getItem('guDex')||'{}');if(d&&typeof d==='object')return d;}catch(e){}return {};}
 function dexAdd(k,id){
  try{
@@ -10424,7 +10478,7 @@ function dexRender(){
   });
   var html='';
   order.forEach(function(line){
-   html+='<div class="dexGroupHead">'+lineLabel(line)+'</div>';
+   html+='<div class="dexGroupHead">'+escHtml(lineLabel(line))+'</div>';
    groups[line].sort(function(a,b){
     var ma=getEndMeta(a),mb=getEndMeta(b);
     var ta=(ma&&ma.tier)||2,tb=(mb&&mb.tier)||2;
@@ -10433,7 +10487,7 @@ function dexRender(){
    });
    groups[line].forEach(function(id){
     var un=got.indexOf(id)>=0;if(un)cnt++;
-    html+='<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+(un?id:'？？？')+'</b><span>'+dexHint('end',id)+'</span></div>';
+    html+='<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+escHtml(un?id:'？？？')+'</b><span>'+escHtml(dexHint('end',id))+'</span></div>';
    });
   });
   $('dexList').innerHTML=html;
@@ -10443,7 +10497,7 @@ function dexRender(){
  }
  $('dexList').innerHTML=list.map(function(id){
   var un=got.indexOf(id)>=0;if(un)cnt++;
-  return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+(un?id:'？？？')+'</b><span>'+dexHint(DEX_TAB,id)+'</span></div>';
+  return '<div class="achvLine'+(un?'':' lock')+'"><b>'+(un?'● ':'○ ')+escHtml(un?id:'？？？')+'</b><span>'+escHtml(dexHint(DEX_TAB,id))+'</span></div>';
  }).join('');
  $('dexCnt').textContent=cnt+'/'+list.length;
  $('dexTabs').innerHTML=DEX_TABS.map(function(t){return '<button data-dextab="'+t[0]+'"'+(t[0]===DEX_TAB?' class="on"':'')+'>'+t[1]+'</button>';}).join('');
@@ -11638,31 +11692,29 @@ on('chgClose','click',function(){closeChangelog();});
 try{if(!document.documentElement.hasAttribute('data-game-export-copy')&&localStorage.getItem('guSeenChg')!==APP_VER)setTimeout(openChangelog,500);}catch(e){}
 chanInit();
 syncToggles();
-window.__G={getResult:function(){return RESULT;},getS:function(){return S;},logs:LOGS};
-window.__audioState=function(){
- try{
-  var a=sfxCtx();
-  return {
-   ctx: a?a.state:'unavailable',
-   sampleRate: a?a.sampleRate:0,
-   spinActive: !!_spinSnd,
-   tickBuf: !!_tickBuf
-  };
- }catch(e){return {err:String(e)};}
-};
-window.__audioTest=function(){
- try{
-  var a=sfxCtx();if(!a)return 'AudioContext unavailable';
-  if(a.state==='suspended')a.resume();
-  sfxDing();
-  return 'ding fired · state='+a.state+' · rate='+a.sampleRate;
- }catch(e){return String(e);}
-};
+/* v1.35：调试对象默认不挂载；开启 debug 后才暴露运行态与音频测试入口。 */
+if(DEBUG_ENABLED){
+ window.__G={getResult:function(){return RESULT;},getS:function(){return S;},logs:LOGS};
+ window.__audioState=function(){
+  try{
+   var a=sfxCtx();
+   return {ctx:a?a.state:'unavailable',sampleRate:a?a.sampleRate:0,spinActive:!!_spinSnd,tickBuf:!!_tickBuf};
+  }catch(e){return {err:String(e)};}
+ };
+ window.__audioTest=function(){
+  try{
+   var a=sfxCtx();if(!a)return 'AudioContext unavailable';
+   if(a.state==='suspended')a.resume();
+   sfxDing();
+   return 'ding fired · state='+a.state+' · rate='+a.sampleRate;
+  }catch(e){return String(e);}
+ };
+}
 window.__DONE=false;
 /* 启动自检：即使上方任一绑定出问题，runGame 也一定会被调用；运行期异常留痕便于定位 */
 try{
  runGame()['catch'](function(e){
-  if(e&&e.end)return;
+  if(e===END_SENTINEL||(e&&e.end))return;
   RUN_ERROR=true;
   var detail=String(e&&e.message?e.message:e||'未知异常').replace(/\s+/g,' ').slice(0,180);
   try{console.error('[天机一转] 运行期异常：',e);}catch(_){}
