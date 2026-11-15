@@ -8,6 +8,8 @@ AI 开发规范 · 新增杀招（v1.30）
 3. trigger 使用自然语言写清习得/触发路径（如“在某处习得”），不要写“——”“不可获得”等占位文字。
 4. 必须确认实际授予路径：learnSpec / addMove / grantBatchSpec / DREAM_SPEC_POOL 等；仅有数据登记不等于玩家可获得。
 5. 后续新增杀招只改 SPEC_LIB.entries.push(...)；不要再维护 SPEC_NAMES，也不要为单条新增手动修改 dexStatics、dexHint 或敌方过滤规则。
+6. 统计总表口径的批量杀招带 batch:true；batchEntries 由 SPEC_LIB.entries 惰性派生，新增条目只需 push 到 entries，不要手动维护 batchEntries。
+7. 新增时代事件时，同步向 DEX_ERA_EVENTS 补一行；新增游历/历练事件时，同步向 DEX_TRAVEL_EVENTS 补一行，保留两类事件的人工分类语义。
 
 AI 开发规范 · 终局控制流（v1.35 起）
 规则：ending() 使用 END_SENTINEL 结束当前异步链；新增 catch 时必须先判断 e&&e.end 并原样 throw，
@@ -1037,10 +1039,15 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.35';
+var APP_VER='v1.36';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+ {v:'v1.36',items:[
+  ['fix','SPEC_LIB.batchEntries 改为惰性派生 getter；后续 entries.push(batch:true) 可立即进入批量授予与战斗倍率逻辑。'],
+  ['doc','文件头补充事件图鉴维护规范：新增时代事件同步维护 DEX_ERA_EVENTS；新增游历/历练事件同步维护 DEX_TRAVEL_EVENTS。'],
+  ['fix','版本号统一升级为 v1.36。']
+ ]},
  {v:'v1.35',items:[
   ['fix','P0：随机奇遇与薄青线捕获异常时透传终局信号，避免战败身死后继续推进剧情；薄青线 finally 仍释放锁。'],
   ['fix','终局信号统一为 END_SENTINEL，启动入口按哨兵识别正常终局。'],
@@ -1569,7 +1576,7 @@ var SPEC_EXTRA=['自由残缺变','白日梦','五禁玄光气']; /* v1.0.20：�
        source 出处 / status live|pending
        功能附加（各条按需，与既有个体条目用法相同）：mulF 本式倍率 / cutF 敌方倍率 /
        onceN+step 终身限次 / saveOnce 每场保命一次 / batch:true 标记其为统计总表批量收录。
-   · batchEntries = 本表的只读派生视图（filter batch===true），兼容 v1.1.6 既有接线调用点：
+   · batchEntries = 本表的只读惰性派生视图（每次读取 filter batch===true），兼容 v1.1.6 既有接线调用点；后续 push 自动生效：
        授予 → learnSpec（游历『研习特殊杀招』/ 寻访『发现真传』/ 遗府真传）；
        落账 → 数据驱动 batchFx()（mulF 本式倍率 / cutF 敌方倍率 / onceN+step 限次 / saveOnce 保命）。
    · 数值克制：批量杀招倍率一律落在 ×0.75~×2.0，不新增硬编码数值分支。
@@ -1671,11 +1678,11 @@ var SPEC_LIB = {
     · v1.1.6 起已【接线】：授予走 learnSpec（游历『研习特殊杀招』/ 寻访『发现真传』/ 遗府真传），
       落账走数据驱动 batchFx()（mulF/cutF/onceN+step/saveOnce），不改任何既有硬编码数值。
     · 强度分档依据频次：≥40 强 / 20~39 中 / <20 轻；数值一律落在 ×0.75~×2.0 区间，克制不膨胀。 */
- batchEntries: [], /* v1.1.8：派生视图，见下方 getBatchEntries() */
+ /* v1.36：兼容既有调用点的惰性派生视图；每次读取均以 entries 当前内容为准。 */
+ get batchEntries(){return this.entries.filter(function(e){return e&&e.batch===true;});}
 
 };
-/* ===== v1.1.8 单表统一：批量条目的只读派生视图（兼容 v1.1.6 既有调用点） ===== */
-SPEC_LIB.batchEntries = SPEC_LIB.entries.filter(function(e){return e.batch===true;});
+/* ===== v1.36：batchEntries 惰性派生，entries 后续 push 也会即时生效 ===== */
 /* 一致性断言（只读，不抛错，仅控制台告警）：批量条目必须字段齐备 */
 (function(){
  try{
