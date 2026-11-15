@@ -15,7 +15,7 @@ AI 开发规范 · 终局控制流（v1.35 起）
 规则：ending() 使用 END_SENTINEL 结束当前异步链；新增 catch 时必须先判断 e&&e.end 并原样 throw，
 不得把终局信号当作普通错误吞掉。finally 可用于释放锁，但不得阻断异常继续传播。
 
-AI 开发规范 · 新增结局（v1.33 起；v1.37 起 opts 可附 epilogue 后世评语；v1.38 起重点结局有专属史书短评；v1.39 起签文关联结果、事件支持文本变奏；v1.40 起门控擦肩叙事与世人侧写；v1.41 起空事件/反常签须保持纯叙事且不登记普通事件；v1.42 起普通结局默认留白）
+AI 开发规范 · 新增结局（v1.33 起；v1.37 起 opts 可附 epilogue 后世评语；v1.38 起重点结局有专属史书短评；v1.39 起签文关联结果、事件支持文本变奏；v1.40 起门控擦肩叙事与世人侧写；v1.41 起空事件/反常签须保持纯叙事且不登记普通事件）
 规则：新增结局只需【一句 ending(...)】，图鉴自动收录。
 DEX_ENDINGS 是未触发结局的静态占位表，由 gen-endings.js 从 ending() 字面量及
 战斗配置 deathName 字面量自动生成；新增结局后重跑脚本，不手工维护列表。
@@ -1041,16 +1041,10 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.42';
+var APP_VER='v1.41';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
- {v:'v1.42',items:[
-  ['fix','空事件/反常签不再推进伤势回合或盗天无相手事件节拍；除原有3年寿元消耗外，不改变角色状态。'],
-  ['fix','结局回味改为克制显示：保留重点结局专属史书短评与显式 opts.epilogue；普通结局默认留白，不再自动套用通用模板。'],
-  ['fix','允许 opts.epilogue 显式传入空字符串以关闭单个结局评语；空评语时隐藏终局页评语容器。'],
-  ['doc','补充叙事来源标注：时代凡人侧写、人物内心补叙与新增见闻属于游戏原创/合理推演，不冒充原著明文情节。']
- ]},
  {v:'v1.41',items:[
   ['new','无常与留白：凡人事件池以独立低权重加入空事件（约1.2%）与反常签（约0.2%）；不发放奖励、不登记为普通事件。'],
   ['new','谶语偶尔缺席：约每17次抽盘出现一次无起签文本；仅由独立序号决定，不调用 RNG。'],
@@ -1907,8 +1901,7 @@ function legacyGatePass(n){
  }
  return true; /* 未登记的具名传承默认放行（本版本无此类） */
 }
-/* 游戏原创场景：依据炼天之世与青茅山背景作合理推演，不代表原著明文发生过这些具体事件。
-   原「通用事件」已删除：下列凡尘场景只属于炼天之世的青茅山一地，
+/* 原「通用事件」已删除：下列凡尘场景只属于炼天之世的青茅山一地，
    其余十个时代各自拥有独立的凡人事件池（见 ERA_MORTAL_EVENTS）。 */
 var MORTAL_SCENES={
  '花酒遗洞':{
@@ -4384,10 +4377,8 @@ setStage('出身');
     await maybeRandEvent('mortal');
     await checkBoqingLine();
    } /* v1.41：静默/反常回合不接续奇遇或薄青线推进，真正留白一轮 */
-   if(!evPick.isVoid&&!evPick.isAnomaly){
-    await injuryTick();
-    if(S.eraIdx===6)await dtTick();
-   } /* v1.42：空事件/反常签不推进伤势与无相手事件节拍，避免暗中改变状态 */
+   await injuryTick();
+   if(S.eraIdx===6)await dtTick();
    renderPanel();
   }
   /* v1.27：凡人阶段结束之后——炼天第二世独立「南疆余波」事件盘（自升仙后前移；与凡人池/关键历练分离） */
@@ -5541,7 +5532,6 @@ async function raceStoryDispatch(name){
 /* v1.40：统一安全门控。异常视为不满足，避免叙事分支影响事件主流程。 */
 function g(test){try{return typeof test==='function'&&!!test();}catch(e){return false;}}
 var EVENT_PRESENCE_SHOWN=false; /* v1.41：同一事件只保留一条附加叙事，避免旁白叠层 */
-/* 游戏原创补叙：只借既有标记与事件上下文写旁观者传闻，不新增原著人物关系或事实。 */
 async function eventWorldAside(name){
  if(EVENT_PRESENCE_SHOWN)return;
  var f=S.flags||(S.flags={}),line='',key='';
@@ -5557,7 +5547,6 @@ async function eventWorldAside(name){
  }
  if(key&&!f[key]){f[key]=true;await say(line,'sys');}
 }
-/* 游戏原创内心补叙：依据已成立的人物标记回想旧事，不作为原著原句或新增剧情事实。 */
 async function eventCharacterPresence(name){
  var line='';
  if(hasMark('见过白凝冰')&&(/坊间论道|白家冰心|野地采蛊/.test(name)))line='你忽然想起白凝冰当日的眼神。那股冰冷剑意像一线薄霜，至今仍留在识海深处。';
@@ -6669,7 +6658,7 @@ var ERA_MORTAL_EVENTS={
      {n:'商心慈·联姻局',w:10,g:function(){return hasMark('商家定约·姻盟')&&!hasMark('商心慈同盟');}},
      {n:'商心慈·危城夜',w:10,g:function(){return (hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商城共守');}},{n:'时代余烬·炼天',w:1}]
 };
-/* v1.37：时代余烬·凡人侧写。以下均为游戏原创/合理推演，不是原著明文事件；每个时代一则，不提供数值奖励、不改变旧事件逻辑。 */
+/* v1.37：时代余烬·凡人侧写。每个时代一则，不提供数值奖励、不改变旧事件逻辑。 */
 async function eraLifeScene(name){
  var scenes={
   '时代余烬·元始':'城中匠户把气墙的涨落刻在门框上，孩子从小便学会辨认哪一日不该出城。修行者谈三气平衡，凡人只盼今夜屋顶不被风压塌。',
@@ -10321,11 +10310,18 @@ var END_EPILOGUES={
  '魂宗初祖':'魂宗的第一块宗碑没有写满名字，只刻了一个初祖。后来宗门几度兴衰，门人仍在碑前添土，因为他们知道乱世里能把活人聚在一起，本身就是一件难事。',
  '以身补天':'裂缝合拢之后，世人只看见天地无恙。少数知情者把你的名字藏进补天录末页，旁边写着：世界看似完整，不代表没有人曾为它缺席。'
 };
-/* v1.42：结局评语遵循留白原则。仅重点结局专属表或调用方显式提供时显示。 */
+/* v1.38：专属评语优先于 opts.epilogue；其余旧结局继续走兼容兜底。 */
 function endingEpilogue(name,quote,opts){
- if(opts&&typeof opts.epilogue==='string')return opts.epilogue;
- var n=String(name||'');
- return END_EPILOGUES[n]||'';
+ if(opts&&typeof opts.epilogue==='string'&&opts.epilogue)return opts.epilogue;
+ var n=String(name||''),q=String(quote||'');
+ if(END_EPILOGUES[n])return END_EPILOGUES[n];
+ if(/成尊|尊者|九转|仙胎/.test(n))return '后世论及此事，往往先谈此人所开之道，再谈其名号。岁月更迭，尊位会被新的传说遮蔽，留下的道统却仍有人修行。';
+ if(/剑|薄青|斩道|剑源/.test(n))return '多年以后，剑修仍会在论剑时提起这一日。胜负早已写入旧史，真正留下来的，是那一剑曾照亮过的后来者。';
+ if(/龙公|天庭|宿命|三气|气潮/.test(n))return '后来的史家把这一幕放进时代转折处记述。亲历者渐渐凋零，众人却仍从旧记中寻找当年局势改变的缘由。';
+ if(/死|亡|败|殒|葬|困/.test(n))return '数年后，旧地换了主人。当地人偶尔提起此事，已说不清当事者的全名，只记得那段岁月曾有人走到这里。';
+ if(/归|隐|退|别|离|终/.test(n))return '此后世事照常向前。有人记得离去的背影，有人只记得留下的空缺；时间没有替任何一方给出定论。';
+ if(/方源|白凝冰|商心慈|古月|贾金生|乐土|元莲/.test(n+' '+q))return '多年以后，相关人物的名字仍偶尔出现在地方旧闻里。传言各有版本，唯有当日留下的痕迹，证明这段相逢并非虚言。';
+ return '多年以后，此事被收入一卷不甚起眼的旧闻。亲历者各有说法，后世难复原当日全貌，只知道那一刻曾真实地改变过某些人的命数。';
 }
 async function ending(name,quote,opts){
  opts=opts||{};
@@ -10341,9 +10337,7 @@ async function ending(name,quote,opts){
  await say('命运的转盘，停在了终局——【'+name+'】。','gold');
  $('endTitle').textContent=name;
  $('endQuote').textContent=quote;
- var _endEpi=endingEpilogue(name,quote,opts),_endEpiEl=$('endEpilogue');
- _endEpiEl.textContent=_endEpi;
- _endEpiEl.style.display=_endEpi?'block':'none';
+ $('endEpilogue').textContent=endingEpilogue(name,quote,opts);
  $('endAttrs').innerHTML=panelHTML();
  $('endChron').innerHTML=S.chr.map(function(c){return '<div>'+c+'</div>';}).join('')||'<div>—</div>';
  $('endMerits').textContent='战功：击杀天庭人物 '+S.kills.length+' 名 ｜ 龙公战：'+(RESULT.sq===3?'本体与三气归来尽破':(RESULT.sq?('已破三气归来 '+RESULT.sq+' 重'):(RESULT.bar?'击溃龙公本体':'未接战')));
