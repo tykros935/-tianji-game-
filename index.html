@@ -9,7 +9,11 @@ AI 开发规范 · 新增杀招（v1.30）
 4. 必须确认实际授予路径：learnSpec / addMove / grantBatchSpec / DREAM_SPEC_POOL 等；仅有数据登记不等于玩家可获得。
 5. 后续新增杀招只改 SPEC_LIB.entries.push(...)；不要再维护 SPEC_NAMES，也不要为单条新增手动修改 dexStatics、dexHint 或敌方过滤规则。
 6. 统计总表口径的批量杀招带 batch:true；batchEntries 由 SPEC_LIB.entries 惰性派生，新增条目只需 push 到 entries，不要手动维护 batchEntries。
-7. 新增时代事件时，同步向 DEX_ERA_EVENTS 补一行；新增游历/历练事件时，同步向 DEX_TRAVEL_EVENTS 补一行，保留两类事件的人工分类语义。
+7. 新增时代池/出生地/种族事件，按时代异闻统一向 DEX_ERA_EVENTS 补一行；新增游历/历练事件向 DEX_TRAVEL_EVENTS 补一行。凡人场景与随机奇遇不必登记，保留两类图鉴的人工分类语义。
+8. v1.42 起，新增时代凡人事件须同步维护对应事件池 / DEX_ERA_EVENTS / EVENT_ERA；时代历史回响须标注原著明确内容、合理推断或游戏原创设定的依据层级；新增人物只按原著时间线与生死门控出场，不用凡人支线改写原著大事件。
+9. v1.44 起，人物交集写入 S.flags.socialMemory.characters，势力交集写入 S.flags.socialMemory.factions；只记录叙事关系，不把阶段性协作写成永久阵营归属。新增人物记忆须复用既有时代/生死/身份门控；新增时代池或游历事件仍按第7条同步图鉴。
+10. v1.45 起，重逢/交涉选项由 socialMemoryChoice(name) 统一提供；按人物/势力真实关系及上次回应分支，使用事件级去重键。
+11. v1.46 起，人物/势力关系统一经 getSocialRelation(type,name) / setSocialRelation(type,name,status,source) 读写；长期 status 与单次 lastResponse 分离，展示与事件判定不得绕过接口。
 
 AI 开发规范 · 终局控制流（v1.35 起）
 规则：ending() 使用 END_SENTINEL 结束当前异步链；新增 catch 时必须先判断 e&&e.end 并原样 throw，
@@ -762,7 +766,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.34</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.47</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -1040,11 +1044,53 @@ var $=function(id){
 };
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
-/* v1.21 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值 */
-var APP_VER='v1.41';
+/* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
+var APP_VER='v1.48';
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡 */
 var CHANGELOG=[
+  {v:'v1.48',items:[
+   ['new','整体剧情重构第一阶段：建立十一时代难度基准，幽魂时期设为极高生存压力；炼天时代区分方源第一世与第二世。'],
+   ['new','建立奖励分类目录：生存、修行、资源、战斗、传承、身份、关系、情报、剧情九类，作为后续事件奖励统一登记标准。'],
+   ['new','新增单局运行账本：记录每次转盘、当前时代难度、奖励与状态变化接口；账本随本局状态创建和销毁。'],
+   ['fix','新局开始时重置终局结果与签文序号，避免上一局的结局状态或签文计数残留到下一局。'],
+   ['fix','新增单局隔离审计入口，检查新局状态容器、动态标记、关系记忆与奖励账本是否为空。']
+  ]},
+  {v:'v1.47',items:[
+   ['fix','修复首次开转需要点击两次：开场三段叙事改为非阻塞展示，首次可操作的转盘出现后，第一次点击即可执行开转。'],
+   ['fix','保留后续普通事件的跳过、抽取后的继续/重抽流程；不改转盘权重、概率、奖励惩罚、寿元消耗与存档结构。']
+  ]},
+ {v:'v1.46',items:[
+  ['fix','新增 getSocialRelation(type,name) 与 setSocialRelation(type,name,status,source)，人物与势力共用统一关系读取/写入接口。'],
+  ['fix','人物记忆写入、势力记忆写入、重逢选项、势力交涉、旁白与属性面板摘要统一读取关系层；旧 setFactionRelation 调用保留兼容包装。'],
+  ['fix','长期关系 status 与单次 lastResponse/lastResponseAge/lastResponseSource 分离；交谈回应不自动将关系升级为盟友、合作或阵营归属。'],
+  ['fix','旧存档缺少关系字段时由统一接口惰性补齐；历史记录仍保留原有上限，不改旧数值与事件门控。']
+ ]},
+ {v:'v1.45',items:[
+  ['new','人物旧识进入条件交互：白凝冰、商心慈、古月方正、古月青书的重逢选项按本局真实关系状态变化。'],
+  ['new','势力关系进入后续交涉：天庭、长生天、影宗、五域势力按此前协助、情报交换、旁观等记录提供不同谈判选项。'],
+  ['fix','旧识交互按具体事件独立记账，不再由每类一次性的宽泛旁白标记吞掉后续重逢；旧存档缺失字段时自动补齐。'],
+  ['bal','新交互只记录叙事回应，不发放属性/资源，不改既有事件权重、奖励惩罚、寿元消耗、时代门控与原著历史。']
+ ]},
+ {v:'v1.44',items:[
+  ['new','人物记忆：白凝冰、商心慈、古月方正、古月青书分别记录初遇与交集结果；重逢时按本局经历追加不同叙事。'],
+  ['new','势力关系：记录天庭、长生天、影宗、商家及五域势力的接触、协助、情报交换、旁观等关系状态；阶段性合作不等同永久结盟。'],
+  ['fix','旧识与势力记忆写入存档状态并兼容旧存档；人物/势力关系摘要加入属性面板，重复经历不重复堆叠同一事件记录。'],
+  ['bal','关系系统只影响叙事与后续记忆，不改变既有事件权重、奖励惩罚、战斗数值、时代门控或原著重大历史。']
+ ]},
+ {v:'v1.43',items:[
+  ['new','时代连续支线：十一时代各新增一则前置事件后续，共11则；只有先见过对应前置事件并作出选择，后续节点才会进入当世事件池。'],
+  ['new','支线记忆：记录玩家在前置事件中的选择，后续剧情按选择分支回应；收束选择写入本局记忆与经历，不强制改写原著历史。'],
+  ['fix','新支线事件同步加入 ERA_MORTAL_EVENTS、EVENT_ERA、DEX_ERA_EVENTS 与 __TIMELINE；新增图鉴维护规则明确出生地/种族事件归入时代异闻、游历/历练归入游历图鉴。'],
+  ['bal','支线只增加叙事与经历标记，不改旧事件权重、旧奖励、凡人事件次数、寿元消耗及随机奇遇概率。']
+ ]},
+ {v:'v1.42',items:[
+  ['new','十一时代凡人事件扩充：每个时代新增4则，共44则；加入社会生活、遗迹传闻与历史余波。'],
+  ['new','原著人物与史事回响：覆盖元始、星宿、无极、狂蛮、红莲、元莲、盗天、巨阳、幽魂、乐土及炼天时代人物；每条标注原著明确内容（历史回响；场景为原创）、合理推断或游戏原创。'],
+  ['new','新增事件提供三种处理选择，并以单局标记防止重复触发；事件分发独立于旧时代剧情分支。'],
+  ['fix','新增事件同步登记 ERA_MORTAL_EVENTS、DEX_ERA_EVENTS 与 EVENT_ERA，供图鉴及 __TIMELINE 读取。'],
+  ['bal','不改动既有事件权重、凡人事件次数、寿元消耗、旧奖励数值及 v1.41 无常/反常签机制。']
+ ]},
  {v:'v1.41',items:[
   ['new','无常与留白：凡人事件池以独立低权重加入空事件（约1.2%）与反常签（约0.2%）；不发放奖励、不登记为普通事件。'],
   ['new','谶语偶尔缺席：约每17次抽盘出现一次无起签文本；仅由独立序号决定，不调用 RNG。'],
@@ -2034,6 +2080,54 @@ var ERA_TIMELINE = [
   {idx:10, name:'炼天魔尊', period:'炼天'}
 ];
 
+/* ══ 03.5A BALANCE · 时代难度与奖励分类（v1.48） ═══════════════════════
+   难度是时代环境基准，不是强制死亡率。后续事件结算应通过 difficultyForEvent()
+   读取压力，再结合玩家身份/修为/庇护/准备修正；不得把幽魂时代做成无解惩罚。
+   0-9 对应十位尊者时代；10 对应炼天时代，按 fyLife 区分前世与重生后。
+*/
+var ERA_DIFFICULTY = [
+ {idx:0,name:'元始时代',tier:2,label:'中等',pressure:1.00,survival:1.00,opportunity:1.00,reason:'人族初兴，异人强盛，生存与开拓并重。'},
+ {idx:1,name:'星宿时代',tier:3,label:'中等偏上',pressure:1.12,survival:0.94,opportunity:1.04,reason:'人族秩序建立，天庭与异人势力的长期博弈加深。'},
+ {idx:2,name:'无极时代',tier:3,label:'中等偏上',pressure:1.14,survival:0.93,opportunity:1.08,reason:'蛮荒与探索危险并存，疯魔窟等机缘门槛极高。'},
+ {idx:3,name:'狂蛮时代',tier:3,label:'中等偏上',pressure:1.18,survival:0.91,opportunity:1.10,reason:'强者与凶兽横行，部族冲突和肉身修行风险突出。'},
+ {idx:4,name:'红莲时代',tier:3,label:'中等偏上',pressure:1.15,survival:0.93,opportunity:1.08,reason:'宿命与光阴长河相关布局带来隐性风险。'},
+ {idx:5,name:'元莲时代',tier:2,label:'中等',pressure:1.02,survival:1.00,opportunity:1.03,reason:'人族秩序相对稳定，传承、建设与势力竞争并行。'},
+ {idx:6,name:'盗天时代',tier:3,label:'中等偏上',pressure:1.16,survival:0.92,opportunity:1.12,reason:'远行、异域探索与盗天传承机缘并存。'},
+ {idx:7,name:'巨阳时代',tier:3,label:'中等偏上',pressure:1.15,survival:0.92,opportunity:1.08,reason:'北原部族、血脉、王庭与运道争夺风险较高。'},
+ {idx:8,name:'幽魂时代',tier:5,label:'非常困难',pressure:1.55,survival:0.72,opportunity:1.28,reason:'魂道灾厄、魔道杀戮与影宗布局交织；机缘丰厚但代价沉重。'},
+ {idx:9,name:'乐土时代',tier:3,label:'中等偏上',pressure:1.10,survival:0.96,opportunity:1.06,reason:'表面秩序较稳，种族矛盾、福地争端与暗线仍在。'},
+ {idx:10,name:'炼天时代',tier:3,label:'中等偏上',pressure:1.12,survival:0.94,opportunity:1.12,reason:'气潮、五域格局与尊者博弈使局势逐步升级。'}
+];
+var REWARD_CATEGORIES = {
+ survival:{label:'生存',desc:'疗伤、寿元、避难、保命与风险解除'},
+ cultivation:{label:'修行',desc:'修为、境界、悟性、流派造诣与炼蛊经验'},
+ resources:{label:'资源',desc:'元石、仙元石、蛊虫、材料与洞天资源'},
+ combat:{label:'战斗',desc:'杀招、战斗经验、防御手段与克敌情报'},
+ inheritance:{label:'传承',desc:'真传、秘境、功法、传承线索与路线资格'},
+ status:{label:'身份',desc:'名声、地位、身份、势力认可与社会通行权'},
+ relationship:{label:'关系',desc:'盟友、师徒、交易关系、人脉与势力交涉机会'},
+ intelligence:{label:'情报',desc:'敌人弱点、历史秘密、地图、布局与风险预警'},
+ plot:{label:'剧情',desc:'特殊事件资格、隐藏路线、历史分支与结局条件'}
+};
+function eraDifficultyProfile(eraIdx,fyLife){
+ var base=ERA_DIFFICULTY[eraIdx]||ERA_DIFFICULTY[10],out={},k;
+ for(k in base)if(Object.prototype.hasOwnProperty.call(base,k))out[k]=base[k];
+ if(eraIdx===10&&fyLife===1){out.name='炼天第一世';out.label='困难';out.tier=4;out.pressure=1.30;out.survival=0.86;out.opportunity=0.96;out.reason='五百年积累与寿元压力；没有宿命大战的时代主线，必须经营自身人生。';}
+ else if(eraIdx===10&&fyLife===2){out.name='炼天第二世';out.label='中等偏上';out.tier=3;out.pressure=1.08;out.survival=0.96;out.opportunity=1.18;out.reason='重生知识提供先机，但历史被改变，尊者博弈与大时代风险逐步升级。';}
+ return out;
+}
+function currentEraDifficulty(){return eraDifficultyProfile(S?S.eraIdx:10,S?S.fyLife:0);}
+function difficultyForEvent(kind){
+ var d=currentEraDifficulty(),pressure=d.pressure;
+ /* 玩家处境只作难度修正，不直接覆盖时代基准。 */
+ if(S&&S.flags){if(S.flags.protectedByFaction)pressure*=0.90;if(S.flags.injured)pressure*=1.08;if(S.flags.wanted)pressure*=1.12;if(S.flags.safeHaven)pressure*=0.88;}
+ if(S&&S.lv>=6)pressure*=0.96;
+ if(kind==='opportunity')return {pressure:pressure,access:d.opportunity};
+ if(kind==='survival')return {pressure:pressure,access:d.survival};
+ return {pressure:pressure,access:1};
+}
+/* ══ 03.5A END ══ */
+
 var CHARACTER_ERA = {
   '元始仙尊': {eras:[0,10]},
   '星宿仙尊': {eras:[0,1,10]},
@@ -2147,7 +2241,57 @@ var EVENT_ERA = {
   '南疆·五域联军': {minEra:10}, '西漠·帝君城援军': {minEra:10}, '东海·龙宫战局': {minEra:10},
   '方源足迹·狐仙与北原': {minEra:10}, '方源足迹·炼道大会与琅琊': {minEra:10},
   '方源足迹·影宗与东海': {minEra:10}, '方源足迹·南疆与光阴长河': {minEra:10},
-  '三王传承余波': {minEra:10}, '白骨山·血海余烬': {minEra:10}, '义天山前夜': {minEra:10}
+  '三王传承余波': {minEra:10}, '白骨山·血海余烬': {minEra:10}, '义天山前夜': {minEra:10},
+  /* v1.42：新增时代凡人事件时代门控 */
+  '气脉分田':{minEra:0},
+  '元始遗训':{minEra:0},
+  '异人来使':{minEra:0},
+  '天庭旧制':{minEra:0},
+  '星宿棋痕':{minEra:1},
+  '智道书院':{minEra:1},
+  '天庭旧册':{minEra:1},
+  '星门传令':{minEra:1},
+  '无极石壁':{minEra:2},
+  '疯魔窟役工':{minEra:2},
+  '九虚回响':{minEra:2},
+  '道场封门':{minEra:2},
+  '狂蛮兽图':{minEra:3},
+  '部族盟誓':{minEra:3},
+  '异人猎场':{minEra:3},
+  '变化道遗骨':{minEra:3},
+  '红莲残瓣':{minEra:4},
+  '光阴渡口':{minEra:4},
+  '宿命旧说':{minEra:4},
+  '红莲棋局':{minEra:4},
+  '元莲画意':{minEra:5},
+  '神帝城画工':{minEra:5},
+  '天元宝莲':{minEra:5},
+  '豆神宫旧闻':{minEra:5},
+  '盗天空门':{minEra:6},
+  '本杰孙旧闻':{minEra:6},
+  '遁空蛊残图':{minEra:6},
+  '长毛炼场':{minEra:6},
+  '巨阳王庭':{minEra:7},
+  '黄金血脉':{minEra:7},
+  '运道签摊':{minEra:7},
+  '北原婚盟':{minEra:7},
+  '幽魂魂碑':{minEra:8},
+  '影宗余烬':{minEra:8},
+  '青家旧恨':{minEra:8},
+  '魂兽过境':{minEra:8},
+  '乐土行愿':{minEra:9},
+  '乐土门人传法':{minEra:9},
+  '悔哭海传闻':{minEra:9},
+  '净土遗规':{minEra:9},
+  '方源旧迹·狐仙福地':{minEra:10},
+  '凤九歌·命运余音':{minEra:10},
+  '龙公旧令':{minEra:10},
+  '五域气潮迁徙':{minEra:10},
+  /* v1.43：时代连续支线后续节点 */
+  '气脉旧契':{minEra:0},'星棋续局':{minEra:1},'石壁守夜':{minEra:2},
+  '兽图盟约':{minEra:3},'渡口归信':{minEra:4},'画工留名':{minEra:5},
+  '归乡残页':{minEra:6},'王庭分肉':{minEra:7},'余烬密令':{minEra:8},
+  '行愿回灯':{minEra:9},'迁徙旧识':{minEra:10}
 };
 
 /* 时间线只读导出：供外部工具/AI 提取，禁止运行期修改 */
@@ -2167,6 +2311,9 @@ window.__TIMELINE={
   // 语义锚点：缺省 = 不限制；eraIdx 0–10；炼天(10) 内另有 fyLife 1/2
   _note:'minEra 缺省=无下限；maxEra 缺省=无上限；整体缺席=通用；eraIdx=10 时另有 S.fyLife 世数维度；pools.mortal/birth 为只读结构视图（gated=是否有 g 门控，函数本体不导出）；CHARACTER_ERA.eras=离散出场时代'
 };
+
+/* v1.48：只读审计入口；仅检查新建状态模板，不暴露或保存上一局动态数据。 */
+window.__RUN_AUDIT={version:'v1.48',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation};
 
 function eraAllowed(entry){
   if(!entry) return true;
@@ -2199,8 +2346,214 @@ var PALETTE=['#C0392B','#2471A3','#1E8449','#6C3483','#B7950B','#2E86C1','#A9322
 var S,RESULT={end:null,bar:0};
 function newState(){return{origin:'',world:'',persona:'',eraIdx:10,race:'',fyLife:0,region:'',birth:'',gender:'',age:16,childhood:'',
  look:'',tIdx:4,dhIdx:4,morIdx:3,aptIdx:3,identity:'',stance:'',schools:[],mainIdx:0,lv:1,wormIdx:5,deduc:1,deducX:null,
- life:84,maxLife:100,moves:[],marks:[],kills:[],flatMods:0,pctMods:0,flags:{},chr:[],stage:'序'};}
-function chr(t){S.chr.push(S.age+'岁·'+t);}
+ life:84,maxLife:100,moves:[],marks:[],kills:[],flatMods:0,pctMods:0,flags:{},chr:[],stage:'序',
+ run:{status:'active',turnCount:0,turns:[],changes:[],rewards:[],difficulty:null,terminal:null}};}
+/* 单局账本：只写入当前 S.run，不写 localStorage/全局历史；下一局由 newState() 全量重建。 */
+function recordRunTurn(wheel,result,index,rigged,rigFail){
+ if(!S||!S.run||S.run.status!=='active')return;
+ var d=currentEraDifficulty();S.run.turnCount++;S.run.difficulty=d;
+ S.run.turns.push({n:S.run.turnCount,era:S.eraIdx,fyLife:S.fyLife||0,stage:S.stage||'',wheel:String(wheel||''),result:String(result||''),index:index,rigged:!!rigged,rigFail:!!rigFail,difficulty:d.label});
+}
+function recordRunChange(type,label,detail){
+ if(!S||!S.run||S.run.status!=='active')return false;
+ S.run.changes.push({turn:S.run.turnCount,age:S.age,era:S.eraIdx,fyLife:S.fyLife||0,type:String(type||'state'),label:String(label||''),detail:String(detail||'')});return true;
+}
+function recordRunReward(category,label,detail,value,cost,source){
+ if(!S||!S.run||S.run.status!=='active'||!REWARD_CATEGORIES[category])return false;
+ S.run.rewards.push({turn:S.run.turnCount,age:S.age,category:category,label:String(label||''),detail:String(detail||''),value:value==null?null:value,cost:cost==null?null:cost,source:String(source||'')});
+ recordRunChange('reward',label,REWARD_CATEGORIES[category].label+'：'+String(detail||''));return true;
+}
+function closeRun(kind,terminal){
+ if(!S||!S.run)return false;S.run.status='ended';S.run.terminal={kind:String(kind||'ending'),name:String(terminal||RESULT.end||''),turn:S.run.turnCount,age:S.age,era:S.eraIdx,fyLife:S.fyLife||0};return true;
+}
+function auditRunIsolation(){
+ var fresh=newState(),fresh2=newState(),checks=[];
+ checks.push(['每局创建独立状态容器',fresh!==fresh2]);
+ checks.push(['属性与标记初始清空',fresh.flags&&Object.keys(fresh.flags).length===0&&fresh.marks.length===0&&fresh.chr.length===0]);
+ checks.push(['人物/势力记忆初始清空',!fresh.flags.socialMemory]);
+ checks.push(['奖励账本初始清空',fresh.run&&fresh.run.rewards.length===0&&fresh.run.changes.length===0]);
+ checks.push(['转盘记录初始清空',fresh.run&&fresh.run.turnCount===0&&fresh.run.turns.length===0]);
+ checks.push(['动态容器互不共享',fresh.flags!==fresh2.flags&&fresh.moves!==fresh2.moves&&fresh.marks!==fresh2.marks&&fresh.chr!==fresh2.chr&&fresh.run!==fresh2.run&&fresh.run.turns!==fresh2.run.turns&&fresh.run.rewards!==fresh2.run.rewards]);
+ return {ok:checks.every(function(x){return !!x[1];}),checks:checks};
+}
+
+/* v1.44：人物记忆与势力关系。只记录叙事关系，不改变数值、权重或原著人物归属。 */
+function ensureSocialMemory(){
+ if(!S.flags)S.flags={};
+ if(!S.flags.socialMemory)S.flags.socialMemory={characters:{},factions:{}};
+ if(!S.flags.socialMemory.characters)S.flags.socialMemory.characters={};
+ if(!S.flags.socialMemory.factions)S.flags.socialMemory.factions={};
+ if(!S.flags.socialMemory.asideShown)S.flags.socialMemory.asideShown={};
+ return S.flags.socialMemory;
+}
+/* v1.46：统一关系接口。长期 status 与单次 lastResponse 分离；回应不自动改写关系。 */
+function getSocialRelation(type,name){
+ var m=ensureSocialMemory(),bucket=type==='character'?m.characters:m.factions;
+ return bucket[name]||null;
+}
+function setSocialRelation(type,name,status,source){
+ var m=ensureSocialMemory(),bucket=type==='character'?m.characters:m.factions,old=bucket[name]||{};
+ if(type==='character'&&!old.history)old.history=[];
+ old.status=status||(old.status||(type==='character'?'相识':'接触'));
+ old.source=source||old.source||'';
+ old.age=S.age;
+ bucket[name]=old;
+ return old;
+}
+/* 兼容既有事件调用点；内部统一转交 setSocialRelation。 */
+function setFactionRelation(name,status,source){return setSocialRelation('faction',name,status,source);}
+function recordSocialMemory(t){
+ var m=ensureSocialMemory(),entry,key,status;
+ function remember(name,seen,rel){
+  if(!seen)return;
+  entry=setSocialRelation('character',name,rel,t);
+  if(entry.history.indexOf(t)<0)entry.history.push(t);
+  if(entry.history.length>12)entry.history.shift();
+  entry.lastEvent=t;entry.age=S.age;
+ }
+ if(t==='白凝冰·月下'||t==='白凝冰·竹林试剑'){
+  status=hasMark('白凝冰认可')?'认可':(hasMark('白凝冰约战')?'约战':(hasMark('白凝冰试剑毕')?'试剑未成':'相识'));
+  remember('白凝冰',hasMark('见过白凝冰')||hasMark('白凝冰约战')||hasMark('白凝冰认可'),status);
+ }
+ if(t==='古月方正'){
+  status=hasMark('古月方正·冷淡')?'疏远':(hasMark('古月方正·指点')?'受教':(hasMark('古月方正·对练')?'切磋':'相识'));
+  remember('古月方正',hasMark('识方正')||hasMark('古月方正·冷淡'),status);
+ }
+ if(t==='古月青书'){
+  status=hasMark('古月青书·受诊')?'受其照料':(hasMark('古月青书·请教')?'请教交流':(hasMark('古月青书·存疑')?'保持戒心':'相识'));
+  remember('古月青书',hasMark('识青书'),status);
+ }
+ if(t.indexOf('商心慈')===0||t==='商家夜宴'||t==='商城拍卖'||t==='商家城一游'){
+  status=hasMark('商心慈同盟')?'盟友':(hasMark('商家拒约')?'婉拒':(hasMark('商家定约·合作')?'合作':(hasMark('商家定约·姻盟')?'姻盟':(hasMark('识商心慈')?'相识':'接触'))));
+  remember('商心慈',hasMark('识商心慈')||hasMark('商心慈同盟')||hasMark('商家拒约')||hasMark('商家定约·合作')||hasMark('商家定约·姻盟'),status);
+  if(hasMark('商心慈同盟'))setFactionRelation('商家','合作',t);
+  else if(hasMark('商家拒约'))setFactionRelation('商家','婉拒',t);
+  else if(hasMark('商家定约·姻盟'))setFactionRelation('商家','姻盟',t);
+  else if(hasMark('商家定约·合作'))setFactionRelation('商家','合作',t);
+  else setFactionRelation('商家','接触',t);
+ }
+ /* 势力线只记录接触与玩家选择，不将一次协作写成永久臣属或阵营归属。 */
+ if(t==='天庭·人道防线'||t==='紫薇仙子·星算追踪'||t==='天庭招贤'){
+  if(!getSocialRelation('faction','天庭'))setFactionRelation('天庭','接触',t);
+ }
+ if(t==='长生天·北原合纵'||t==='冰塞川·劫运坛'||t==='王庭阴影'||t==='黄金血脉'){
+  if(!getSocialRelation('faction','长生天'))setFactionRelation('长生天','接触',t);
+ }
+ if(t==='影宗·中洲暗线'||t==='紫山真君·影宗遗谋'||t==='影宗余烬'){
+  if(!getSocialRelation('faction','影宗'))setFactionRelation('影宗','接触',t);
+ }
+ if(t==='南疆·五域联军'||t==='西漠·帝君城援军'||t==='东海·龙宫战局'){
+  if(!getSocialRelation('faction','五域势力'))setFactionRelation('五域势力','接触',t);
+ }
+ if(t.indexOf('商心慈')===0||t==='商家夜宴'||t==='商城拍卖'||t==='商家城一游'){
+  if(!getSocialRelation('faction','商家'))setFactionRelation('商家',hasMark('商心慈同盟')?'合作':'接触',t);
+ }
+}
+function socialMemoryAside(name){
+ var m=ensureSocialMemory(),line='',key='';
+ if(charEraAllowed('白凝冰')&&/白家|白凝冰|竹林/.test(name)&&getSocialRelation('character','白凝冰')){key='bing:'+name;line='你想起白凝冰：'+((getSocialRelation('character','白凝冰')||{}).status||'相识')+'。那次交手留下的态度，并未随岁月散尽。';}
+ else if(charEraAllowed('古月青书')&&/青书|青茅山祭祖|医蛊/.test(name)&&getSocialRelation('character','古月青书')){key='qingshu:'+name;line='你想起古月青书：'+((getSocialRelation('character','古月青书')||{}).status||'相识')+'。他的善意或戒心，仍留在旧事里。';}
+ else if(charEraAllowed('古月方正')&&/方正|古月学舍|学舍/.test(name)&&getSocialRelation('character','古月方正')){key='fang:'+name;line='你想起古月方正：'+((getSocialRelation('character','古月方正')||{}).status||'相识')+'。当年的木刀与话语仍有余音。';}
+ else if(charEraAllowed('商心慈')&&/商家|商城|商心慈/.test(name)&&getSocialRelation('character','商心慈')){key='shang:'+name;line='商家旧识仍记得你。商心慈对你的态度是：'+((getSocialRelation('character','商心慈')||{}).status||'接触')+'。';}
+ else if(/天庭|紫薇/.test(name)&&getSocialRelation('faction','天庭')){key='heaven:'+name;line='天庭仍记得你此前的接触：'+((getSocialRelation('faction','天庭')||{}).status||'接触')+'。';}
+ else if(/长生天|北原|劫运坛|冰塞川/.test(name)&&getSocialRelation('faction','长生天')){key='longevity:'+name;line='长生天方面记得你此前的往来：'+((getSocialRelation('faction','长生天')||{}).status||'接触')+'。';}
+ else if(/影宗|紫山|影无邪/.test(name)&&getSocialRelation('faction','影宗')){key='shadow:'+name;line='影宗残部对你的旧印象是：'+((getSocialRelation('faction','影宗')||{}).status||'接触')+'。';}
+ else if(/南疆|西漠|东海|五域/.test(name)&&getSocialRelation('faction','五域势力')){key='five:'+name;line='五域势力仍记得你此前的参与：'+((getSocialRelation('faction','五域势力')||{}).status||'接触')+'。';}
+ if(line){if(m.asideShown['aside:'+key])return Promise.resolve();m.asideShown['aside:'+key]=true;EVENT_PRESENCE_SHOWN=true;return say(line,'sys');}
+ return Promise.resolve();
+}
+/* v1.45：旧识与势力关系进入实际交互。每个具体重逢节点独立记账，不再由宽泛类别的一次旁白吞掉后续机会。 */
+async function socialMemoryChoice(name){
+ var m=ensureSocialMemory(),a=m.asideShown,opts=null,title='',kind='',target='',status='',idx,relation;
+ if(!name)return false;
+ /* 人物旧识：选项由本局真实关系决定；只改变本局叙事回应，不额外发放属性或资源。 */
+ if(charEraAllowed('白凝冰')&&getSocialRelation('character','白凝冰')&&/白凝冰|白家|竹林/.test(name)){
+  kind='character';target='白凝冰';relation=getSocialRelation('character',target);status=(relation&&relation.status)||'相识';title='旧识·白凝冰';
+  opts=status==='认可'?[['以旧日试剑之名相邀',40],['谈及冰雪道心得',35],['保持距离，互不相欠',25]]:
+       status==='约战'?[['兑现当年竹林之约',40],['先谈彼此近况',35],['暂不提旧约',25]]:
+       status==='试剑未成'?[['承认当年失约',40],['重新提出切磋',35],['不作解释',25]]:
+       [['提起溪边初遇',40],['询问白家近况',35],['只作寻常寒暄',25]];
+ }else if(charEraAllowed('古月青书')&&getSocialRelation('character','古月青书')&&/青书|青茅山祭祖|医蛊/.test(name)){
+  kind='character';target='古月青书';relation=getSocialRelation('character',target);status=(relation&&relation.status)||'相识';title='旧识·古月青书';
+  opts=status==='受其照料'?[['向他道谢并叙旧',40],['请教医蛊旧法',35],['不愿再欠人情',25]]:
+       status==='请教交流'?[['继续请教医蛊',40],['分享自己的见闻',35],['谈完便告辞',25]]:
+       status==='保持戒心'?[['解释当年的疑虑',40],['只交换必要情报',35],['保持戒备',25]]:
+       [['提起初见时的诊治',40],['询问族中旧人',35],['寻常问候',25]];
+ }else if(charEraAllowed('古月方正')&&getSocialRelation('character','古月方正')&&/方正|古月学舍|学舍/.test(name)){
+  kind='character';target='古月方正';relation=getSocialRelation('character',target);status=(relation&&relation.status)||'相识';title='旧识·古月方正';
+  opts=status==='受教'?[['继续切磋修行心得',40],['提醒他戒骄戒躁',35],['各走各的路',25]]:
+       status==='切磋'?[['再较量一场',40],['交流各自所学',35],['不谈胜负',25]]:
+       status==='疏远'?[['主动释去旧日冷淡',40],['只谈族中公事',35],['转身离开',25]]:
+       [['提起当年的木刀',40],['询问他的修行',35],['简单寒暄',25]];
+ }else if(charEraAllowed('商心慈')&&getSocialRelation('character','商心慈')&&/商家|商城|商心慈/.test(name)){
+  kind='character';target='商心慈';relation=getSocialRelation('character',target);status=(relation&&relation.status)||'接触';title='旧识·商心慈';
+  opts=status==='盟友'?[['按旧盟共同议事',40],['交换商路情报',35],['公私分明，只谈交易',25]]:
+       status==='合作'?[['续谈旧日商约',40],['交换各自掌握的消息',35],['暂缓合作',25]]:
+       status==='姻盟'?[['以旧名分出面',40],['私下厘清盟约边界',35],['暂避公开场合',25]]:
+       status==='婉拒'?[['尊重当年的答复',40],['只谈生意往来',35],['不再提旧事',25]]:
+       [['提起账房旧事',40],['询问商家近况',35],['寻常交易',25]];
+ }else if(getSocialRelation('faction','天庭')&&/天庭|紫薇|人道防线/.test(name)){
+  kind='faction';target='天庭';relation=getSocialRelation('faction',target);status=(relation&&relation.status)||'接触';title='旧账·天庭交涉';
+  opts=status==='协助'?[['继续协助人道防线',40],['要求交换更完整情报',35],['声明此后只旁观',25]]:
+       status==='情报交换'?[['续换战场情报',40],['要求对等开放线索',35],['停止情报往来',25]]:
+       [['表明曾经接触',40],['要求先说明来意',35],['保持旁观',25]];
+ }else if(getSocialRelation('faction','长生天')&&/长生天|北原|劫运坛|冰塞川/.test(name)){
+  kind='faction';target='长生天';relation=getSocialRelation('faction',target);status=(relation&&relation.status)||'接触';title='旧账·长生天交涉';
+  opts=status==='递送情报'?[['再递一份可信消息',40],['要求回报与保证',35],['不再替人传信',25]]:
+       status==='接触散修'?[['继续联络北原散修',40],['转向部族议事',35],['退出合纵事务',25]]:
+       [['说明曾参与合纵',40],['先观察各部立场',35],['不介入北原争端',25]];
+ }else if(getSocialRelation('faction','影宗')&&/影宗|紫山|影无邪/.test(name)){
+  kind='faction';target='影宗';relation=getSocialRelation('faction',target);status=(relation&&relation.status)||'接触';title='旧账·影宗交涉';
+  opts=status==='协助转移'?[['继续掩护残部',40],['索取行动情报',35],['就此两清',25]]:
+       status==='打探消息'?[['交换更多情报',40],['只谈北原消息',35],['停止接触',25]]:
+       status==='取走情报'?[['归还部分线索',40],['以情报换取通行',35],['拒绝再谈',25]]:
+       [['说明来意',40],['先试探残部态度',35],['保持距离',25]];
+ }else if(getSocialRelation('faction','五域势力')&&/南疆|西漠|东海|五域|武庸|沈家/.test(name)){
+  kind='faction';target='五域势力';relation=getSocialRelation('faction',target);status=(relation&&relation.status)||'接触';title='旧账·五域交涉';
+  opts=status==='协助破阵'?[['继续协助阵道推演',40],['交换阵线情报',35],['不再卷入战局',25]]:
+       status==='递交情报'||status==='交换情报'?[['续换各家情报',40],['要求明确合作边界',35],['停止情报往来',25]]:
+       status==='联络诸家'||status==='协调联军'?[['继续协调诸家',40],['只与单一家族往来',35],['退出联军事务',25]]:
+       [['说明曾参与五域事务',40],['先辨各家立场',35],['只作旁观',25]];
+ }
+ /* 上一次回应会影响下一次重逢/交涉的可选态度，形成连续关系，而非只写一条旁白。 */
+ relation=getSocialRelation(kind,target);var previous=relation&&relation.lastResponse;
+ if(previous&&/保持距离|转身离开|不再提|不愿再欠|停止接触|退出|只作旁观|不再替人|拒绝再谈|就此两清/.test(previous)){
+  opts=[['尊重此前划下的界线',50],['尝试重新开启话题',25],['就此结束交谈',25]];
+ }else if(previous&&/继续|续谈|交换|请教|协助|掩护|协调|共同议事|递交|再递|续换|叙旧/.test(previous)){
+  opts=[['沿着上次的话题继续',50],['提出新的合作方向',30],['暂时告一段落',20]];
+ }
+ if(!opts)return false;
+ /* 每个具体事件独立标记；同一事件不会反复弹出，但不同事件仍可形成新的交涉。 */
+ var mark='socialChoice:'+kind+':'+target+':'+name;
+ if(a[mark])return false;
+ a[mark]=true;
+ idx=await optW(title,opts);
+ if(kind==='character'){
+  relation=getSocialRelation('character',target)||setSocialRelation('character',target,status,name);
+  relation.lastResponse=opts[idx] ? opts[idx][0] : '';
+  relation.lastResponseAge=S.age;
+  if(!relation.history)relation.history=[];
+  if(relation.history.indexOf('重逢·'+name)<0)relation.history.push('重逢·'+name);
+  if(relation.history.length>12)relation.history.shift();
+  await say('旧识之间的话没有改变既有因果，却让你们对彼此此刻的态度有了新的判断。','sys');
+ }else{
+  var rel=opts[idx]?opts[idx][0]:'保持观望';
+  relation=getSocialRelation('faction',target)||setSocialRelation('faction',target,status,name);
+  relation.lastResponse=rel;relation.lastResponseAge=S.age;relation.lastResponseSource=name;
+  await say('这次交涉留下新的往来记录，但不等于结盟、臣属或永久承诺。','sys');
+ }
+ return true;
+}
+function socialMemorySummary(kind){
+ var m=ensureSocialMemory(),bucket=kind==='characters'?m.characters:m.factions,out=[],k,v,type=kind==='characters'?'character':'faction';
+ for(k in bucket)if(Object.prototype.hasOwnProperty.call(bucket,k)){
+  v=getSocialRelation(type,k);
+  out.push(k+'：'+((v&&v.status)||(type==='character'?'相识':'接触')));
+ }
+ return out.length?out.join('；'):'—';
+}
+
+function chr(t){S.chr.push(S.age+'岁·'+t);recordSocialMemory(t);}
 function lvName(){var k=Math.floor(S.lv);return S.lv>k?k+'转巅峰':k+'转';}
 function anchor(){var k=Math.floor(S.lv);if(S.lv>8)return ANCH_YA;if(S.lv>k&&ANCH_PEAK[k])return ANCH_PEAK[k];return ANCH_T[k]||0;}
 function mainSchool(){return S.schools[S.mainIdx];}
@@ -2237,7 +2590,7 @@ function panelHTML(){
   +row('空窍资质',S.flags.gotApt?aptName():'—')+row('等级',S.flags.gotLv?lvName():'—')+row('蛊虫完善度',S.flags.gotLv?wormName():'—')
   +row('杀招推演','凡'+S.deduc+' / 仙'+dx)
   +row('身份',(S.identity||'—')+(S.stance?' · '+S.stance:''))
-  +row('流派',sch)+row('杀招',mv)
+  +row('流派',sch)+row('杀招',mv)+row('人物旧识',socialMemorySummary('characters'))+row('势力关系',socialMemorySummary('factions'))
   +(S.eraIdx===8&&S.flags.hyOn?row('幽魂关注度',hyAttention()+'%'):'')
    +(S.eraIdx===6?row('窃取度',dtStealVal()+'%')+(dtTaint()>0?row('窃痕','剩 '+dtTaint()+' 事'):''):'')
    +(typeof ysOn==='function'&&ysOn()?row('元始之世','气道初立 · 天地人三气'):'')
@@ -2301,6 +2654,12 @@ document.addEventListener('keydown',function(e){
  if(IS_TOUCH)return; /* 手机端仅按钮可开转 */
  if(e.key==='Enter'||e.key===' '){e.preventDefault();onTapBtn();}
 });
+function sayIntro(t,cls){
+ /* v1.47：开场叙事只展示、不占用首次交互；避免第一击只用于解除旁白锁。 */
+ log(t,cls);
+ var sb=$('sayBox');
+ if(sb){sb.textContent=t;sb.className=cls||'';}
+}
 function say(t,cls){
  log(t,cls);
  return new Promise(function(res){
@@ -2709,6 +3068,7 @@ async function W(title,sub,secs,opt){
   }
  }
  syncRerollBtn();
+ recordRunTurn(title,sp.secs[idx]?sp.secs[idx].l:'',idx,rigged,_rigFail);
  return idx;
 }
 async function rollW(p,name){
@@ -4043,15 +4403,15 @@ async function tribulationPromote(){
 }
 async function runGame(){
  try{
-  S=newState();rerollInit();renderPanel();syncRerollBtn();
+  S=newState();RESULT={end:null,bar:0};SPIN_SIGN_SEQ=0;rerollInit();renderPanel();syncRerollBtn();
   if(AUTO)log('AUTO 模式——春秋蝉不可用；需要逆流请先关 AUTO','sys');
-  await say('天圆地方，蛊纳乾坤。一缕天外之意坠入蛊界——此后生死荣辱，皆由命运转盘裁定。','gold');
+  sayIntro('天圆地方，蛊纳乾坤。一缕天外之意坠入蛊界——此后生死荣辱，皆由命运转盘裁定。','gold');
   var pendT=0,pendDH=0,pendMOR=0;
 
   /* ══ 10 STORY · 主流程 runGame · 一 · 出身 ══════════════════════════ */
   tianyiPick();
- await say('降生那日，四野无兆：没有祥云，没有异香，安静得像什么都没有发生过。');
- await say('命数从不肯在人刚睁眼的时候就亮出底牌——总要过很久，才肯露出一点端倪。');
+ sayIntro('降生那日，四野无兆：没有祥云，没有异香，安静得像什么都没有发生过。');
+ sayIntro('命数从不肯在人刚睁眼的时候就亮出底牌——总要过很久，才肯露出一点端倪。');
 setStage('出身');
   var oIdx=await W('跟脚盘','万界之外，还是蛊界土著',[['天外之魔',70],['土生土长',30,null,'#8C8C8C']],{flash:'跟脚已定'});
   S.origin=oIdx===0?'天外之魔':'土生土长';
@@ -4078,7 +4438,7 @@ setStage('出身');
   }
   var eSecs=[];for(var e2=0;e2<ERAS.length;e2++)eSecs.push([ERAS[e2]+'时期',ERA_DISP[e2],eHidden[ERAS[e2]],e2===10?'#F049A8':(e2===6?'#6BB6E0':(e2===1?'#5B7CBA':(e2===7?'#E8A838':(e2===3?'#C45C26':(e2===0?'#C9A227':(e2===4?'#C23B3B':undefined))))))]); /* 元始金褐/星宿青蓝/狂蛮赭/红莲赤/盗天淡蓝/巨阳金 */
   var eIdx=await W('诞生时间点盘','十大尊者纪元与炼天时代，落谁之世',eSecs.map(function(x,i){return [ERA_PERIODS[i]+'·'+x[0],x[1],x[2],x[3]];}),{small:true});
-  S.eraIdx=eIdx;S.flags.gotEra=true;dexAdd('era',ERAS[eIdx]); /* v1.4.17 时代图鉴登记 */
+  S.eraIdx=eIdx;S.flags.gotEra=true;S.run.difficulty=currentEraDifficulty();dexAdd('era',ERAS[eIdx]); /* v1.4.17 时代图鉴登记 */
   chr('降生于'+ERAS[eIdx]+'时期');
   await say('天机轮转，你降生于【'+ERAS[eIdx]+'】时期。',eIdx===10||eIdx===1?'gold':'');
   if(eIdx===0){S.flags.ysQi=S.flags.ysQi||0;await say('元始仙尊之世——气道与奴道开创，人族在异人强盛的时代中寻求立足之地；天地人三气作为本游戏的修行主题逐渐展开。','gold');}
@@ -4152,7 +4512,8 @@ setStage('出身');
   }
   if(S.age>=56){pendDH+=1;await say('耄耋之年降世，一生阅尽——道心+1。','good');}
   S.maxLife=100;S.life=S.maxLife-S.age;if(S.life<1)S.life=1; /* v1.14.37 P0：寿元与开局年龄对齐，避免 0~15 岁首次耗寿后 age 从 0 跳到 19 */
-  var lSecs=[['EX',1],['SSS',2],['SS',4],['S',9],['A',14],['B',22],['C',26],['D',15],['E',7]];
+  /* 容貌分布：以中间档为主体，绝世容貌极稀有，极端丑陋也少见；权重合计100。 */
+  var lSecs=[['EX',1.2],['SSS',2.8],['SS',10],['S',8],['A',17],['B',25],['C',20],['D',11],['E',5]];
   var lkIdx=await W('容貌盘','皮囊一副',lSecs,{small:true});
   S.look=lSecs[lkIdx][0];
   await say('容貌【'+S.look+'】——'+ATTR_NOTE.look[S.look]+'。');
@@ -4161,17 +4522,20 @@ setStage('出身');
   var twIdx=await W('才情盘','悟性根骨，决定杀招与推演',tReal,{small:true});
   S.tIdx=clamp(8-twIdx+pendT,0,8);S.flags.gotT=true;
   await say('才情【'+talName()+'】——'+ATTR_NOTE.tal[talName()]+'。');
-  var dSecs=[['EX',1.82],['SSS',4.55],['SS',7.27],['S',12.73],['A',14.55],['B',20],['C',22.71],['D',11.82],['E',4.55]]; /* 原始110按比例归一至100 */
+  /* 道心分布：中等心志最常见，极端坚韧与极端脆弱均属少数；权重合计100。 */
+  var dSecs=[['EX',1.5],['SSS',5],['SS',11],['S',10],['A',17],['B',22],['C',18],['D',10],['E',5.5]];
   var dwIdx=await W('道心盘','心志之坚，凶中求活之门',dSecs,{small:true});
   S.dhIdx=clamp(8-dwIdx+pendDH,0,8);
   await say('道心【'+TAL_ORD[S.dhIdx]+'】——'+ATTR_NOTE.dh[TAL_ORD[S.dhIdx]]+'。');
+  /* 道德盘：提高高道德档（SSS、SS）概率，从B/C/D档调配；两套权重均合计100，盘面扇区与抽取概率同步。 */
   var mSecs=S.origin==='天外之魔'
-   ?[['SSS',1],['SS',2],['S',5],['A',8],['B',16],['C',26],['D',24],['E',18]]
-   :[['SSS',0.91],['SS',1.82],['S',3.64],['A',5.45],['B',11.82],['C',25.45],['D',27.27],['E',23.64]]; /* 本地原始110按比例归一至100 */
+   ?[['SSS',4],['SS',9],['S',5],['A',8],['B',13],['C',22],['D',21],['E',18]]
+   :[['SSS',3.91],['SS',8.82],['S',3.64],['A',5.45],['B',7.82],['C',22.45],['D',24.27],['E',23.64]]; /* 本地与天外之魔分别归一至100 */
   var mwIdx=await W('道德盘',S.origin==='天外之魔'?'天外之意，善恶未定':'蛊界人心，险恶者众',mSecs,{small:true});
   S.morIdx=clamp(7-mwIdx+pendMOR,0,7);
   await say('道德【'+morName()+'】——'+ATTR_NOTE.mor[morName()]+'。');
-  var aSecs=[['十绝体',2],['甲等九成九',6],['甲等',14],['乙等',22],['丙等',26],['丁等',28],['未开窍',2]];
+  /* 资质分布：提高甲乙等高资质占比；丙丁合计控制在45%，权重合计100。 */
+  var aSecs=[['十绝体',0.2],['甲等九成九',7],['甲等',18],['乙等',29.7],['丙等',20],['丁等',25],['未开窍',0.1]];
   /* v1.1.5【项目4】：十绝体仅本地人（土生土长）可得——天外之魔的十绝体权重归零 */
   var aReal=[];for(var a2=0;a2<aSecs.length;a2++){var aw=aSecs[a2][1];
    if(a2===0&&S.origin!=='土生土长')aw=0; /* 十绝体：仅本地人 */
@@ -4372,6 +4736,7 @@ setStage('出身');
    }else{
     await genericEvent(evName);
     await eventWorldAside(evName); /* v1.40：少量世界视角侧写，纯文本 */
+    unlockEraMortalLinks(gpool); /* v1.43：本轮刚完成前置事件时，后续节点可进入剩余抽取 */
    }
    if(!evPick.isVoid&&!evPick.isAnomaly){
     await maybeRandEvent('mortal');
@@ -5556,7 +5921,122 @@ async function eventCharacterPresence(name){
  else if(hasMark('识方正')&&name==='古月学舍')line='学舍里有人提起古月方正。你记得那张仍带稚气、却不肯轻易服输的脸。';
  else if(hasMark('识青书')&&name==='青茅山祭祖')line='祭祖的人群中，有人提起古月青书。仁心与族中规矩之间的旧事，令这场祭礼多了几分沉重。';
  if(line){EVENT_PRESENCE_SHOWN=true;await say(line,'sys');}
+ else{await socialMemoryAside(name);}
+ await socialMemoryChoice(name);
 }
+/* v1.42：时代人物史事与凡人侧写。basis 明示原著依据层级；不让凡人支线改写原著大事件。 */
+var ERA_MORTAL_EXTRA=[
+ {era:0,n:'气脉分田',basis:'合理推断',desc:'村中几条气脉交错，修行者争论灵气该归哪一支。元始仙尊开创气道、奠定人族秩序的传说，也被乡民讲成了田界与水渠的旧规矩。'},
+ {era:0,n:'元始遗训',basis:'原著明确内容（历史回响；场景为原创）',desc:'石壁上刻着一句关于蛊与人的古训。老人说这是天庭初立时流传下来的训诫；字句历经转抄，已难辨最初模样。'},
+ {era:0,n:'异人来使',basis:'游戏原创设定',desc:'一支异人商队带着珍稀蛊材来到城外。人族修行者戒备森严，商队却只想换取越冬粮食。'},
+ {era:0,n:'天庭旧制',basis:'原著明确内容（历史回响；场景为原创）',desc:'天庭门外有人讲起元始仙尊创立天庭、推动门派制度的旧事。制度传到基层，最终变成了收徒名额与修行规矩。'},
+ {era:1,n:'星宿棋痕',basis:'原著明确内容（历史回响；场景为原创）',desc:'一座旧亭的石桌刻满棋痕。讲棋的老者提到星宿仙尊以智道布局、辅佐天庭的传说，却没人能复原最后几手。'},
+ {era:1,n:'智道书院',basis:'合理推断',desc:'书院招收能背诵星象与推演口诀的学徒。先生说星宿仙尊留下的影响，不只在天庭高层，也在一代代智道传承之中。'},
+ {era:1,n:'天庭旧册',basis:'游戏原创设定',desc:'抄录天庭旧册的书吏发现几页名录被虫蛀空了。空白处没有答案，只有不同年代留下的批注。'},
+ {era:1,n:'星门传令',basis:'游戏原创设定',desc:'夜空出现异象，驿站急令各地检查星门与传讯蛊。百姓不知道天庭为何紧张，只担心商路因此中断。'},
+ {era:2,n:'无极石壁',basis:'原著明确内容（历史回响；场景为原创）',desc:'疯魔窟外围的石壁出现难以解释的纹路。有人将它们与无极魔尊的求道痕迹联系起来，但没有人敢说自己读懂了。'},
+ {era:2,n:'疯魔窟役工',basis:'合理推断',desc:'招工告示承诺高额报酬，条件却是不得询问洞窟深处的声音。老役工说，无极魔尊的传说让这里既是机缘地，也是吞人的凶地。'},
+ {era:2,n:'九虚回响',basis:'游戏原创设定',desc:'夜里传来九种不同的回声，像有人在远处逐一敲击石门。守夜人争论那是风声还是某种道场禁制。'},
+ {era:2,n:'道场封门',basis:'合理推断',desc:'道场忽然封闭，外门弟子与役工都被赶下山。封门理由无人知晓，只留下几卷关于无极之道的残缺讲义。'},
+ {era:3,n:'狂蛮兽图',basis:'原著明确内容（历史回响；场景为原创）',desc:'兽皮上绘着远古荒兽与部族迁徙路线。族中祭司说狂蛮魔尊崇尚变化与力量，后人便把他的传说画进了狩猎图腾。'},
+ {era:3,n:'部族盟誓',basis:'合理推断',desc:'数个部族在水源旁立誓共猎，盟约却没有写明猎物如何分配。年轻人相信强者为尊，老人只想让盟约撑过寒季。'},
+ {era:3,n:'异人猎场',basis:'游戏原创设定',desc:'猎场边缘发现异人留下的工具与足迹。部族首领命人追踪，猎队却担心这会引来更强大的对手。'},
+ {era:3,n:'变化道遗骨',basis:'游戏原创设定',desc:'山洞里留着一具形态扭曲的荒兽遗骨，骨面有变化道痕迹。它究竟是修行失败，还是某场古老战斗的遗留，无人能断定。'},
+ {era:4,n:'红莲残瓣',basis:'原著明确内容（历史回响；场景为原创）',desc:'河滩上漂来一片不腐的红莲花瓣。说书人将它与红莲魔尊、光阴长河和宿命抗争联系起来，听众却各有理解。'},
+ {era:4,n:'光阴渡口',basis:'合理推断',desc:'渡口近日常有旅人声称看见昨日的自己。摆渡人不问缘由，只要求每个人上船前说出一个绝不愿遗忘的名字。'},
+ {era:4,n:'宿命旧说',basis:'原著明确内容（历史回响；场景为原创）',desc:'村中祭师讲述宿命蛊与红莲魔尊的故事。有人认为命数不可违，有人则相信红莲留下的反抗意志仍在影响世间。'},
+ {era:4,n:'红莲棋局',basis:'游戏原创设定',desc:'商贩兜售一张标着逆流河的旧地图，声称沿河而上便能找回失去之物。地图上的水道却与任何已知地形都对不上。'},
+ {era:5,n:'元莲画意',basis:'原著明确内容（历史回响；场景为原创）',desc:'画师临摹一幅青莲山水，画中木石似有生机。师傅说元莲仙尊开创木道、画道的传承，至今仍影响着中洲匠人与蛊师。'},
+ {era:5,n:'神帝城画工',basis:'原著明确内容（历史回响；场景为原创）',desc:'神帝城的画工修补壁画时，发现画中人物的神情与旧稿不同。关于元莲仙尊留下的画道布置，工匠只敢记录异象，不敢妄自揣测。'},
+ {era:5,n:'天元宝莲',basis:'原著明确内容（历史回响；场景为原创）',desc:'药铺展示一株能持续凝出真元的宝莲仿品。掌柜提起元莲仙尊创出的天元宝莲一系，提醒众人莫把仿品当成真正传承。'},
+ {era:5,n:'豆神宫旧闻',basis:'原著明确内容（历史回响；场景为原创）',desc:'游历者谈起豆神宫与元莲仙尊的布局。故事传到凡人耳中，只剩下木豆、画壁与一座会吞没来客的古老宫殿。'},
+ {era:6,n:'盗天空门',basis:'原著明确内容（历史回响；场景为原创）',desc:'西漠商队传出空门传闻。有人说盗天魔尊本杰孙毕生寻求归乡之路，空门正是他留下的执念与谜题。'},
+ {era:6,n:'本杰孙旧闻',basis:'原著明确内容（历史回响；场景为原创）',desc:'说书人讲到一位来自异域的天外之魔：他创偷道、求归乡，也曾与长毛老祖合作炼蛊。听众最记得的，却是他未能抵达的故乡。'},
+ {era:6,n:'遁空蛊残图',basis:'原著明确内容（历史回响；场景为原创）',desc:'残图记载着遁空蛊的炼制思路，旁边注明曾有长毛老祖与盗天魔尊合作的旧事。图纸缺页严重，无法据此复原仙蛊。'},
+ {era:6,n:'长毛炼场',basis:'原著明确内容（历史回响；场景为原创）',desc:'毛民炼场里流传着长毛老祖的故事。老人说中古炼道盛极一时，盗天与巨阳两位尊者都曾与这位炼道大宗师有过交集。'},
+ {era:7,n:'巨阳王庭',basis:'原著明确内容（历史回响；场景为原创）',desc:'北原各部谈起王庭福地与巨阳仙尊留下的血脉、运道影响。对普通族人而言，传说最终落在名分、婚盟与资源分配上。'},
+ {era:7,n:'黄金血脉',basis:'合理推断',desc:'族中长老重新核对黄金血脉族谱，几支旁系为继承顺序争执不休。巨阳仙尊的遗泽被视作荣耀，也成为现实中的权力凭据。'},
+ {era:7,n:'运道签摊',basis:'游戏原创设定',desc:'集市里有人摆出运道签摊，声称能测出下一场风雪与猎获。签文看似灵验，摊主却从不肯解释其中的蛊虫手段。'},
+ {era:7,n:'北原婚盟',basis:'合理推断',desc:'两个部族为抵御寒潮商议联姻。年轻人不愿成为盟约筹码，族老则认为在北原，活过冬天比个人心愿更重要。'},
+ {era:8,n:'幽魂魂碑',basis:'原著明确内容（历史回响；场景为原创）',desc:'荒野立着一块记录亡者姓名的魂碑。路人谈及幽魂魔尊与魂道兴盛，碑下却只有寻常人留下的祭品。'},
+ {era:8,n:'影宗余烬',basis:'原著明确内容（历史回响；场景为原创）',desc:'废弃据点里找到影宗旧令的残页。纸上提到魂道布局与长生谋划，落款已被刻意抹去，无法确认具体传令者。'},
+ {era:8,n:'青家旧恨',basis:'原著明确内容（历史回响；场景为原创）',desc:'青家后人守着一处不许外人靠近的旧地，传说其中埋着与幽魂魔尊相关的血仇。仇恨跨越数代，真相却逐渐被传说替代。'},
+ {era:8,n:'魂兽过境',basis:'合理推断',desc:'夜色中一群魂兽越过荒村。村民熄灯躲藏，猎人则争论要不要趁它们远去后收集残留魂材。'},
+ {era:9,n:'乐土行愿',basis:'原著明确内容（历史回响；场景为原创）',desc:'石桥旁刻着一段劝人向善的行愿文。旅人将它与乐土仙尊的理念联系起来，认为善念并非软弱，而是能改变人心的力量。'},
+ {era:9,n:'乐土门人传法',basis:'原著明确内容（历史回响；场景为原创）',desc:'一位行脚僧讲述乐土仙尊门人传法的旧事。听众听不懂仙尊布局，只记住先救眼前受苦之人的朴素道理。'},
+ {era:9,n:'悔哭海传闻',basis:'原著明确内容（历史回响；场景为原创）',desc:'渔民谈起悔哭海与乐土仙尊留下的传承。有人说海水会映出悔意，有人只相信风暴来前海鸟会先行离岸。'},
+ {era:9,n:'净土遗规',basis:'合理推断',desc:'村中施粥棚立下新规：不问来历，先让饥者吃饱。长者说这是乐土遗风，真正难的不是立规矩，而是灾年里仍有人愿意守规矩。'},
+ {era:10,n:'方源旧迹·狐仙福地',basis:'原著明确内容（历史回响；场景为原创）',desc:'商旅谈起狐仙福地易主的往事：方源曾借此踏入更广阔的蛊仙棋局。如今旧事传到凡人耳中，只剩下福地易主与一场场追逐。'},
+ {era:10,n:'凤九歌·命运余音',basis:'原著明确内容（历史回响；场景为原创）',desc:'酒楼有人哼起命运歌，旋律令在座蛊师沉默。凤九歌与天庭、宿命蛊的纠葛早已传遍五域，却无人能说清歌中每一层含义。'},
+ {era:10,n:'龙公旧令',basis:'原著明确内容（历史回响；场景为原创）',desc:'中洲旧城翻出一份龙公时代的征调文书。纸面记载着天庭曾如何调动资源应对大局，落到百姓头上便是徭役与迁徙。'},
+ {era:10,n:'五域气潮迁徙',basis:'原著明确内容（历史回响；场景为原创）',desc:'气潮席卷五域后，商路与聚落不断改道。各大势力忙于争夺机缘，普通人只能带着家当寻找下一处能安身的地方。'},
+ ];
+/* v1.43：时代连续支线。前置事件的选择会写入本局 marks；后续节点读取该选择，形成可追溯的关系记忆。
+   仅增加叙事节点与经历标记，不改变原著重大历史，也不改变旧事件数值。 */
+var ERA_MORTAL_LINKS=[
+ {era:0,from:'气脉分田',n:'气脉旧契',basis:'合理推断',text:{'细查来历':'你循着旧渠找到当年丈量气脉的石匠。老人记得你曾认真追问分田缘由，便取出一份未曾交出的旧契。','出手相助':'当初受你帮助的农户一直记着那份情。如今他们邀你回村，愿把共同修渠的旧契交由你见证。','收存线索':'你保存的气脉图引来一名隐居老匠。他认出图上的刻痕，告诉你那是早年分脉时留下的标记。'}},
+ {era:1,from:'星宿棋痕',n:'星棋续局',basis:'合理推断',text:{'细查来历':'旧亭棋手认出你曾细究棋痕，终于愿意摆出未完的残局。棋盘并非仙尊布局本身，而是后人对智道思路的揣摩。','出手相助':'你曾替棋手护住棋谱。多年后他邀你续局，并把自己毕生整理的星象注记交给你。','收存线索':'你留下的棋痕拓本被一位书院先生认出。他邀请你对照旧谱，补全一段失传的民间注解。'}},
+ {era:2,from:'无极石壁',n:'石壁守夜',basis:'游戏原创设定',text:{'细查来历':'守壁人记得你曾逐字辨认石纹。封山前夜，他特意请你再看一次新出现的裂痕。','出手相助':'当初你帮忙照料的役工如今成了守壁人。他没有透露石壁深处的秘密，只请你陪他守完这一夜。','收存线索':'你保存的石纹拓片让守壁人认出旧刻。他把一枚普通石屑交给你，作为这段共同经历的凭证。'}},
+ {era:3,from:'狂蛮兽图',n:'兽图盟约',basis:'合理推断',text:{'细查来历':'部族祭司记得你曾仔细研究兽图。如今迁徙路线改变，他请你协助辨认祖辈留下的水源标记。','出手相助':'曾与你并肩守猎的族人没有忘记你的援手。他们邀你参加盟誓，商议如何让老弱也能平安迁徙。','收存线索':'你收存的兽图残页被另一支部族认出。双方决定交换拓本，避免因误读旧路线而发生冲突。'}},
+ {era:4,from:'红莲残瓣',n:'渡口归信',basis:'游戏原创设定',text:{'细查来历':'渡口老人记得你曾追问花瓣来历。他收到一封迟来的家书，信中提到同一段河岸与一场未竟的告别。','出手相助':'你曾帮渡口人家渡过难关。如今他们请你见证一封旧信的送达，信里没有改写命运的秘法，只有迟到多年的歉意。','收存线索':'你留下的花瓣拓影引来一名旧物收藏者。他辨认出河岸印记，愿与你一同把线索送回渡口。'}},
+ {era:5,from:'元莲画意',n:'画工留名',basis:'合理推断',text:{'细查来历':'画师记得你曾细看画中木石。他请你协助校对一卷画工名录，让无名匠人的手艺不至于被时代抹去。','出手相助':'你曾帮画工修复受损画壁。如今他把自己的第一幅完整作品题上你的见证之名，作为师友之谊的纪念。','收存线索':'你收存的画意拓片让一位老画工想起失散同门。他托你把一页题跋送到神帝城外的旧作坊。'}},
+ {era:6,from:'本杰孙旧闻',n:'归乡残页',basis:'游戏原创设定',text:{'细查来历':'异域商旅记得你曾认真听完本杰孙的故事。他拿出一页残缺航图，承认自己也曾把归乡当作毕生执念。','出手相助':'你曾替商旅保住一批货物。他将一页家族旧记赠你，其中记着异域来客如何在陌生天地寻找归途。','收存线索':'你保存的旧闻抄本被一名毛民炼师认出。他补上长毛炼场的旁注，却提醒你残页不足以复原任何仙蛊。'}},
+ {era:7,from:'巨阳王庭',n:'王庭分肉',basis:'合理推断',text:{'细查来历':'族老记得你曾追问王庭旧制。他邀你旁听一次分配议事，让你看见血脉名分之外，族人如何争取活下去的份额。','出手相助':'你曾在风雪中帮助过一户旁支。如今他们邀请你参加冬祭，并把最先分得的一份肉留给无力狩猎的老人。','收存线索':'你留下的王庭旧闻让一名族谱抄手找到旁支记录。他愿与你共同补录那些从未被写进英雄传说的普通族人。'}},
+ {era:8,from:'影宗余烬',n:'余烬密令',basis:'游戏原创设定',text:{'细查来历':'废墟看守人记得你曾细查残令。他带你找到一处被封存的空室，里面只有一份提醒后人远离旧巢的警告。','出手相助':'你曾帮助附近村民清理魂兽留下的灾痕。他们把拾到的残纸交给你，希望这段旧事不再成为新的祸端。','收存线索':'你收存的残令拓本被一名避世蛊师辨认。他只补充了几处年代注记，便劝你不要继续追查影宗未竟的布局。'}},
+ {era:9,from:'乐土行愿',n:'行愿回灯',basis:'合理推断',text:{'细查来历':'施粥棚的老人记得你曾追问行愿文。他邀你把旧规写成白话，让后来者明白善念要落在每日行动上。','出手相助':'你曾帮助过受灾村民。如今他们自发点起回灯，邀请你与他们一起把施粥棚重新开起来。','收存线索':'你收存的行愿拓片被一位行脚僧认出。他补上缺失的几句劝善文字，却说真正的传承仍在众人如何待人。'}},
+ {era:10,from:'五域气潮迁徙',n:'迁徙旧识',basis:'游戏原创设定',text:{'细查来历':'迁徙路上的向导记得你曾认真记录气潮变化。他邀你重走旧路，核对哪些聚落已经恢复、哪些仍无人归来。','出手相助':'你曾帮一户流民安顿下来。如今他们已在新地扎根，特意邀请你参加新居落成的小宴。','收存线索':'你保存的迁徙路线图被商队认出。商队愿与你交换各地近况，让这份记录成为后来者避险的参考。'}}
+];
+function eraLinkChoice(link){
+ var opts=['细查来历','出手相助','收存线索'],i;
+ for(i=0;i<opts.length;i++)if(hasMark('支线选择·'+link.from+'·'+opts[i]))return opts[i];
+ return '';
+}
+function eraLinkReady(name){
+ var i,link,c;
+ for(i=0;i<ERA_MORTAL_LINKS.length;i++){
+  link=ERA_MORTAL_LINKS[i];
+  if(link.n!==name)continue;
+  c=eraLinkChoice(link);
+  return !!c&&!hasMark('已见·'+link.n)&&S.eraIdx===link.era;
+ }
+ return false;
+}
+/* 前置事件在本轮事件池建立后才完成时，将刚解锁的后续节点加入剩余抽取池。 */
+function unlockEraMortalLinks(pool){
+ if(!pool||!S)return;
+ ERA_MORTAL_LINKS.forEach(function(link){
+  if(link.era===S.eraIdx&&eraLinkReady(link.n)&&!pool.some(function(x){return x.n===link.n;}))pool.push({n:link.n,w:8});
+ });
+}
+async function eraMortalLinkDispatch(name){
+ var i,link,choice,c,ending;
+ for(i=0;i<ERA_MORTAL_LINKS.length;i++)if(ERA_MORTAL_LINKS[i].n===name){link=ERA_MORTAL_LINKS[i];break;}
+ if(!link||link.era!==S.eraIdx||hasMark('已见·'+name))return false;
+ choice=eraLinkChoice(link);
+ if(!choice)return false;
+ await say('【'+link.basis+'·前事有续】'+link.text[choice],'sys');
+ c=await optW(name,[['续此旧缘',34],['将经历传下',33],['各自奔赴前路',33]]);
+ ending=c===0?'续此旧缘':(c===1?'将经历传下':'各自奔赴前路');
+ S.marks.push('支线收束·'+name+'·'+ending);
+ S.marks.push('已见·'+name);
+ chr('支线收束·'+name);
+ await say(c===0?'你与旧识约定，日后仍以此事相互照应。':(c===1?'你把这段经历整理成记录，留给后来者作参考。':'你们没有强求同行，只将这段相逢妥善收在记忆里。'),'sys');
+ renderPanel();return true;
+}
+async function eraMortalExtraDispatch(name){
+ var e=null,i;
+ for(i=0;i<ERA_MORTAL_EXTRA.length;i++){if(ERA_MORTAL_EXTRA[i].n===name){e=ERA_MORTAL_EXTRA[i];break;}}
+ if(!e||e.era!==S.eraIdx||hasMark('已见·'+name))return false;
+ await say('【'+e.basis+'】'+e.desc,'sys');
+ var c=await optW(name,[['细查来历',40],['出手相助',35],['收存线索',25]]);
+ var _branch=c===0?'细查来历':(c===1?'出手相助':'收存线索');
+ if(c===0){S.tIdx=Math.min(8,S.tIdx+1);await say('你从旧闻与细节中理出头绪，才情+1。','good');}
+ else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await say('你没有只顾自身，心性与声望都得到磨砺，道心+1，道德+1。','good');}
+ else{S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你将线索妥善收好，道缘+1。','gold');}
+ if(ERA_MORTAL_LINKS.some(function(x){return x.from===name;}))S.marks.push('支线选择·'+name+'·'+_branch);
+ S.marks.push('已见·'+name);chr(name);renderPanel();return true;
+}
+
 async function genericEvent(name){
  EVENT_PRESENCE_SHOWN=false;
  var _eraPool=ERA_MORTAL_EVENTS[S.eraIdx]||[];
@@ -5565,6 +6045,8 @@ async function genericEvent(name){
  await eventCharacterPresence(name); /* v1.37：仅为已有标记追加叙事，不改变事件判定与结算 */
  if(name.indexOf('时代余烬·')===0){await eraLifeScene(name);return;}
  if(await raceStoryDispatch(name))return;
+ if(await eraMortalLinkDispatch(name))return; /* v1.43：前置选择驱动的时代支线后续 */
+ if(await eraMortalExtraDispatch(name))return; /* v1.42：新增时代事件独立分发 */
  /* v1.14.36 出生地专属 */
  if(await birthStoryDispatch(name))return;
  if(S.eraIdx===2){
@@ -5734,6 +6216,8 @@ function lowestSchool(){
  return m||mainSchool()||{name:'主修',realm:0};
 }
 async function doTravail(n){
+ await socialMemoryAside(n);
+ await socialMemoryChoice(n);
  if(n==='种族传承·'+S.race){
   var text={
    '人族':'你在古籍与人道遗篇中追索人祖传说。人族的灵性与组织能力，使其能不断学习、整合百家之长。',
@@ -5760,6 +6244,7 @@ async function doTravail(n){
  if(n==='天庭·人道防线'){
   await say('中洲炼道大会召开在即，天庭修复宿命蛊的计划牵动五域局势。正元老人调动人道手段，秦鼎菱统筹战力；紫薇仙子则持续推演潜伏者。炼道大会与不败福地、帝君城、隐藏龙窟及天庭本部的战局逐渐连成一线。','sys');
   var ht=await optW('天庭·人道防线',[['协助正元老人梳理人道意志',40],['向秦鼎菱交换战场情报',35],['暗中观察紫薇推演',25]]);
+  setFactionRelation('天庭',ht===0?'协助':(ht===1?'情报交换':'旁观'),n);
   if(ht===0){S.morIdx=Math.min(7,S.morIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你看见人道众意如何汇聚，也看见它并非没有代价——道德+1，道缘+1。','gold');}
   else if(ht===1){S.tIdx=Math.min(8,S.tIdx+1);await say('秦鼎菱只交换了战场外围情报，真正的运道底牌仍然保留——才情+1。','good');}
   else{if(await rollW(48+rlm('智道')*5,'天庭推演旁观盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你从星算与人道布置的交界处看出一处破绽——道心+1。','gold');}else{S.pctMods-=0.03;await say('推演余波扫过你的心神，你留下了可疑痕迹（权重-3%）。','bad');}}
@@ -5768,6 +6253,7 @@ async function doTravail(n){
  if(n==='长生天·北原合纵'){
   await say('北原各部并非天然一心。长生天借助巨阳仙尊的威望整合黄金血脉与散修，冰塞川负责联络与布局；楚度等北原强者各有自己的算盘。长生天能号令一部分北原，却不能让所有人毫无保留地听命。','sys');
   var cs=await optW('长生天·北原合纵',[['替冰塞川递送部族情报',40],['拜访楚度，谈北原散修立场',35],['只观察黄金血脉盟议',25]]);
+  setFactionRelation('长生天',cs===0?'递送情报':(cs===1?'接触散修':'旁观盟议'),n);
   if(cs===0){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('情报送达劫运坛，冰塞川记下你这份人情，却没有许诺让你进入核心——道缘+1，才情+1。','gold');}
   else if(cs===1){if(await rollW(48+S.tIdx*4,'楚度论势盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('楚度不愿受人驱使，你也没有强求；北原散修与长生天之间仍留着可谈的余地——道心+1。','good');}else{S.pctMods-=0.03;await say('谈话不欢而散，你被当成某一方的说客（权重-3%）。','bad');}}
   else{S.tIdx=Math.min(8,S.tIdx+1);await say('黄金血脉愿意响应号召，但各部利益并不相同——才情+1。','good');}
@@ -5776,6 +6262,7 @@ async function doTravail(n){
  if(n==='影宗·中洲暗线'){
   await say('影宗并未因紫山真君的遗谋而变成一支能公开列阵的军队。影无邪与残部各自求生，白凝冰、黑楼兰等人的立场也不完全相同；你发现他们真正能做的，是在天庭视线之外制造牵制、传递情报与保全传承。','sys');
   var sy=await optW('影宗·中洲暗线',[['协助影无邪转移残部',40],['替黑楼兰打探北原消息',35],['取走一份影宗情报后离开',25]]);
+  setFactionRelation('影宗',sy===0?'协助转移':(sy===1?'打探消息':'取走情报'),n);
   if(sy===0){if(await rollW(45+rlm('魂道')*5+S.dhIdx*2,'影宗转移盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('残部暂时脱离追踪，但影宗没有因此恢复昔日规模——道心+1。','gold');}else{S.pctMods-=0.04;await say('天庭追踪线逼近，转移被迫中断（权重-4%）。','bad');}}
   else if(sy===1){S.tIdx=Math.min(8,S.tIdx+1);await say('黑楼兰只给出有限消息，她仍按自己的目标行事——才情+1。','good');}
   else{await wormUp(1);S.morIdx=Math.max(0,S.morIdx-1);await say('你带走一份残缺情报与蛊材，影宗残部也失去了一处联络点——完善度+1，道德-1。','bad');}
@@ -6609,25 +7096,65 @@ function wujiRaise(name,n){
    ===================================================================== */
 var ERA_MORTAL_EVENTS={
  0:[{n:'气墙初试',w:12},{n:'天地人三气论',w:11},{n:'借气修行',w:10},
-    {n:'气道晨课',w:10},{n:'气道残篇',w:9},{n:'三气异动',w:9},{n:'时代余烬·元始',w:1}],
+    {n:'气道晨课',w:10},{n:'气道残篇',w:9},{n:'三气异动',w:9},{n:'时代余烬·元始',w:1},
+     {n:'气脉分田',w:8,g:function(){return !hasMark('已见·气脉分田');}},
+     {n:'元始遗训',w:8,g:function(){return !hasMark('已见·元始遗训');}},
+     {n:'异人来使',w:8,g:function(){return !hasMark('已见·异人来使');}},
+     {n:'天庭旧制',w:8,g:function(){return !hasMark('已见·天庭旧制');}},],
  1:[{n:'观星夜课',w:12},{n:'棋盘残局',w:11},{n:'天庭招贤',w:10},
-    {n:'星象异变',w:10},{n:'智道论道',w:10},{n:'星轨刻石',w:9},{n:'时代余烬·星宿',w:1}],
+    {n:'星象异变',w:10},{n:'智道论道',w:10},{n:'星轨刻石',w:9},{n:'时代余烬·星宿',w:1},
+     {n:'星宿棋痕',w:8,g:function(){return !hasMark('已见·星宿棋痕');}},
+     {n:'智道书院',w:8,g:function(){return !hasMark('已见·智道书院');}},
+     {n:'天庭旧册',w:8,g:function(){return !hasMark('已见·天庭旧册');}},
+     {n:'星门传令',w:8,g:function(){return !hasMark('已见·星门传令');}},],
  2:[{n:'偶遇凡人时期无极',w:12},{n:'魔音初啼',w:12},{n:'九虚残页',w:12},
-    {n:'道场役工',w:10},{n:'凶地兽潮',w:10},{n:'一块石头',w:5},{n:'时代余烬·无极',w:1}],
+    {n:'道场役工',w:10},{n:'凶地兽潮',w:10},{n:'一块石头',w:5},{n:'时代余烬·无极',w:1},
+     {n:'无极石壁',w:8,g:function(){return !hasMark('已见·无极石壁');}},
+     {n:'疯魔窟役工',w:8,g:function(){return !hasMark('已见·疯魔窟役工');}},
+     {n:'九虚回响',w:8,g:function(){return !hasMark('已见·九虚回响');}},
+     {n:'道场封门',w:8,g:function(){return !hasMark('已见·道场封门');}},],
  3:[{n:'兽潮避难',w:12},{n:'剥皮换衣',w:11},{n:'角力定份',w:10},
-    {n:'生吃兽核',w:10},{n:'部落招婿',w:9},{n:'变化走火',w:9},{n:'时代余烬·狂蛮',w:1}],
+    {n:'生吃兽核',w:10},{n:'部落招婿',w:9},{n:'变化走火',w:9},{n:'时代余烬·狂蛮',w:1},
+     {n:'狂蛮兽图',w:8,g:function(){return !hasMark('已见·狂蛮兽图');}},
+     {n:'部族盟誓',w:8,g:function(){return !hasMark('已见·部族盟誓');}},
+     {n:'异人猎场',w:8,g:function(){return !hasMark('已见·异人猎场');}},
+     {n:'变化道遗骨',w:8,g:function(){return !hasMark('已见·变化道遗骨');}},],
  4:[{n:'昨日重影',w:12},{n:'时漏失灵',w:11},{n:'老死复生',w:10},
-    {n:'飞刃传闻',w:10},{n:'改命小贩',w:9},{n:'红莲夜雨',w:9},{n:'时代余烬·红莲',w:1}],
+    {n:'飞刃传闻',w:10},{n:'改命小贩',w:9},{n:'红莲夜雨',w:9},{n:'时代余烬·红莲',w:1},
+     {n:'红莲残瓣',w:8,g:function(){return !hasMark('已见·红莲残瓣');}},
+     {n:'光阴渡口',w:8,g:function(){return !hasMark('已见·光阴渡口');}},
+     {n:'宿命旧说',w:8,g:function(){return !hasMark('已见·宿命旧说');}},
+     {n:'红莲棋局',w:8,g:function(){return !hasMark('已见·红莲棋局');}},],
  5:[{n:'青莲初绽',w:12},{n:'画壁留名',w:11},{n:'神帝城旧闻',w:10},
-    {n:'木道新芽',w:10},{n:'丹青问心',w:10},{n:'青莲托梦',w:9},{n:'时代余烬·元莲',w:1}],
+    {n:'木道新芽',w:10},{n:'丹青问心',w:10},{n:'青莲托梦',w:9},{n:'时代余烬·元莲',w:1},
+     {n:'元莲画意',w:8,g:function(){return !hasMark('已见·元莲画意');}},
+     {n:'神帝城画工',w:8,g:function(){return !hasMark('已见·神帝城画工');}},
+     {n:'天元宝莲',w:8,g:function(){return !hasMark('已见·天元宝莲');}},
+     {n:'豆神宫旧闻',w:8,g:function(){return !hasMark('已见·豆神宫旧闻');}},],
  6:[{n:'指缝里的风',w:12},{n:'六转哄八转',w:10},{n:'雪人夜行',w:10},
-    {n:'盗天遗梦',w:10},{n:'十道真传',w:8},{n:'街市无影',w:10},{n:'时代余烬·盗天',w:1}],
+    {n:'盗天遗梦',w:10},{n:'十道真传',w:8},{n:'街市无影',w:10},{n:'时代余烬·盗天',w:1},
+     {n:'盗天空门',w:8,g:function(){return !hasMark('已见·盗天空门');}},
+     {n:'本杰孙旧闻',w:8,g:function(){return !hasMark('已见·本杰孙旧闻');}},
+     {n:'遁空蛊残图',w:8,g:function(){return !hasMark('已见·遁空蛊残图');}},
+     {n:'长毛炼场',w:8,g:function(){return !hasMark('已见·长毛炼场');}},],
  7:[{n:'血祭夜',w:12},{n:'族谱记名',w:11},{n:'运道小赌',w:10},
-    {n:'北原赛马',w:10},{n:'弃子逃亡',w:9},{n:'日蚀传言',w:9},{n:'时代余烬·巨阳',w:1}],
+    {n:'北原赛马',w:10},{n:'弃子逃亡',w:9},{n:'日蚀传言',w:9},{n:'时代余烬·巨阳',w:1},
+     {n:'巨阳王庭',w:8,g:function(){return !hasMark('已见·巨阳王庭');}},
+     {n:'黄金血脉',w:8,g:function(){return !hasMark('已见·黄金血脉');}},
+     {n:'运道签摊',w:8,g:function(){return !hasMark('已见·运道签摊');}},
+     {n:'北原婚盟',w:8,g:function(){return !hasMark('已见·北原婚盟');}},],
  8:[{n:'空村拾遗',w:12},{n:'白骨原野',w:12},{n:'无主蛊群',w:12},
-    {n:'灭门旧宅',w:10},{n:'荒地灵泉',w:10},{n:'魂灯夜话',w:8},{n:'时代余烬·幽魂',w:1}],
+    {n:'灭门旧宅',w:10},{n:'荒地灵泉',w:10},{n:'魂灯夜话',w:8},{n:'时代余烬·幽魂',w:1},
+     {n:'幽魂魂碑',w:8,g:function(){return !hasMark('已见·幽魂魂碑');}},
+     {n:'影宗余烬',w:8,g:function(){return !hasMark('已见·影宗余烬');}},
+     {n:'青家旧恨',w:8,g:function(){return !hasMark('已见·青家旧恨');}},
+     {n:'魂兽过境',w:8,g:function(){return !hasMark('已见·魂兽过境');}},],
  9:[{n:'净土施粥',w:12},{n:'厚土石窟',w:11},{n:'万家灯会',w:10},
-    {n:'归土安魂',w:10},{n:'渡口问心',w:10},{n:'乐土钟声',w:9},{n:'时代余烬·乐土',w:1}],
+    {n:'归土安魂',w:10},{n:'渡口问心',w:10},{n:'乐土钟声',w:9},{n:'时代余烬·乐土',w:1},
+     {n:'乐土行愿',w:8,g:function(){return !hasMark('已见·乐土行愿');}},
+     {n:'乐土门人传法',w:8,g:function(){return !hasMark('已见·乐土门人传法');}},
+     {n:'悔哭海传闻',w:8,g:function(){return !hasMark('已见·悔哭海传闻');}},
+     {n:'净土遗规',w:8,g:function(){return !hasMark('已见·净土遗规');}},],
  /* 炼天之世：青茅山凡人见闻（原通用表归入本世）+ 出生地/世数专属 */
  10:[/* v1.25：移除固定强制战斗类凡人事件（小兽潮支援/年末演武/山道遇袭/行旅救援） */
      {n:'蛤蟆商队',w:11},{n:'灵泉告急',w:10},
@@ -6656,8 +7183,17 @@ var ERA_MORTAL_EVENTS={
      /* v1.14.36 商心慈长线 */
      {n:'商心慈·密谈',w:11,g:function(){return hasMark('商心慈信一角')&&!hasMark('商家定约·合作')&&!hasMark('商家定约·姻盟')&&!hasMark('商家拒约');}},
      {n:'商心慈·联姻局',w:10,g:function(){return hasMark('商家定约·姻盟')&&!hasMark('商心慈同盟');}},
-     {n:'商心慈·危城夜',w:10,g:function(){return (hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商城共守');}},{n:'时代余烬·炼天',w:1}]
+     {n:'商心慈·危城夜',w:10,g:function(){return (hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商城共守');}},{n:'时代余烬·炼天',w:1},
+     {n:'方源旧迹·狐仙福地',w:8,g:function(){return S.fyLife===2&&!hasMark('已见·方源旧迹·狐仙福地');}},
+     {n:'凤九歌·命运余音',w:8,g:function(){return S.fyLife===2&&!hasMark('已见·凤九歌·命运余音');}},
+     {n:'龙公旧令',w:8,g:function(){return !hasMark('已见·龙公旧令');}},
+     {n:'五域气潮迁徙',w:8,g:function(){return S.fyLife===2&&!hasMark('已见·五域气潮迁徙');}},]
 };
+/* v1.43：后续节点仅在对应前置事件已选择后进入当世池；每条只触发一次。 */
+ERA_MORTAL_LINKS.forEach(function(link){
+ var pool=ERA_MORTAL_EVENTS[link.era];
+ if(pool)pool.push({n:link.n,w:8,g:function(){return eraLinkReady(link.n);}});
+});
 /* v1.37：时代余烬·凡人侧写。每个时代一则，不提供数值奖励、不改变旧事件逻辑。 */
 async function eraLifeScene(name){
  var scenes={
@@ -7723,16 +8259,19 @@ async function lianF8(){
   if(ok){S.tIdx=Math.min(8,S.tIdx+1);await wormUp(1);await say('对练见真章。才情+1，完善度+1。','good');}
   else{await say('你落了下风。方正没有笑，只是说：「下次再来。」','');}
   if(!hasMark('识方正'))S.marks.push('识方正');
+  if(!hasMark('古月方正·对练'))S.marks.push('古月方正·对练');
  }else if(c===1){
   await say('你没有接刀，只点出他出招时肩肘的一处滞涩。','');
   await say('方正愣了愣，随即认真点头：「多谢。家老总说我心急——原来是这里。」','sys');
   S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);
   if(!hasMark('识方正'))S.marks.push('识方正');
+  if(!hasMark('古月方正·指点'))S.marks.push('古月方正·指点');
   await say('道心+1，道德+1。这份善意，他大概会记很久。','good');
  }else{
   await say('你点了点头，没有停步。','');
   await say('方正的笑容僵了一瞬，随即又扬起来：「那……后会有期？」','sys');
   S.morIdx=Math.max(0,S.morIdx-1);
+  if(!hasMark('古月方正·冷淡'))S.marks.push('古月方正·冷淡');
   await say('道德-1。有些同族的路，从一开始就不是同路。','bad');
  }
  chr('古月方正');
@@ -7802,15 +8341,18 @@ async function lianF11(){
   await say('「族里的人，不必见外。你若愿学医蛊，午后可以来我这边。」','sys');
   S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await wormUp(1);
   if(!hasMark('识青书'))S.marks.push('识青书');
+  if(!hasMark('古月青书·受诊'))S.marks.push('古月青书·受诊');
   await say('道心+1，道德+1，完善度+1。获【识青书】。','good');
  }else if(c===1){
   await say('你谢过，转而问他行气时如何护住经脉。他想了想，在沙地上画了三道简易图。','');
   S.tIdx=Math.min(8,S.tIdx+1);S.dhIdx=Math.min(8,S.dhIdx+1);
   if(!hasMark('识青书'))S.marks.push('识青书');
+  if(!hasMark('古月青书·请教'))S.marks.push('古月青书·请教');
   await say('才情+1，道心+1。他的教法没有私藏。','good');
  }else{
   await say('你抽回手。青书一顿，随即笑了笑：「疑心重也好，能活得久些。」','sys');
   S.dhIdx=Math.min(8,S.dhIdx+1);
+  if(!hasMark('古月青书·存疑'))S.marks.push('古月青书·存疑');
   await say('道心+1。他没有恼。','good');
  }
  if(!hasMark('识青书'))S.marks.push('识青书');
@@ -8389,6 +8931,7 @@ async function doKeyTrial(n){
  if(n==='南疆·五域联军'){
   await say('南疆武家家主武庸不愿天庭以宿命蛊凌驾五域，池曲由则从阵道角度寻找不败福地的破绽。各大超级家族利益并不一致，但在天庭威胁面前，南疆开始形成暂时的共同战线。','gold');
   var wy=await optW('南疆·五域联军',[['协助池曲由推演破阵',40],['向武庸递交联军情报',35],['联络乔家与其他家族',25]]);
+  setFactionRelation('五域势力',wy===0?'协助破阵':(wy===1?'递交情报':'联络诸家'),n);
   if(wy===0){if(await rollW(48+rlm('阵道')*6+S.tIdx*2,'南疆破阵推演盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('阵纹被你补出一处缺口，池曲由据此修正推演——阵道精进，道缘+1。','gold');}else{S.pctMods-=0.04;await say('阵中反制发动，你及时退开（权重-4%）。','bad');}}
   else if(wy===1){S.tIdx=Math.min(8,S.tIdx+1);await say('武庸收下情报，却只承诺在共同目标上合作；南疆不会把家族命运交给外人——才情+1。','good');}
   else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('各家各有私心，乔家与其他家族只同意有限协助。你学会在盟约中保留退路——道心+1。','good');}
@@ -8397,6 +8940,7 @@ async function doKeyTrial(n){
  if(n==='西漠·帝君城援军'){
   await say('西漠诸家对天庭插手五域早有不满。方家、萧家等超级势力各有利益盘算，并非单纯为了方源而战；他们借宿命大战的机会牵制中洲天庭，与方源只是阶段性目标重合。','sys');
   var xd=await optW('西漠·帝君城援军',[['协助方迪昌协调仙蛊屋',40],['替萧家护送蛊材',35],['探查帝君城外围阵线',25]]);
+  setFactionRelation('五域势力',xd===0?'协调联军':(xd===1?'护送蛊材':'外围侦察'),n);
   if(xd===0){if(await rollW(48+rlm('智道')*5+rlm('阵道')*3,'西漠协调盘')){S.tIdx=Math.min(8,S.tIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('方迪昌将各家仙蛊屋的行动次序重新排定，临时联军得以协同——才情+1，道缘+1。','gold');}else{S.pctMods-=0.03;await say('各家不愿交出底牌，协调只完成一半（权重-3%）。','bad');}}
   else if(xd===1){await wormUp(1);await say('蛊材送达，萧家记下这份人情；但西漠诸家仍保留各自的退路——完善度+1。','good');}
   else{if(await rollW(50+S.lv*3,'帝君城侦察盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你摸清了帝君城外围的防线变化——道心+1。','gold');}else{S.pctMods-=0.03;await say('侦察被中洲蛊仙察觉，你带伤撤离（权重-3%）。','bad');}}
@@ -8405,6 +8949,7 @@ async function doKeyTrial(n){
  if(n==='东海·龙宫战局'){
   await say('东海各大超级势力围绕龙宫与隐藏龙窟展开争夺。沈从声等人有自己的家族利益，古月方源与长生天也各有目标；帝藏生被镇压在龙宫相关布置之下，东海诸仙的合作随时可能因仙蛊屋归属而破裂。','sys');
   var dh=await optW('东海·龙宫战局',[['协助东海蛊仙破解隐藏龙窟阵法',40],['向沈从声交换龙宫情报',35],['观察帝藏生封印变化',25]]);
+  setFactionRelation('五域势力',dh===0?'协助破阵':(dh===1?'交换情报':'观察封印'),n);
   if(dh===0){if(await rollW(48+rlm('阵道')*5+S.tIdx*2,'隐藏龙窟破阵盘')){setRealm('阵道',Math.min(7,Math.max(1,rlm('阵道')+1)));await say('阵法被撕开一道缝隙，东海诸仙趁势推进；龙宫归属仍未定——阵道精进。','gold');}else{S.pctMods-=0.04;await say('阵法反击，东海诸仙各自退守（权重-4%）。','bad');}}
   else if(dh===1){S.tIdx=Math.min(8,S.tIdx+1);await say('沈从声只交换外围情报，不肯透露沈家真正的筹码——才情+1。','good');}
   else{if(await rollW(50+rlm('魂道')*3,'帝藏生封印观察盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你看出封印与龙宫之间存在牵连，却没有贸然触动帝藏生——道心+1。','gold');}else{S.life=Math.max(1,S.life-2);await say('封印震荡，你被余波逼退，耗去两年寿元。','bad');}}
@@ -10331,7 +10876,7 @@ async function ending(name,quote,opts){
   hint:opts.hint||quote||'',
   epilogue:endingEpilogue(name,quote,opts)
  });
- RESULT.end=name;dexAdd('end',name);achvFin(); /* v1.4.14 成就终局结算；v1.4.17 结局图鉴登记 */
+ RESULT.end=name;closeRun('ending',name);dexAdd('end',name);achvFin(); /* v1.4.14 成就终局结算；v1.4.17 结局图鉴登记 */
  log('═══ 终局：'+name+' ═══','gold');
  VOICE.say('终局，'+name,{priority:true,vol:0.75});
  await say('命运的转盘，停在了终局——【'+name+'】。','gold');
@@ -10639,7 +11184,10 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  '空村拾遗','白骨原野','无主蛊群','灭门旧宅','荒地灵泉','魂灯夜话', /* 近古·幽魂 */
  '净土施粥','厚土石窟','万家灯会','归土安魂','渡口问心','乐土钟声', /* 近古·乐土 */
  '青茅山祭祖','古月学舍','白家冰心','熊家猎场','春秋蝉蜕','方源同门','白凝冰·月下','白凝冰·竹林试剑','古月方正','古月青书','贾金生·赌石','酒仙遗踪','商心慈·账房','商睚·比宝','商家夜宴','商城拍卖','商家城一游','商心慈·密谈','商心慈·联姻局','商心慈·危城夜','白骨坊市','武家差遣','铁家风波','三叉山旧影','义天山风闻','黑家议事','王庭阴影','刘家余烬','雪原夜话','灵缘听雨','仙鹤门下','战仙演武','沈家海盟','诗情海域','狐仙福地·初临','地灵三问','狐仙真传·认主','鹤门压境','福地稳固','琅琊地灵','星象观台','黑凡残局','铁鹰旧主', /* 出生地专属+青茅山 */
- '时代余烬·元始','时代余烬·星宿','时代余烬·无极','时代余烬·狂蛮','时代余烬·红莲','时代余烬·元莲','时代余烬·盗天','时代余烬·巨阳','时代余烬·幽魂','时代余烬·乐土','时代余烬·炼天'
+ '时代余烬·元始','时代余烬·星宿','时代余烬·无极','时代余烬·狂蛮','时代余烬·红莲','时代余烬·元莲','时代余烬·盗天','时代余烬·巨阳','时代余烬·幽魂','时代余烬·乐土','时代余烬·炼天',
+ /* v1.42：新增十一时代凡人事件 */ '气脉分田', '元始遗训', '异人来使', '天庭旧制', '星宿棋痕', '智道书院', '天庭旧册', '星门传令', '无极石壁', '疯魔窟役工', '九虚回响', '道场封门', '狂蛮兽图', '部族盟誓', '异人猎场', '变化道遗骨', '红莲残瓣', '光阴渡口', '宿命旧说', '红莲棋局', '元莲画意', '神帝城画工', '天元宝莲', '豆神宫旧闻', '盗天空门', '本杰孙旧闻', '遁空蛊残图', '长毛炼场', '巨阳王庭', '黄金血脉', '运道签摊', '北原婚盟', '幽魂魂碑', '影宗余烬', '青家旧恨', '魂兽过境', '乐土行愿', '乐土门人传法', '悔哭海传闻', '净土遗规', '方源旧迹·狐仙福地', '凤九歌·命运余音', '龙公旧令', '五域气潮迁徙',
+ /* v1.43：时代连续支线后续（只登记时代池事件；凡人场景/随机奇遇不登记） */
+ '气脉旧契','星棋续局','石壁守夜','兽图盟约','渡口归信','画工留名','归乡残页','王庭分肉','余烬密令','行愿回灯','迁徙旧识'
 ];
 /* 游历/历练事件静态清单：从 doTravail / doKeyTrial 的 if 分支提取
  一次性维护，加新游历时往这里补一行 */
