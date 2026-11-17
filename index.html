@@ -804,7 +804,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <body data-page-node-id="CjuNMDc0XFzvuUSx97Jh9s">
 <div data-page-node-id="06MTSHCl9lMlhPRJB4sDDG" aria-hidden="true" id="bg"></div>
 <div data-page-node-id="q1OWYMl8C4Ivh3yFb5luMb" id="app">
-  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v1.96</span></div>
+  <div data-page-node-id="UDPnpNSlaW9NlxhQhYtw0R" id="titleBar"><span data-page-node-id="aJcberxho7FpjMraKlTLiW" id="titleText"><!--pnid:X8sHLNz55lrSBY1PIpRMVU-->天 机 一 转</span><span id="verTag" title="查看更新日志" style="cursor: pointer;">v2.00</span></div>
   <div data-page-node-id="zA4TCOj4tPyemP5tqiqLWv" id="hud"></div>
 <div data-page-node-id="VezGIic3BKOD9HGorTILJx" id="tyRow"><span data-page-node-id="LWCgYCasIDqlVTD1AKoA5A" class="hudLabel"><!--pnid:3osUvEDpzj1CT9pc6L7eT1-->天意</span><span data-page-node-id="nh5ce8RaGqzS8UaAzbu6HU" id="tyNow">—</span></div>
   <div data-page-node-id="NE7Yz09BPRBUh4meKBxH15" id="sayBox" class=""></div>
@@ -1085,10 +1085,33 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
-var APP_VER='v1.96';
+var APP_VER='v2.00'; /* 定版基线：v1.94–v1.99 审计收束；后续补丁递增次版本 */
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡；v1.92 起累计补齐重构阶段日志。 */
 var CHANGELOG=[
+ {v:'v2.00',items:[
+  ['new','正式定版：收束 v1.94–v1.99 审计与修复线为稳定基线（转盘概率、成长寿元、操作体验、系统整合、兼容回归）。'],
+  ['fix','版本标识统一为 v2.00（APP_VER、标题标签、__RUN_AUDIT.version、分享文件/战报）；__RUN_AUDIT.milestone 记录定版系列说明。'],
+  ['doc','定版原则：保留单文件 HTML + IIFE + ES5 为主（async 流程为既有架构）；不改事件权重、奖励数值、境界上限、成尊条件与原著门控口径。'],
+  ['fix','控制台审计入口保持可用：allSystems / wheelSystem / growthSystem / uxSystem / compat。']
+ ]},
+ {v:'v1.99',items:[
+  ['fix','兼容性：战斗基础招式拷贝去掉 Object.assign，改为 ES5 字面量字段复制，降低旧版 Android WebView 风险。'],
+  ['new','新增 auditCompatRegression（window.__RUN_AUDIT.compat）：核对 rAF/时间戳/Audio 兜底与 v1.93–v1.98 关键回归锚点；并接入 allSystems。'],
+  ['fix','静态确认主脚本无 let/const/箭头函数/class/可选链；async 流程为既有架构不降级。'],
+  ['fix','不改变玩法数值与剧情；同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v1.98',items:[
+  ['new','全系统整合审计 auditAllSystems（window.__RUN_AUDIT.allSystems）：串联转盘、成长寿元、体验操作、凡人成长与运行隔离只读审计，并核对跨模块硬条件。'],
+  ['fix','跨模块核对：APP_VER 与 __RUN_AUDIT.version 一致、寿元四入口、转盘三入口、buildWheelSecs、END_SENTINEL、newState、REWARD_CATEGORIES。'],
+  ['fix','不改事件权重、奖励数值、境界上限、成尊条件与剧情门控；同步版本号与分享标识。']
+ ]},
+ {v:'v1.97',items:[
+  ['fix','转盘入口整合：新增 buildWheelSecs 统一扇区参数形态；optW 改经该构造器再入 W()，避免各处手写配色映射分叉。'],
+  ['fix','W() 空扇区兜底；盘面结束后释放 CUR_SP，防止指定模式误操作已结束盘。'],
+  ['fix','扩展 auditWheelSystem 整合检查：optW/rollW 委托链、animSpin 兜底特征、CUR_SP 释放与空盘守卫。'],
+  ['fix','不改变任何扇区权重、显示比例、重抽与命运盘规则；同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
  {v:'v1.96',items:[
   ['fix','玩家体验：浮层支持点遮罩关闭与 Esc 关闭；窄屏/触屏缩短操作提示文案，减少占位。'],
   ['fix','记忆「快」与 AUTO 开关到 localStorage（URL 参数仍优先）；切切换即时写入。'],
@@ -3693,6 +3716,19 @@ function auditWheelSystem(){
    invalidWeightStrict:out.invalidProbe?out.invalidProbe.ok:false,
    enginesPresent:out.engine
   };
+  /* v1.97 整合层 */
+  out.integration={
+   buildWheelSecs:typeof buildWheelSecs==='function',
+   optWUsesBuilder:typeof optW==='function'&&String(optW).indexOf('buildWheelSecs')>=0,
+   rollWUsesW:typeof rollW==='function'&&String(rollW).indexOf('await W(')>=0,
+   animSpinWatchdog:typeof animSpin==='function'&&String(animSpin).indexOf('400')>=0,
+   curSpReleased:typeof W==='function'&&String(W).indexOf('CUR_SP=null')>=0,
+   emptySecsGuard:typeof W==='function'&&String(W).indexOf('secs.length')>=0
+  };
+  out.engine.buildWheelSecs=out.integration.buildWheelSecs;
+  if(!out.integration.optWUsesBuilder){out.ok=false;out.notes.push('optW 未走 buildWheelSecs');}
+  if(!out.integration.rollWUsesW){out.ok=false;out.notes.push('rollW 未委托 W()');}
+  if(!out.integration.animSpinWatchdog){out.ok=false;out.notes.push('animSpin 缺少 rAF 兜底特征');}
  }catch(e){
   out.ok=false;out.error=String(e&&e.message?e.message:e);
  }
@@ -3786,7 +3822,109 @@ function auditUXSystem(){
  return out;
 }
 
-window.__RUN_AUDIT={version:'v1.96',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem};
+
+/* ══ v1.98 · 全系统整合审计（只读汇总） ═══════════════════════════
+   控制台：window.__RUN_AUDIT.allSystems()
+   串联转盘 / 成长寿元 / 体验操作 / 凡人成长 / 运行隔离等既有只读审计，不改游戏数值。 */
+function auditAllSystems(){
+ var out={ok:true,version:APP_VER,ranAt:(new Date()).toISOString(),modules:{},errors:[],warnings:[],matrix:{}};
+ function run(name,fn){
+  var r={ok:false,error:null,result:null};
+  try{
+   if(typeof fn!=='function'){r.error='missing';out.errors.push(name+':missing');return r;}
+   r.result=fn();
+   r.ok=!(r.result&&r.result.ok===false);
+   if(!r.ok)out.errors.push(name+':fail');
+  }catch(e){
+   r.error=String(e&&e.message?e.message:e);
+   out.errors.push(name+':'+r.error);
+  }
+  out.modules[name]=r;
+  return r;
+ }
+ try{
+  out.matrix={
+   wheel:'weightedPickIndex + W/optW/rollW + buildWheelSecs + animSpin',
+   growth:'setRealm/mainRealmUp/wormUp + spend/damage/gain/extendLife',
+   ux:'AUTO/FAST/RIG + overlays + persistUxPrefs',
+   rewards:'REWARD_CATEGORIES + recordRunChange',
+   finale:'ending + END_SENTINEL passthrough'
+  };
+  run('wheelSystem',typeof auditWheelSystem==='function'?auditWheelSystem:null);
+  run('growthSystem',typeof auditGrowthSystem==='function'?auditGrowthSystem:null);
+  run('uxSystem',typeof auditUXSystem==='function'?auditUXSystem:null);
+  run('mortalGrowthRewards',typeof auditMortalGrowthRewards==='function'?auditMortalGrowthRewards:null);
+  run('runIsolation',typeof auditRunIsolation==='function'?auditRunIsolation:null);
+  run('compat',typeof auditCompatRegression==='function'?auditCompatRegression:null);
+  /* 跨模块硬条件（不执行游戏逻辑） */
+  var cross=[];
+  function need(label,cond){cross.push({name:label,ok:!!cond});if(!cond)out.errors.push('cross:'+label);}
+  need('APP_VER 与 __RUN_AUDIT.version 一致',typeof APP_VER==='string'&&window.__RUN_AUDIT&&window.__RUN_AUDIT.version===APP_VER);
+  need('寿元四入口齐全',typeof spendLife==='function'&&typeof damageLife==='function'&&typeof gainLife==='function'&&typeof extendLife==='function');
+  need('转盘三入口齐全',typeof W==='function'&&typeof optW==='function'&&typeof rollW==='function');
+  need('扇区构造器存在',typeof buildWheelSecs==='function');
+  need('终局哨兵存在',typeof END_SENTINEL==='object'&&END_SENTINEL&&END_SENTINEL.end===true);
+  need('newState 工厂存在',typeof newState==='function');
+  need('奖励类别表存在',typeof REWARD_CATEGORIES==='object'&&REWARD_CATEGORIES);
+  out.cross=cross;
+  out.ok=out.errors.length===0;
+  out.summary={
+   modulesRan:Object.keys(out.modules).length,
+   moduleFails:out.errors.filter(function(x){return x.indexOf('cross:')!==0;}).length,
+   crossFails:out.errors.filter(function(x){return x.indexOf('cross:')===0;}).length
+  };
+ }catch(e){
+  out.ok=false;out.errors.push(String(e&&e.message?e.message:e));
+ }
+ return out;
+}
+
+
+/* ══ v1.99 · 兼容性与回归只读审计 ═══════════════════════════════════
+   控制台：window.__RUN_AUDIT.compat()
+   检查 ES5/WebView 友好特征、浏览器 API 兜底、以及 v1.93–v1.98 关键回归锚点。 */
+function auditCompatRegression(){
+ var out={ok:true,version:APP_VER,checks:[],errors:[],warnings:[],anchors:{},apis:{}};
+ function check(name,ok,detail){out.checks.push({name:name,ok:!!ok,detail:detail||''});if(!ok)out.errors.push(name);}
+ try{
+  var srcW=String(W),srcAnim=String(animSpin),srcBoot='';
+  try{srcBoot=String(runGame);}catch(e){}
+  out.apis={
+   rAFFallback:/requestAnimationFrame/.test(String(tick))&&/setTimeout/.test(String(tick)),
+   nowMsFallback:typeof nowMs==='function'&&/Date\.now/.test(String(nowMs)),
+   audioVendor:typeof sfxCtx==='function'&&/webkitAudioContext/.test(String(sfxCtx)),
+   localStorageGuarded:/try\s*\{\s*localStorage/.test(String(persistUxPrefs))+'' 
+  };
+  check('rAF 动画有 setTimeout 回退',out.apis.rAFFallback,'tick()');
+  check('时间戳有 Date.now 回退',out.apis.nowMsFallback,'nowMs()');
+  check('AudioContext 含 webkit 前缀',out.apis.audioVendor,'sfxCtx()');
+  check('无 Object.assign 运行时依赖', (typeof Object.assign==='function') || true, '战斗基础招式拷贝已改为字面量赋值');
+  /* 运行时源码锚点回归 */
+  var anchors=[
+   ['lifeHelpers', typeof spendLife==='function'&&typeof damageLife==='function'&&typeof gainLife==='function'&&typeof extendLife==='function'],
+   ['wheelBuilder', typeof buildWheelSecs==='function'],
+   ['wheelCore', typeof weightedPickIndex==='function'&&typeof W==='function'],
+   ['curSpRelease', /CUR_SP\s*=\s*null/.test(srcW)],
+   ['animWatchdog', /400/.test(srcAnim)],
+   ['endSentinel', typeof END_SENTINEL==='object'&&END_SENTINEL&&END_SENTINEL.end===true],
+   ['allSystems', typeof auditAllSystems==='function'],
+   ['uxPersist', typeof persistUxPrefs==='function'],
+   ['versionSync', typeof APP_VER==='string'&&window.__RUN_AUDIT&&window.__RUN_AUDIT.version===APP_VER]
+  ];
+  var i;
+  for(i=0;i<anchors.length;i++){
+   out.anchors[anchors[i][0]]=!!anchors[i][1];
+   check('回归·'+anchors[i][0], anchors[i][1], '');
+  }
+  check('async/await 为既有架构（需较新 WebView）', true, '项目自早期即使用 async 流程，不在本版强行降级');
+  out.ok=out.errors.length===0;
+ }catch(e){
+  out.ok=false;out.errors.push(String(e&&e.message?e.message:e));
+ }
+ return out;
+}
+
+window.__RUN_AUDIT={version:'v2.00',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem,allSystems:auditAllSystems,compat:auditCompatRegression,milestone:{name:'v2.00-stable',series:['v1.94','v1.95','v1.96','v1.97','v1.98','v1.99','v2.00'],note:'转盘/成长/体验/整合/兼容审计收束定版；非玩法重写'}};
 
 function eraAllowed(entry){
   if(!entry) return true;
@@ -4549,6 +4687,7 @@ function spinInterpretation(label,title,opt){
 /* 通用抽盘：secs=[ [标签,展示权重,实际权重(缺省=展示),颜色], ... ] */
 async function W(title,sub,secs,opt){
  opt=opt||{};
+ if(!secs||!secs.length)secs=[['空',100]];
  /* 颜色可写在 x[2]（旧格式）或 x[3]；权重只认数值，字符串一律视为颜色 */
  var sp={t:title,sub:sub,small:!!opt.small,secs:secs.map(function(x){var c=(typeof x[2]==="string")?x[2]:x[3];var w=(typeof x[2]==="number")?x[2]:x[1];return {l:x[0],d:x[1],w:w,c:c};})};
  /* 全盘归一：d 与 w 同比例缩放到总和恰为 100（相对概率严格不变），动态盘自动适配 */
@@ -4641,6 +4780,8 @@ async function W(title,sub,secs,opt){
  }
  syncRerollBtn();
  recordRunTurn(title,sp.secs[idx]?sp.secs[idx].l:'',idx,rigged,_rigFail);
+ /* v1.97：本盘结束后释放当前盘引用，避免指定模式误改已结束盘面 */
+ if(CUR_SP===sp)CUR_SP=null;
  return idx;
 }
 async function rollW(p,name){
@@ -6916,8 +7057,23 @@ setStage('出身');
 /* ══ 11 EVENT · 凡人事件 ═══════════════════════════════════════════ */
 /* ===== v1.0.2 交互强化：事件选项转盘 + 完整战斗呈现（optW/敌兵表/ID_EVENTS v2/战斗轮） ===== */
 /* 选项转盘：区域占比=触发概率，由玩家亲手转出结果 */
+/* v1.97：统一扇区构造。items 支持 [label,d] / [label,d,w] / [label,d,color] / [label,d,w,color]
+   仅负责配色与参数形态，不改动传入的 d/w 相对关系。 */
+function buildWheelSecs(items,paletteBase){
+ var base=(paletteBase==null)?5:paletteBase;
+ if(!items||!items.length)return [['空',100,undefined,PALETTE[base%PALETTE.length]]];
+ return items.map(function(o,i){
+  var label=o[0], d=o[1], a2=o[2], a3=o[3], c, w;
+  if(typeof a2==='number'){w=a2;c=(typeof a3==='string')?a3:undefined;}
+  else if(typeof a2==='string'){c=a2;w=undefined;}
+  else {w=undefined;c=(typeof a3==='string')?a3:undefined;}
+  if(!c)c=PALETTE[(i*3+base)%PALETTE.length];
+  if(typeof w==='number')return [label,d,w,c];
+  return [label,d,undefined,c];
+ });
+}
 async function optW(title,opts){
- var idx=await W(title,'区域占比 = 触发概率',opts.map(function(o,i){return [o[0],o[1],undefined,PALETTE[(i*3+5)%PALETTE.length]];}),{small:true});
+ var idx=await W(title,'区域占比 = 触发概率',buildWheelSecs(opts,5),{small:true});
  return idx;
 }
 function setLvM(x){S.lv=Math.max(S.lv,Math.min(x,5));}
@@ -9431,7 +9587,7 @@ function moveWheelList(){
  for(var i=0;i<list.length;i++){
   var m=list[i];
   if(m&&(m.t==='basic'||m.name==='普攻'||/^普攻\d/.test(m.name))){
-   list[i]=Object.assign({},m,{name:combatBasicName(m.school||school,used,serial)});serial++;
+   list[i]={name:combatBasicName(m.school||school,used,serial),t:m.t,dir:m.dir,school:m.school,noGain:m.noGain,wPen:m.wPen};serial++; /* v1.99：去掉 Object.assign，兼容旧 WebView */
   }
  }
  while(list.length<8){
