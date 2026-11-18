@@ -1076,10 +1076,60 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
-var APP_VER='v2.06'; /* v2.06：炼天时期原著剧情事件接入；撤下主界面剧情按钮 */
+var APP_VER='v2.16'; /* v2.16：补齐敌方通用招式属性识别；四属性统一配色并展示战斗结算明细 */
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡；v1.92 起累计补齐重构阶段日志。 */
 var CHANGELOG=[
+  {v:'v2.16',items:[
+    ['fix','敌方通用招式不再全部默认显示为攻击：按招式语义识别攻击、防御、控制、增益，并将属性带入实际结算。'],
+    ['new','四种属性使用固定颜色：攻击红、防御蓝、控制紫、增益绿；我方与敌方招式盘保持一致，战斗结束增加双方属性效果汇总。'],
+    ['fix','专属敌方招式数组格式兼容显式 dir 字段；旧版数组与对象格式继续兼容。保留原有四属性倍率、出手次数、招式权重与胜负转盘。']
+  ]},
+  {v:'v2.15',items:[
+    ['fix','修复 v2.14 四属性效果不易辨识的问题：我方杀招盘、敌方杀招盘、战斗过程播报及属性面板均显示【攻击/防御/控制/增益】标签。'],
+    ['fix','敌方专属招式保留并读取自身 dir 属性，不再因敌方招式对象丢失属性而统一按攻击处理；通用招式无独立属性时明确显示默认攻击。'],
+    ['bal','四属性效果调整为更明显的战斗差异：攻击本式×1.2；防御令对方总权重×0.8；控制令对方最高单式×0.65；增益令后续招式×1.2，均由敌我双方共用。']
+  ]},
+  {v:'v2.14',items:[
+    ['new','招式牌现有四属性接入战斗：攻击强化本式，防御削弱对方总权重，控制压制对方最高单式，增益强化己方后续招式；敌我双方共用规则。'],
+    ['fix','四属性按招式现有 dir 字段读取，兼容「攻击/防御/控制/增益」全称与原有「攻/防/控/增」缩写；保留原有专属杀招效果、出手次数、八格招式盘及最终胜负转盘。']
+  ]},
+  {v:'v2.13',items:[
+    ['new','黑楼兰力道切磋接入六格专属招式盘，固定三式；考虑当前剧情时间点尚未重修力道，按其大力真武体与肉身力量设计表现名，不将体质名称冒充原著杀招。'],
+    ['fix','紫薇仙子、正元老人、陈衣追杀盘补充招式来源说明：现有六式均为按流派特点设计的游戏原创表现名；天庭律使明确为游戏原创普通追杀职位。保持原有抽取概率、单式战力和追杀规则。']
+  ]},
+ {v:'v2.12',items:[
+  ['new','为冰塞川、影无邪、楚度的关键历练切磋补充六格具名招式盘；保留原有三式出手次数、非致死规则与胜负结算。'],
+  ['new','楚度加入原著明确仙道杀招「身体力行」；影无邪加入既有杀招库「魂啸」。其他补充名称明确标注为游戏原创或原著战斗表现改编，不伪称原著杀招。'],
+  ['fix','新增 namedMoveWheel 统一生成器，抽取权重与单式战力独立配置；各盘保持等概率，不改变人物锚点、单式战力档位及转盘玩法。']
+ ]},
+ {v:'v2.11',items:[
+  ['fix','凤九歌、武庸专属杀招盘改为显式 weight/val 配置：抽取权重独立为 1，单式战力继续沿用凤九歌七转 125、八转 120，武庸普通版 140、Boss 版 170；所有招式仍保持原有等概率。'],
+  ['fix','龙公专属盘统一为 [名称,实际战力,抽取权重]：八种招式保持等概率，攻击数值与随身闪、九龙纹护身、龙御上宾的特殊效果分别读取，不再在战斗循环中重复硬编码攻击数值。'],
+  ['bal','本次只整理专属招式数据结构，不改变凤九歌追加抽取机制、武庸固定五式、龙公每回合两式、三气归来阶段倍率及最终胜负转盘规则。']
+ ]},
+ {v:'v2.10',items:[
+  ['bal','血道×2改为仅作用于血道相关招式，不再放大全部流派的战斗权重；血神子作为血道被动，其额外普攻权重仍享受血道增幅。魔罗原有全局×1.5保持不变。'],
+  ['new','敌方通用招式按敌方流派调用对应流派的具名基础招式池；凡人期与蛊仙期仍保留六格招式盘、原出手次数、单式战力与通用兜底。'],
+  ['fix','专属敌方招式新增独立抽取权重与战斗权重配置格式（weight/val）；旧版[name,val]数组继续兼容，原有抽取概率与战斗数值不变。'],
+  ['fix','方源决战与常规 duel 统一按单式招式流派结算血道增幅；不改既有招式基础值、流派境界加成、胜负转盘下限及其他战斗倍率。']
+ ]},
+ {v:'v2.09',items:[
+  ['fix','修复敌方选择再战后，玩家第二轮战败却仍返回胜利的问题；胜利奖励、掠夺与击杀结算延后至敌方最终退场后执行，避免再战失败仍领取胜利收益。'],
+  ['fix','修复战前补入基础攻击时可能令杀招数组超过八格的问题；补位前按既有容量回收规则腾出位置，并对旧存档超限数组作上限整理。'],
+  ['fix','批量杀招达到 onceN 终身限次后，直接从可抽取权重中禁用，不再占用出手次数后才判定为零权重。']
+ ]},
+ {v:'v2.08',items:[
+  ['new','战斗盘基础攻击备用名称全面优化：按流派提供具名招式，移除「星道·起手式01」等机械占位命名；仅改变展示名，不伪造已习得杀招、不改变权重。'],
+  ['new','原著杀招库新增秋镰、冬裘、天地一视、岁月如梭、阎罗、龙御上宾；统一登记至 SPEC_LIB，自动进入杀招图鉴，并接入批量授予与对应战斗效果。'],
+  ['fix','新增杀招沿用现有时代门控、流派门槛与八格容量规则；不改既有招式数值、事件权重及成尊条件。']
+ ]},
+ {v:'v2.07',items:[
+  ['new','凡人期：元始、星宿、无极、狂蛮、红莲、元莲、盗天、巨阳、乐土九位尊者与青家遗孤青仇，各新增一则可直接对话、选择并改变关系的人物交互事件。'],
+  ['new','升仙后：同一批人物各新增一则本时代专属游历交互，涵盖炉前问气、星盘问对、九虚残局、力祭对饮、光阴一叶、画中问心、空门一诺、真阳赐宴、魂潮夜话、渡魂一灯。'],
+  ['new','炼天时期补入两则人物交互：「方源·同门夜谈」只在第二世青茅山出现，玩家不获得方源身份、记忆或机缘；「陆畏因·南疆论善」只写后世乐土真传的南疆善后，不提前到乐土时期。'],
+  ['fix','人物相遇按游戏原创标注，不改变原著主线、生死与归属；幽魂时期不安排幽魂本尊现身，以青仇承接。选项沿用流派成长、道心道德、道缘三类结算，并写入人物关系记忆。']
+ ]},
  {v:'v2.06',items:[
   ['new','炼天时期（时代 10）新增 8 则原著剧情事件：界壁消散·跨域行商、宿命既碎·问命人、炼蛊大会·外围坊市、逆流河·渡口、影宗残部·暗市、大爱盟·招揽、疯魔窟·外围异象、三尊并立·说书人。'],
   ['new','事件全部接入时代池、时代异闻图鉴与编年目录；第二世专属，玩家只在外围参与，不获取方源身份、记忆与主角机缘。'],
@@ -1817,7 +1867,7 @@ var SCHOOLS=[
  ['炼道','增',23],['运道','增',18],['人道','增',17],['信道','增',16],['气道','增',16],['食道','增',11],['律道','增',8],['光道','增',8],['丹道','增',3],['天道','增',2.2],['魅情道','增',2],
  ['智道','控',28],['宙道','控',21],['魂道','控',16],['奴道','控',15],['梦道','控',16],['宇道','控',10],['音道','控',9],['偷道','控',9],['画道','控',5],['阴阳道','控',2],['幻道','控',2]
 ];
-var GROUP_N={'攻':'攻击','防':'防御','增':'增幅','控':'控制'};
+var GROUP_N={'攻':'攻击','防':'防御','增':'增益','控':'控制'};
 var BIRTHS={
  /* v1.25：有专属剧情的出生地上调（青茅山/商家城/白骨山/义天山/三叉山/狐仙/琅琊等），薄剧情与纯背景板压低 */
  '南疆':[['武仪山·武家',10],['白骨山·白骨寨',11],['万城山·铁家',9],['商家城',16],['青茅山·熊家',12],['青茅山·白家',12],['青茅山·古月',30],['大宅山·夏家',4],['大宅山·巴家',3],['大宅山·乔家',3],['义天山',8],['三叉山',8],['五界山',3],['无名城镇村落',6]],
@@ -1858,7 +1908,8 @@ var REALM_ROW={8:[10,32,38,20],7:[10,32,38,20],6:[20,36,38,6],5:[20,36,38,6],4:[
 var CNT_W=[
  [[1,50],[2,40],[3,10]],[[1,40],[2,40],[3,20]],[[1,30],[2,38],[3,32]],[[1,25],[2,35],[3,28],[4,12]],[[1,20],[2,32],[3,30],[4,18]],
  [[1,15],[2,28],[3,30],[4,20],[5,7]],[[2,20],[3,30],[4,28],[5,15],[6,7]],[[2,15],[3,25],[4,30],[5,20],[6,7],[7,3]],[[3,10],[4,20],[5,30],[6,25],[7,15]]];
-var DRAGON_MOVES=[['乱龙拳',250],['撼世龙锤',200],['龙爪击',190],['气呼山',180],['龙啸波',160],['随身闪',0],['九龙纹护身',0],['龙御上宾',0]];
+/* v2.11：龙公招式统一为 [名称,实际战力,抽取权重]；默认等权，数值效果只读取第二列。 */
+var DRAGON_MOVES=[['乱龙拳',250,1],['撼世龙锤',200,1],['龙爪击',190,1],['气呼山',180,1],['龙啸波',160,1],['随身闪',50,1],['九龙纹护身',0,1],['龙御上宾',0,1]];
 var KMW_RATE=50; /* v1.2.9 增补【狂蛮意志】：出手判定成功率（单点常量，便于调整） */
 /* ===== v1.1.7 凤九歌（音道）专属敌人数据 =====
    · 音道仙道杀招专属杀招盘：七转 6 招；八转额外掌握【命运歌】（七转杀招全部保留）。
@@ -1877,8 +1928,9 @@ var FENG_JIUGE = {
 function fengMoveWheel(zhuan){
  var d=(zhuan>=8?FENG_JIUGE.t8:FENG_JIUGE.t7);
  var per=d.perMove;
- var list=d.hold.map(function(n,i){return [n,per,undefined,PALETTE[(i*3+5)%PALETTE.length]];});
- list.push(['打爽了，再抽两次',per,undefined,'#B7791F']); /* v1.2.6：凤九歌专属扇区——命中追加两次抽取（等权入盘） */
+ /* 抽取权重固定为 1；实际单式战力仍按七转 125 / 八转 120。 */
+ var list=d.hold.map(function(n,i){return {name:n,val:per,weight:1};});
+ list.push({name:'打爽了，再抽两次',val:per,weight:1}); /* 凤九歌专属追加抽取扇区，仍与杀招等概率 */
  return list;
 }
 /* ===== v1.1.11 武庸专属敌人数据（v1.2.6：五界山脉 / 中洲帝君城 双出场 · 七式统一模板） =====
@@ -1898,7 +1950,49 @@ var WU_YONG={
 /* 武庸敌方杀招盘：统一七式模板（等权）；boost=true 为 Boss 版（每式 +bossBonus） */
 function wuYongWheel(boost){
  var per=WU_YONG.perMove+(boost?WU_YONG.bossBonus:0);
- return WU_YONG.hold.map(function(n,i){return [n,per,undefined,PALETTE[(i*3+5)%PALETTE.length]];});
+ /* 抽取权重固定为 1；实际单式战力为基础 140，Boss 版 170。 */
+ return WU_YONG.hold.map(function(n){return {name:n,val:per,weight:1};});
+}
+/* v2.12：补齐北原三位重要人物的具名招式盘。
+   来源标注：楚度「身体力行」为原著明确仙道杀招；影无邪「魂啸」为既有杀招库收录。
+   其余为依据人物流派/战斗方式补足的游戏原创表现名，不冒充原著杀招。
+   各盘权重与单式战力分开，保持等概率；不改变出手次数与胜负结算。 */
+var CHU_DU_MOVES=[
+ {name:'身体力行',source:'原著明确',weight:1,offset:10},
+ {name:'霸力崩山',source:'游戏原创',weight:1,offset:8},
+ {name:'力道震空',source:'游戏原创',weight:1,offset:6},
+ {name:'巨力压顶',source:'游戏原创',weight:1,offset:4},
+ {name:'横冲直撞',source:'游戏原创',weight:1,offset:2},
+ {name:'蛮力破阵',source:'游戏原创',weight:1,offset:0}
+];
+var ICE_SAI_CHUAN_MOVES=[
+ {name:'劫运坛冲撞',source:'原著战斗表现改编',weight:1,offset:10},
+ {name:'运势逆转',source:'游戏原创',weight:1,offset:8},
+ {name:'金霞护身',source:'游戏原创',weight:1,offset:6},
+ {name:'劫数临身',source:'游戏原创',weight:1,offset:4},
+ {name:'运道镇压',source:'游戏原创',weight:1,offset:2},
+ {name:'福祸牵引',source:'游戏原创',weight:1,offset:0}
+];
+var YING_WU_XIE_MOVES=[
+ {name:'魂啸',source:'既有杀招库收录',weight:1,offset:10},
+ {name:'分魂乱念',source:'游戏原创',weight:1,offset:8},
+ {name:'魂念穿刺',source:'游戏原创',weight:1,offset:6},
+ {name:'幽魂缠身',source:'游戏原创',weight:1,offset:4},
+ {name:'魂魄震荡',source:'游戏原创',weight:1,offset:2},
+ {name:'残魂噬念',source:'游戏原创',weight:1,offset:0}
+];
+/* 黑楼兰：此处时间点尚未重修力道、成为黑月仙子。原著明确的是大力真武体与惊人肉身力量，
+   并无足够可核实的六式专属杀招名称；因此不把体质名伪装成杀招，六式均标为游戏原创表现名。 */
+var HEI_LOU_LAN_MOVES=[
+ {name:'真武巨力',source:'游戏原创（体质表现）',weight:1,offset:10},
+ {name:'霸拳崩岳',source:'游戏原创',weight:1,offset:8},
+ {name:'裂地重击',source:'游戏原创',weight:1,offset:6},
+ {name:'蛮力冲阵',source:'游戏原创',weight:1,offset:4},
+ {name:'铁臂横扫',source:'游戏原创',weight:1,offset:2},
+ {name:'力破千钧',source:'游戏原创',weight:1,offset:0}
+];
+function namedMoveWheel(def,base){
+ return def.map(function(m){var se=specEntry(m.name);return {name:m.name,val:Math.max(1,base+(m.offset||0)),weight:m.weight,dir:m.dir||(se&&se.dir)||'攻'};});
 }
 var KILL_POOL=['阮丹','张飞照','顾六如','万紫红','青夜','从严','朱雀儿','旋空童子','赵山河','吴双','煞狴九十五','玉珠','君神光','苍玄子','紫薇仙子','古月方正','陈衣','白苍水','正元老人','秦鼎菱'];
 var SAGES=[['薄青','剑道'],['血海老祖','血道'],['白相','冰雪道'],['万寿娘子','炼道'],['秦百胜','魂道'],['黑凡','宙道']];
@@ -2000,8 +2094,15 @@ var SPEC_LIB = {
   {id:'tbl33_破晓剑', name:'破晓剑', school:'剑道', type:'spec', grade:'剑道（频次29·中档）', dir:'攻', mulF:1.2, effectKey:'amp', trigger:'寻访/历练中习得（剑道）', effect:'剑群如蟒绞杀大阵：本式 ×1.2', limit:'万年斗飞车傍身杀招', holder:'玩家', source:'统计总表·第一卷·第29节语境', batch:true, status:'live'},
   {id:'tbl34_暗歧杀', name:'暗歧杀', school:'剑道', type:'spec', grade:'剑道（频次23·中档）', dir:'攻', onceN:3,step:20,mulF:1.2, effectKey:'once', trigger:'寻访/历练中习得（剑道）', effect:'眉间血痕无声索命（飞剑/暗渡双仙蛊）：本式 ×1.2，终身限 3 次', limit:'—', holder:'玩家', source:'统计总表·第一卷·第23节语境', batch:true, status:'live'},
   {id:'tbl35_春剪', name:'春剪', school:'宙道', type:'spec', grade:'宙道（频次46·强档）', dir:'攻', mulF:1.3, effectKey:'amp', trigger:'寻访/历练中习得（宙道）', effect:'八转级锋锐剪杀：本式 ×1.3（原文 46 次·夏槎四招套）', limit:'夏槎四招套之一', holder:'玩家', source:'统计总表·第三百六十三节·暗里交锋', batch:true, status:'live'},
-  {id:'tbl36_夏扇', name:'夏扇', school:'宙道', type:'spec', grade:'宙道（频次35·中档）', dir:'攻', mulF:1.25, effectKey:'amp', trigger:'寻访/历练中习得（宙道）', effect:'三扇崩阵：本式 ×1.25（原文 35 次·夏槎四招套）', limit:'—', holder:'玩家', source:'统计总表·第三百六十二节·武庸的恨与怒', batch:true, status:'live'}
+  {id:'tbl36_夏扇', name:'夏扇', school:'宙道', type:'spec', grade:'宙道（频次35·中档）', dir:'攻', mulF:1.25, effectKey:'amp', trigger:'寻访/历练中习得（宙道）', effect:'三扇崩阵：本式 ×1.25（原文 35 次·夏槎四招套）', limit:'—', holder:'玩家', source:'统计总表·第三百六十二节·武庸的恨与怒', batch:true, status:'live'},
 
+ /* v2.08：补录原著具名杀招；均进入 SPEC_LIB，specNames() 自动同步杀招图鉴。 */
+ {id:'qiu_lian',name:'秋镰',school:'宙道',type:'spec',grade:'特殊仙道·宙道',dir:'攻',effectKey:'amp',mulF:1.25,trigger:'宙道传承 / 研习特殊杀招',effect:'宙道锋锐杀招：本式权重 ×1.25',limit:'夏槎四招套之一',holder:'玩家',source:'原著·夏槎四招',status:'live',dex:true,batch:true},
+ {id:'dong_qiu',name:'冬裘',school:'宙道',type:'spec',grade:'特殊仙道·宙道',dir:'防',effectKey:'save',saveOnce:true,trigger:'宙道传承 / 研习特殊杀招',effect:'宙道防护杀招：每场战斗抵消一次败局',limit:'夏槎四招套之一',holder:'玩家',source:'原著·夏槎四招',status:'live',dex:true,batch:true},
+ {id:'tian_di_yi_shi',name:'天地一视',school:'智道',type:'spec',grade:'特殊仙道·智道',dir:'控',effectKey:'cut',cutF:0.9,trigger:'智道传承 / 研习特殊杀招',effect:'以天地为棋盘的推演压制：敌方权重 ×0.9',limit:'智道杀招',holder:'玩家',source:'原著',status:'live',dex:true,batch:true},
+ {id:'sui_yue_ru_suo',name:'岁月如梭',school:'宙道',type:'spec',grade:'特殊仙道·宙道',dir:'攻',effectKey:'amp',mulF:1.2,trigger:'宙道传承 / 研习特殊杀招',effect:'光阴之力疾斩：本式权重 ×1.2',limit:'宙道杀招',holder:'玩家',source:'原著',status:'live',dex:true,batch:true},
+ {id:'yan_luo',name:'阎罗',school:'魂道',type:'spec',grade:'特殊仙道·魂道',dir:'防',effectKey:'save',saveOnce:true,trigger:'魂道传承 / 研习特殊杀招',effect:'阎罗护身：每场战斗抵消一次败局',limit:'幽魂真传相关',holder:'玩家',source:'原著',status:'live',dex:true,batch:true},
+ {id:'long_yu_shang_bin',name:'龙御上宾',school:'气道',type:'spec',grade:'特殊仙道·气道',dir:'攻',effectKey:'cut',cutF:0.9,trigger:'气道传承 / 研习特殊杀招',effect:'龙公气道杀招：压制敌方权重 ×0.9',limit:'龙公杀招',holder:'玩家',source:'原著',status:'live',dex:true,batch:true},
  ],
  /* 敌方专属（龙公）——不与玩家库混装 */
  enemyEntries: ['乱龙拳','撼世龙锤','龙爪击','气呼山','龙啸波','随身闪','九龙纹护身','龙御上宾'],
@@ -2201,6 +2302,7 @@ var NAME_GATE = [
 var LIFE_GATE = [
  '方源同门','方源旧迹·狐仙福地','凤九歌·命运余音','五域气潮迁徙',
  '三王传承余波','白骨山·血海余烬','义天山前夜',
+ '方源·同门夜谈','陆畏因·南疆论善',
  '琅琊·毛民炼道','紫薇仙子·星算追踪','冰塞川·劫运坛',
  '影无邪·分魂残响','黑楼兰·霸仙之志','龙鲸乐土·悔哭海',
  '紫山真君·影宗遗谋','凤九歌·命运歌','天庭·人道防线',
@@ -3950,7 +4052,7 @@ function auditCompatRegression(){
  return out;
 }
 
-window.__RUN_AUDIT={version:'v2.06',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem,allSystems:auditAllSystems,compat:auditCompatRegression,milestone:{name:'v2.00-stable',series:['v1.94','v1.95','v1.96','v1.97','v1.98','v1.99','v2.00'],note:'转盘/成长/体验/整合/兼容审计收束定版；非玩法重写'}};
+window.__RUN_AUDIT={version:'v2.13',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem,allSystems:auditAllSystems,compat:auditCompatRegression,milestone:{name:'v2.00-stable',series:['v1.94','v1.95','v1.96','v1.97','v1.98','v1.99','v2.00'],note:'转盘/成长/体验/整合/兼容审计收束定版；非玩法重写'}};
 
 function eraAllowed(entry){
   if(!entry) return true;
@@ -4314,7 +4416,7 @@ function hud(){
 function panelHTML(){
  var marks=S.marks.length?S.marks.join(' / '):'—';
  var sch=S.schools.map(function(s,i){return s.name+'('+GROUP_N[s.dir]+'·'+REALMS[s.realm]+(i===S.mainIdx?'·主修':'')+')';}).join('、')||'—';
- var mv=S.moves.map(function(m){return m.name;}).join('、')||'—';
+ var mv=S.moves.map(function(m){return '【'+combatMoveDirName(m)+'】'+m.name;}).join('、')||'—';
  var dx=(S.deducX==null)?'—':S.deducX;
  var lyn=S.age+'岁 · 出身'+S.region+S.birth+' · '+(S.identity||'')+(S.stance?'·'+S.stance:'');
  function row(k,v){return '<div class="pRow"><b>'+k+'</b><span>'+v+'</span></div>';}
@@ -5219,13 +5321,13 @@ function bloodKill(eT){
    v1.26：按原著为天庭具名追杀者轮换（紫薇仙子/正元老人/陈衣/天庭律使），
    战斗盘使用原著向流派杀招，而非无名「天庭追杀者」。 */
 var TIAN_TING_HUNTERS=[
- {name:'紫薇仙子',school:'智道',eT:280,per:155,intro:'星轨骤亮——中洲天庭智道巨擘紫薇仙子的推演锁落在你身上。她未必亲自下界久战，但这一缕分念与星算杀招已足以定人生死。',
+ {name:'紫薇仙子',school:'智道',eT:280,per:155,moveBasis:'游戏原创补充（以智道推演、星算、锁定为表现方向；不冒充原著杀招名）',intro:'星轨骤亮——中洲天庭智道巨擘紫薇仙子的推演锁落在你身上。她未必亲自下界久战，但这一缕分念与星算杀招已足以定人生死。',
   hold:[['星算推演',155],['智道杀招·算尽机缘',150],['星念锁魂',150],['推演一劫',145],['天机泄露',140],['智光破妄',150]]},
- {name:'正元老人',school:'炼道',eT:240,per:140,intro:'炉火气味先于人至。天庭炼道一脉的正元老人踏空而来，须发皆白，袖中丹火已成。',
+ {name:'正元老人',school:'炼道',eT:240,per:140,moveBasis:'游戏原创补充（以炼道、丹炉、炼化为表现方向；不冒充原著杀招名）',intro:'炉火气味先于人至。天庭炼道一脉的正元老人踏空而来，须发皆白，袖中丹火已成。',
   hold:[['炼道杀招·炉火纯青',140],['丹元爆裂',145],['炼化敌蛊',135],['护炉金光',130],['残炉反震',140],['百炼成钢',135]]},
- {name:'陈衣',school:'信道',eT:240,per:140,intro:'一声轻叹自虚空传来：「天外之魔，受死。」天庭信道八转陈衣现身，言辞未落，信蛊已锁向你的名姓。',
+ {name:'陈衣',school:'信道',eT:240,per:140,moveBasis:'游戏原创补充（以信道、名姓、言辞与信念为表现方向；不冒充原著杀招名）',intro:'一声轻叹自虚空传来：「天外之魔，受死。」天庭信道八转陈衣现身，言辞未落，信蛊已锁向你的名姓。',
   hold:[['言出法随',145],['真假莫辨',140],['信锁魂牵',135],['伪信迷心',130],['传音定身',135],['信蛊反噬',140]]},
- {name:'天庭律使',school:'律道',eT:240,per:138,intro:'律道金纹在云层展开。天庭律使执律印而来，专为缉拿不受命数所缚的天外之魔。',
+ {name:'天庭律使',school:'律道',eT:240,per:138,moveBasis:'游戏原创虚构职位与招式（用于普通追杀遭遇，不对应原著具名人物）',intro:'律道金纹在云层展开。天庭律使执律印而来，专为缉拿不受命数所缚的天外之魔。',
   hold:[['律道杀招·禁制',140],['金律锁身',145],['罚罪一斩',150],['律印镇魂',135],['无赦之令',140],['律网笼罩',130]]}
 ];
 function pickTianTingHunter(){
@@ -5317,11 +5419,12 @@ async function fangyuanBossBattle(){
    v=trueBuff(mv,v); /* v1.2.9：慧剑/八转仙蛊屋终值增益 */
    var wf=wormCombatFactor();if(wf!==1)v=Math.round(v*wf); /* 蛊群协同：完善度带来轻量杀招稳定性修正 */
    if(S.flags.injured>0)v=Math.max(0,v-20); /* v1.2.5：重伤未愈·杀招权重-20 */
+   v=bloodMoveValue(mv,v); /* v2.10：决战方源同样只强化血道招式 */
    if(specVoice(mv,v))speakMove(mv.name); /* v1.1.8：统一播报判据（原 t==='spec' 易漏） */
    myW+=v;
    await say('我方第'+(i2+1)+'式【'+mv.name+'】权重 '+v+' · 累计 '+myW,'battle');
   }
-  var mul=1;if(S.flags.molu)mul*=1.5;if(hasSchool('血道'))mul*=2;
+  var mul=S.flags.molu?1.5:1; /* v2.10：血道增幅已按单式招式流派结算 */
   myW=Math.round(myW*mul);
   var ecn=CNT_W[8];
   var en22=await W('方源出手次数盘',S.flags.supreme?'EX 才情 · 八转':'EX 才情 · 亚仙尊',ecn.map(function(x){return [x[0]+'式',x[1]];}),{small:true});
@@ -5899,6 +6002,52 @@ var FAN_NAMED={
  '阴阳道':['阴阳逆','两仪刺','中和破'],
  '幻道':['幻杀','真假手','镜花刺']
 };
+/* v2.08：战斗盘基础招式备用名；仅用于基础攻击展示，不作为习得杀招或图鉴条目。 */
+var COMBAT_BASIC_EXTRA={
+ '力道':["裂岳拳", "伏虎掌", "擎天臂", "崩城劲", "撼山锤"],
+ '剑道':["流光剑", "断水剑", "穿云剑", "惊鸿剑", "斩月剑"],
+ '刀道':["断浪刀", "追风刀", "裂甲刀", "斩岳刀", "破阵刀"],
+ '血道':["血刃飞芒", "赤血掌", "血影刺", "凝血刃", "血潮击"],
+ '炎道':["赤焰指", "焚风掌", "烈火轮", "炎龙击", "焚天印"],
+ '风道':["追风刺", "裂风掌", "风刃连斩", "罡风击", "旋风破"],
+ '毒道':["蚀骨针", "腐心掌", "毒雾袭", "百毒刺", "断脉毒劲"],
+ '金道':["金锋刺", "玄铁掌", "碎金斩", "金罡印", "穿金劲"],
+ '雷道':["奔雷拳", "雷光刺", "霹雳掌", "惊电击", "雷霆印"],
+ '骨道':["白骨爪", "碎骨拳", "骨锋刺", "枯骨掌", "白骨穿心"],
+ '杀道':["杀念斩", "夺命刺", "断魂指", "绝杀掌", "杀机破"],
+ '变化道':["百变爪", "化形击", "异兽扑", "变相刺", "幻形掌"],
+ '土道':["裂地掌", "镇山拳", "厚土印", "地脉震", "崩岳击"],
+ '阵道':["困阵印", "锁灵纹", "四方镇", "阵门封", "八门击"],
+ '水道':["分浪掌", "寒潮刺", "水镜斩", "逆流击", "沧波印"],
+ '木道':["青藤缚", "穿林刺", "荆棘掌", "木灵击", "森罗印"],
+ '冰雪道':["寒霜刺", "冰魄掌", "雪崩击", "冻云印", "玄冰斩"],
+ '星道':["星芒刺", "流星贯夜", "星河倒悬", "星辉裂空", "落星镇"],
+ '暗道':["暗影刺", "潜夜爪", "幽光斩", "无声断", "暗幕封"],
+ '虚道':["虚空刺", "裂隙掌", "空门斩", "虚影击", "断界印"],
+ '云道':["流云掌", "云涛击", "雾锁千峰", "翻云印", "云崩"],
+ '禁道':["禁行印", "封脉指", "止念咒", "禁域镇", "封天锁"],
+ '炼道':["炉火指", "淬金掌", "丹焰击", "熔元印", "炼火破"],
+ '运道':["转运掌", "截运指", "借势击", "鸿运印", "逆运破"],
+ '人道':["众生掌", "人心斩", "百念击", "民意印", "人极破"],
+ '信道':["誓约印", "信念刺", "守诺斩", "言灵击", "信念镇"],
+ '气道':["罡气掌", "气浪冲", "聚气印", "裂空罡", "气海击"],
+ '食道':["吞元掌", "化食劲", "饕餮击", "反哺印", "吞流破"],
+ '律道':["律令印", "定则指", "破律掌", "法度镇", "裁断击"],
+ '光道':["流光刺", "耀日掌", "光瀑斩", "明辉印", "破晓击"],
+ '丹道':["丹火指", "药鼎掌", "凝丹印", "百草劲", "炉火破"],
+ '天道':["天意指", "劫云掌", "天机印", "命数击", "天罚破"],
+ '魅情道':["惑心丝", "情丝刺", "迷情掌", "心障印", "幻情击"],
+ '智道':["算尽一击", "识破指", "谋定掌", "推演印", "断策刺"],
+ '宙道':["寸光刺", "流年掌", "迟时印", "光阴斩", "岁月击"],
+ '魂道':["摄魂爪", "魂针刺", "震魄掌", "幽魂印", "断魂击"],
+ '奴道':["役兽印", "驱灵掌", "奴纹刺", "御兽击", "役魂令"],
+ '梦道':["梦魇刺", "碎梦掌", "入梦印", "惊梦击", "幻梦斩"],
+ '宇道':["挪移刺", "空间掌", "裂空印", "虚门击", "界壁斩"],
+ '偷道':["窃影手", "盗机刺", "无痕取", "移物掌", "空手夺"],
+ '画道':["墨痕刺", "落笔斩", "泼墨掌", "点睛印", "丹青破"],
+ '阴阳道':["两仪掌", "阴阳刺", "太极印", "逆转击", "乾坤破"],
+ '幻道':["幻影刺", "镜花掌", "真假印", "迷踪击", "破幻斩"]
+};
 function fanPool(school){
  return (FAN_NAMED[school]||[school+'杀招']).slice();
 }
@@ -5941,17 +6090,26 @@ function learnXian(school,label){
 /* ===== v1.4.9 升仙后招式仙道化 + 天劫突破 ===== */
 function isImmortal(){return Math.floor(S.lv)>=6;}
 function ensureBasicMove(){
- /* 战前兜底：凡人补「普攻」；蛊仙补「仙道攻击」 */
+ /* 战前兜底：凡人补「普攻」；蛊仙补「仙道攻击」。任何补位都必须先遵守八格容量。 */
  var school=(S.schools&&S.schools.length)?mainSchool().name:'力道';
+ var needBasic=false,basic;
  if(isImmortal()){
   if(!S.moves.some(function(m){return m.t==='xian'||m.t==='spec'||m.t==='wu'||m.t==='fan'||m.t==='basic';})){
-   S.moves.unshift({name:'仙道攻击',t:'xian',dir:'攻',school:school});
+   needBasic=true;basic={name:'仙道攻击',t:'xian',dir:'攻',school:school};
   }else if(!hasMove('仙道攻击')&&!S.moves.some(function(m){return m.t==='xian';})&&!hasMove('普攻')){
-   S.moves.unshift({name:'仙道攻击',t:'xian',dir:'攻',school:school});
+   needBasic=true;basic={name:'仙道攻击',t:'xian',dir:'攻',school:school};
   }
  }else if(!hasMove('普攻')){
-  S.moves.unshift({name:'普攻',t:'basic',dir:'攻',school:school});
+  needBasic=true;basic={name:'普攻',t:'basic',dir:'攻',school:school};
  }
+ /* 与 addMove() 使用同一套弱招回收优先级；补位时预留一格，不会把数组推到九式。 */
+ while(S.moves.length>(needBasic?7:8)){
+  var pri={fan:0,basic:1,xian:2,spec:3,wu:4},wi=0,low=1e9;
+  S.moves.forEach(function(x,i){var v=moveBase(x)+(pri[x.t]||0)*1000;if(v<low){low=v;wi=i;}});
+  log('杀招满八式，战前整理舍弃【'+S.moves[wi].name+'】','sys');
+  S.moves.splice(wi,1);
+ }
+ if(needBasic)S.moves.unshift(basic);
 }
 function ascendConvertMoves(){
  /* 升仙瞬间：普攻/普通攻击/凡道杀招 → 仙道 */
@@ -6708,6 +6866,8 @@ setStage('出身');
   if(kmOn()){travPool.push({n:'兽骨堆',w:12},{n:'变形草滩',w:10},{n:'力祭台',w:9});}
   if(S.eraIdx===5){travPool.push({n:'青莲池',w:12},{n:'画中天地',w:10},{n:'木道长阶',w:9});}
   if(S.eraIdx===9){travPool.push({n:'净土边',w:12},{n:'厚土祭',w:10},{n:'渡魂渡口',w:9});}
+  /* v2.07：各时代升仙后人物交互，只在本时代出现，每局一次 */
+  for(var _cE=0;_cE<ERA_CHAR_EVENTS.length;_cE++){var _cEv=ERA_CHAR_EVENTS[_cE];if(_cEv.phase==='immortal'&&_cEv.era===S.eraIdx&&(!_cEv.secondLife||isSecondLife())&&(!_cEv.region||S.region===_cEv.region)&&(!_cEv.birthLike||String(S.birth||'').indexOf(_cEv.birthLike)>=0)&&!hasMark('已见·'+_cEv.n))travPool.push({n:_cEv.n,w:_cEv.w||9});}
   if(S.region==='南疆'||S.birth==='商家城'){travPool.push({n:'商家城一游',w:S.birth==='商家城'?12:9});} /* v1.14.29 商家线游历 */
   if(hasJian()){travPool.push({n:'剑冢一夜',w:isJianMain()?14:9});}
   if(hasZhiXing()&&!xxOn()){travPool.push({n:'观星台',w:(isZhiMain()||isXingMain())?13:8});}
@@ -7134,6 +7294,25 @@ function mortalEraRewardSchool(era){
 function foeAnchor(off,span){var lvE=clamp(Math.floor(S.lv)+off+ri(0,span),1,6);return ANCH_T[lvE]||35;}
 var ENEMY_MOVES=['杀招01','杀招02','杀招03','杀招04','杀招05','杀招06'];
 var MORTAL_ENEMY_MOVES=['普通攻击01','普通攻击02','普通攻击03','普通攻击04','普通攻击05','拼死一搏']; /* v1.2.9：凡人期敌人专用·通用杀招盘二 */
+/* v2.10：有明确敌方流派时，用该流派已有具名招式替代机械编号；未标注流派时保留旧通用池。 */
+function genericEnemyMoves(school,immortal){
+ var pool=school&&FAN_NAMED[school]?FAN_NAMED[school].slice():null;
+ /* 音道未纳入凡道习得池；此处只给无专属配置的普通敌人使用，属于游戏原创通用表现名。 */
+ if(!pool&&school==='音道')pool=['裂音刺','回声掌','断弦击','震音波','音刃斩','余音震'];
+ if(!pool||!pool.length)return (immortal?ENEMY_MOVES:MORTAL_ENEMY_MOVES).slice();
+ /* 保留敌方通用盘六格：前三式取流派凡道具名招式，不足部分由该流派基础招式备用名补齐。 */
+ var extra=COMBAT_BASIC_EXTRA[school]||[],i;
+ for(i=0;i<extra.length&&pool.length<6;i++)if(pool.indexOf(extra[i])<0)pool.push(extra[i]);
+ if(pool.length>6)pool=pool.slice(0,6);
+ if(immortal)return pool.map(function(n){return '仙·'+n;});
+ return pool;
+}
+/* v2.10：专属敌招支持 {name,weight,val} 或 [name,val,weight]。
+   旧版 [name,val] 继续令 val 同时充当抽取权重与单式战力，确保存量配置概率不变。 */
+function enemyMoveSpec(m){
+ if(Object.prototype.toString.call(m)==='[object Array]'){var ae=specEntry(m[0]);return {name:m[0],val:Number(m[1])||0,weight:m.length>2?Math.max(0,Number(m[2])||0):(Number(m[1])||0),dir:m.length>3?(m[3]||((ae&&ae.dir)||'攻')):((ae&&ae.dir)||'攻')};}
+ m=m||{};var se=specEntry(m.name);return {name:m.name||'无名杀招',val:Number(m.val)||0,weight:m.weight==null?(Number(m.val)||0):Math.max(0,Number(m.weight)||0),dir:m.dir||(se&&se.dir)||'攻'};
+}
 function enemyMoveVal(eT){return eT>=280?140:eT>=240?120:eT>=200?105:eT>=180?90:eT>=130?65:eT>=95?48:eT>=80?40:eT>=55?28:eT>=35?18:eT>=20?10:5;}
 
 
@@ -8548,6 +8727,7 @@ async function genericEvent(name){
  if(await raceStoryDispatch(name))return;
  if(await eraMortalLinkDispatch(name))return; /* v1.43：前置选择驱动的时代支线后续 */
  if(await eraMortalExtraDispatch(name))return; /* v1.42：新增时代事件独立分发 */
+ if(await eraCharEventDispatch(name,'mortal'))return; /* v2.07：各时代凡人期与原著人物交互 */
  /* v1.14.36 出生地专属 */
  if(await birthStoryDispatch(name))return;
  if(S.eraIdx===2){
@@ -8960,6 +9140,7 @@ async function doTravail(n){
  await socialMemoryAside(n);
  await socialMemoryChoice(n);
  if(await doCanonImmortalTravel(n))return true;
+ if(await eraCharEventDispatch(n,'immortal'))return true; /* v2.07：各时代升仙后与原著人物交互 */
  if(n==='种族传承·'+S.race){
   var text={
    '人族':'你在古籍与人道遗篇中追索人祖传说。人族的灵性与组织能力，使其能不断学习、整合百家之长。',
@@ -9034,7 +9215,7 @@ async function doTravail(n){
   if(cs===0){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('情报送达劫运坛，冰塞川记下你这份人情，却没有许诺让你进入核心——道缘+1，才情+1。','gold');}
   else if(cs===1){if(await rollW(48+S.tIdx*4,'楚度论势盘')){S.dhIdx=Math.min(8,S.dhIdx+1);await say('楚度不愿受人驱使，你也没有强求；北原散修与长生天之间仍留着可谈的余地——道心+1。','good');}else{S.pctMods-=0.03;await say('谈话不欢而散，你被当成某一方的说客（权重-3%）。','bad');}}
   else if(cs===2){S.tIdx=Math.min(8,S.tIdx+1);await say('黄金血脉愿意响应号召，但各部利益并不相同——才情+1。','good');}
-  else{await say('楚度并不以长生天附庸自居，但他愿意以一场切磋判断你的本事。交手只到点为止，不涉及北原散修与长生天的归属。','battle');var csFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var csWin=await battleRound(csFoe,'楚度·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('你在正面交锋中逼出楚度一式力道变化，他随即收手。你没有胜过这位北原强者，只从交手中磨炼了力道。','gold');},{enemyFixed:3,eTalentUp:1,nonLethal:true,fatalAsHurt:true});if(!csWin)await say('楚度以雄浑力道压住你的攻势，你被迫认输，双方仍保留余地。','bad');}
+  else{await say('楚度并不以长生天附庸自居，但他愿意以一场切磋判断你的本事。交手只到点为止，不涉及北原散修与长生天的归属。','battle');var csFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var csWin=await battleRound(csFoe,'楚度·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('你在正面交锋中逼出楚度一式力道变化，他随即收手。你没有胜过这位北原强者，只从交手中磨炼了力道。','gold');},{enemyFixed:3,eTalentUp:1,enemyMoves:namedMoveWheel(CHU_DU_MOVES,enemyMoveVal(csFoe)),enemySchool:'力道',nonLethal:true,fatalAsHurt:true});if(!csWin)await say('楚度以雄浑力道压住你的攻势，你被迫认输，双方仍保留余地。','bad');}
   S.marks.push('长生天·北原合纵');chr('长生天·北原合纵');return;
  }
  if(n==='影宗·中洲暗线'){
@@ -9070,7 +9251,7 @@ async function doTravail(n){
   if(bs===0){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.tIdx=Math.min(8,S.tIdx+1);await say('你交出一份有用情报，冰塞川没有许诺结盟，只记下了这份人情——才情+1，道缘+1。','gold');}
   else if(bs===1){if(await rollW(45+rlm('运道')*6+S.tIdx*2,'劫运坛问道盘')){setRealm('运道',Math.min(7,Math.max(1,rlm('运道')+1)));await say('劫运坛运转一周，你窥见运道布局的一角——运道精进。','gold');}else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你未能看透阵势，却记住了冰塞川的谨慎——道心+1。','good');}}
   else if(bs===2){if(await rollW(55+S.lv*3,'劫运坛试探盘')){await wormUp(1);await say('你只探到外围禁制，顺手取走一份遗落蛊材——完善度+1。','gold');}else{S.pctMods-=0.04;await say('禁制反震，你被迫退开（权重-4%）。','bad');}}
-  else{await say('冰塞川没有把劫运坛的核心布置暴露给你，只以运道手段试你根底。你们约定点到为止，胜负只论这一场交锋。','battle');var bsFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var bsWin=await battleRound(bsFoe,'冰塞川·运道切磋',async function(){S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你在运道变化中抓住一瞬破绽，冰塞川主动收手。你没有窥得劫运坛核心，却得到一份实战心得。道缘+1。','gold');},{enemyFixed:3,eTalentUp:1,nonLethal:true,fatalAsHurt:true});if(!bsWin)await say('运道牵引层层叠加，你被冰塞川逼出阵外，切磋到此为止。','bad');}
+  else{await say('冰塞川没有把劫运坛的核心布置暴露给你，只以运道手段试你根底。你们约定点到为止，胜负只论这一场交锋。','battle');var bsFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var bsWin=await battleRound(bsFoe,'冰塞川·运道切磋',async function(){S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('你在运道变化中抓住一瞬破绽，冰塞川主动收手。你没有窥得劫运坛核心，却得到一份实战心得。道缘+1。','gold');},{enemyFixed:3,eTalentUp:1,enemyMoves:namedMoveWheel(ICE_SAI_CHUAN_MOVES,enemyMoveVal(bsFoe)),enemySchool:'运道',nonLethal:true,fatalAsHurt:true});if(!bsWin)await say('运道牵引层层叠加，你被冰塞川逼出阵外，切磋到此为止。','bad');}
   if(!hasMark('劫运坛·冰塞川'))S.marks.push('劫运坛·冰塞川');chr('冰塞川·劫运坛');
  }
  else if(n==='影无邪·分魂残响'){
@@ -9079,14 +9260,14 @@ async function doTravail(n){
   if(yw===0){if(await rollW(45+rlm('魂道')*6+S.dhIdx*3,'稳魂盘')){S.dhIdx=Math.min(8,S.dhIdx+1);S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('魂魄暂时归于平稳。影无邪没有道谢，只将一段残缺魂道心得留在原地——道心+1，道缘+1。','gold');}else{S.pctMods-=0.03;await say('分魂反噬，你被迫退出（权重-3%）。','bad');}}
   else if(yw===1){S.tIdx=Math.min(8,S.tIdx+1);await say('你听到幽魂布局的只言片语，却无法据此断言其全部计划——才情+1。','good');}
   else if(yw===2){await wormUp(2);S.morIdx=Math.max(0,S.morIdx-1);await say('你取走魂材，影无邪没有追击。完善度+2，道德-1。','bad');}
-  else{await say('影无邪的分魂忽然暴起。你没有趁机夺舍或伤其性命，而是以魂道手段与其短暂交锋，试图把失控的魂念逼回体内。','battle');var ywFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var ywWin=await battleRound(ywFoe,'影无邪·分魂交锋',async function(){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你压住了那股暴走魂念，影无邪恢复片刻清明。你没有击败影无邪本体，只是替他争取到喘息之机。道心+1。','gold');},{enemyFixed:3,eTalentUp:1,nonLethal:true,fatalAsHurt:true});if(!ywWin){S.pctMods-=0.03;await say('分魂反噬压过你的魂道防线，你带着心神损伤退出（权重-3%）。','bad');}}
+  else{await say('影无邪的分魂忽然暴起。你没有趁机夺舍或伤其性命，而是以魂道手段与其短暂交锋，试图把失控的魂念逼回体内。','battle');var ywFoe=Math.max(ANCH_T[6],foeAnchor(1,1));var ywWin=await battleRound(ywFoe,'影无邪·分魂交锋',async function(){S.dhIdx=Math.min(8,S.dhIdx+1);await say('你压住了那股暴走魂念，影无邪恢复片刻清明。你没有击败影无邪本体，只是替他争取到喘息之机。道心+1。','gold');},{enemyFixed:3,eTalentUp:1,enemyMoves:namedMoveWheel(YING_WU_XIE_MOVES,enemyMoveVal(ywFoe)),enemySchool:'魂道',nonLethal:true,fatalAsHurt:true});if(!ywWin){S.pctMods-=0.03;await say('分魂反噬压过你的魂道防线，你带着心神损伤退出（权重-3%）。','bad');}}
   if(!hasMark('影无邪·残响'))S.marks.push('影无邪·残响');chr('影无邪·分魂残响');
  }
  else if(n==='黑楼兰·霸仙之志'){
   await say('此时的黑楼兰尚在北原蛰伏，她尚未重修力道成为黑月仙子，但那股霸道的野心已初露端倪。你在与她的交锋中，能感受到她未来必将挑战楚度的锋芒。她的野心与处境都不容旁人轻慢；她不会因为你的一句招揽便改变立场。','sys');
   var hl2=await optW('黑楼兰·霸仙之志',[['坦诚谈论霸业',40],['切磋力道',35],['观察后离去',25]]);
   if(hl2===0){if(await rollW(45+S.tIdx*3+S.dhIdx*2,'霸仙论志盘')){S.tIdx=Math.min(8,S.tIdx+1);await say('你们对霸业的理解并不相同，却都听懂了对方的野心——才情+1。','gold');}else{S.dhIdx=Math.max(0,S.dhIdx-1);await say('话不投机。她不再给你第二次解释的机会——道心-1。','bad');}}
-  else if(hl2===1){var hbw=await battleRound(foeAnchor(2,2),'黑楼兰·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('一击之后各自收手。力道境界精进。','gold');},{nonLethal:true,fatalAsHurt:true});if(!hbw)await say('你被她的蛮力逼退，至少看清了差距。','bad');}
+  else if(hl2===1){var hlFoe=foeAnchor(2,2);var hbw=await battleRound(hlFoe,'黑楼兰·力道切磋',async function(){setRealm('力道',Math.min(7,Math.max(1,rlm('力道')+1)));await say('一击之后各自收手。力道境界精进。','gold');},{enemyFixed:3,enemyMoves:namedMoveWheel(HEI_LOU_LAN_MOVES,enemyMoveVal(hlFoe)),enemySchool:'力道',nonLethal:true,fatalAsHurt:true});if(!hbw)await say('你被她的蛮力逼退，至少看清了差距。','bad');}
   else{S.dhIdx=Math.min(8,S.dhIdx+1);await say('你没有试图控制她。强者之间，有时保持距离才是尊重——道心+1。','good');}
   if(!hasMark('黑楼兰·再会'))S.marks.push('黑楼兰·再会');chr('黑楼兰·霸仙之志');
  }
@@ -9558,15 +9739,19 @@ async function battleRound(eT,label,onWin,opts){
  async function winOnce(){if(!rewarded){rewarded=true;await onWin();if(!opts.nonLethal){await stealOnWin();bloodKill(eT);}}}
  for(var at=0;at<2;at++){
   if(await duel(eT,label,opts)){
-   await winOnce();
-   if(opts.nonLethal){await say(label+'——交锋到此为止，双方收手/各自脱离战圈，不判定对方生死。','battle');await injuryTick();return true;}
+   if(opts.nonLethal){await winOnce();await say(label+'——交锋到此为止，双方收手/各自脱离战圈，不判定对方生死。','battle');await injuryTick();return true;}
+   /* 先裁定敌方是否退场；若敌方要求再战，暂不发放胜利收益。 */
    var er=await enemyDefeat(eT,label,at===0);
    if(er==='retry'&&at===0){
     await say(label+'——敌将不服，缠战再起！','battle');
-    if(await duel(eT,label,opts)){await winOnce();await enemyDefeat(eT,label,false);await injuryTick();return true;}
-    await playerDefeat(eT,label,false,opts.deathName,opts.saves,opts.deathCut,opts);await injuryTick();return true;
+    if(await duel(eT,label,opts)){
+     await enemyDefeat(eT,label,false);
+     await winOnce();await injuryTick();return true;
+    }
+    await playerDefeat(eT,label,false,opts.deathName,opts.saves,opts.deathCut,opts);
+    await injuryTick();return false;
    }
-   await injuryTick();return true;
+   await winOnce();await injuryTick();return true;
   }
   var pr=await playerDefeat(eT,label,at===0,opts.deathName,opts.saves,opts.deathCut,opts);
   if(pr==='retry'&&at===0){await say(label+'——胜负未分，再战！','battle');continue;}
@@ -9578,8 +9763,55 @@ async function battleRound(eT,label,onWin,opts){
    例：我方5招500 vs 敌方5招500 → 各占50%；我方600 vs 敌方400 → 六四开。 */
 /* 完整战斗：双方各抽出手次数，逐式抽取杀招（转盘可见可控），权重和定胜负转盘占比 */
 /* 亚仙尊档属性（未来身用） */
+/* v2.10：血道增幅只作用于血道招式本式，不再放大全部流派的总权重。
+   优先读取战斗招式对象的 school；旧存档/特殊招式缺字段时回查 SPEC_LIB。 */
+function combatMoveSchool(m){
+ if(!m)return '';
+ if(m.school)return m.school;
+ var e=specEntry(m.name);
+ return e&&e.school?e.school:'';
+}
+function bloodMoveValue(m,v){
+ if(hasSchool('血道')&&combatMoveSchool(m)==='血道')return Math.round(v*2);
+ return v;
+}
+/* v2.14：战斗招式四属性统一读取现有 dir 字段。
+   攻=本式攻击+10%；防=削弱对方最终总权重10%；控=压低对方最高单式20%；
+   增=自身后续招式+10%。敌我双方共用同一套规则，原有专属杀招效果仍照常叠加。 */
+function combatMoveDir(m){
+ if(!m)return '攻';
+ var d=m.dir;
+ if(!d&&m.name){var e=specEntry(m.name);if(e)d=e.dir;}
+ if(d==='攻击')d='攻';else if(d==='防御')d='防';else if(d==='控制')d='控';else if(d==='增益')d='增';
+ return (d==='攻'||d==='防'||d==='控'||d==='增')?d:'攻';
+}
+function combatMoveDirName(m){var d=combatMoveDir(m);return d==='攻'?'攻击':(d==='防'?'防御':(d==='控'?'控制':'增益'));}
+function combatMoveLabel(m){return '【'+combatMoveDirName(m)+'】'+(m&&m.name?m.name:'无名招式');}
+/* v2.16：四属性固定配色，确保我敌双方招式盘视觉一致。 */
+function combatMoveColor(m){var d=combatMoveDir(m);return d==='攻'?'#C0392B':(d==='防'?'#2471A3':(d==='控'?'#8E44AD':'#239B56'));}
+/* v2.16：敌方通用招式原本只有名称，没有 dir 元数据，导致全部显示为攻击。
+   依据招式语义补充游戏战斗分类；无法明确判断的基础攻击仍归攻击，不伪造原著机制。 */
+function genericEnemyMoveDir(name,index,school){
+ var n=String(name||'');
+ if(/(封|锁|困|禁|缠|盲|瘴|蚀心|寒域|慢一息|迟时|情障|魇压|摄魂|夺魄|雾隐|云锁|禁步|哑火|规则压|名分压|梦呓|真假手|落笔封)/.test(n))return '控';
+ if(/(壁|护|盾|守|镇岳|镇山|厚土|青囊|寒铁印|化劲|中和|反哺|回风掌|无形飘|雾隐刺|随身闪|九龙纹)/.test(n))return '防';
+ if(/(聚气|借运|顺水|信标|淬体|点睛|驱役|役兽|言出法随|吞力|反嚼|借势|鸿运印|青囊手|气机拨|奴印激|易形|兽化|化形)/.test(n))return '增';
+ /* 少数明确偏控制但不含常见字根的招式 */
+ if(n==='血线牵'||n==='电光缠'||n==='夺命线'||n==='无声抹'||n==='慢一息')return '控';
+ return '攻';
+}
 /* v1.0.20：杀招轮权重——【五禁玄光气】每场战斗限一次，用过后权重置 0（引擎规则：0=不可抽中） */
-function wheelWeight(m){if(m&&m.name==='血神子')return 0; /* v1.1.5：血神子占格但永不被抽中 */if(m&&m.name==='五禁玄光气'&&S.flags.wjUsed)return 0;if(m&&m.name==='鬼不觉'&&S.flags.gjUsed)return 0; /* v1.2.6：鬼不觉每场限一次 */if(m&&m.name==='白日梦'&&S.flags.baimengUsed)return 0; /* v1.2.6：白日梦每场限一次 */return 1;}
+function wheelWeight(m){
+ if(!m)return 0;
+ if(m.name==='血神子')return 0; /* v1.1.5：血神子占格但永不被抽中 */
+ if(m.name==='五禁玄光气'&&S.flags.wjUsed)return 0;
+ if(m.name==='鬼不觉'&&S.flags.gjUsed)return 0; /* v1.2.6：鬼不觉每场限一次 */
+ if(m.name==='白日梦'&&S.flags.baimengUsed)return 0; /* v1.2.6：白日梦每场限一次 */
+ /* 批量杀招 onceN 是终身限次；耗尽后应在抽取前禁用，不能占掉一次出手机会。 */
+ var fx=batchFx(m.name);
+ if(fx&&fx.once>0&&(Number(S.flags['oc_'+m.name])||0)>=fx.once)return 0;
+ return 1;
+}
 /* ---- v1.1.5 血神子：被动加成 ---- */
 /* 位阶：血神子自身分六/七/八转三档，默认映射角色当前转数档；血道境界可提升其档位
    血道 宗师(4) → 至少七转档；血道 大宗师(6) → 至少八转档 */
@@ -9599,11 +9831,12 @@ function bloodGodBonus(){
 /* v1.4.11：战斗盘固定 8 格。基础攻击仍沿用 basic 数值口径，但显示为主修流派的具名起手招式，
    不再出现「普攻/普攻补位」；仅改变战斗盘展示名，不伪造已习得杀招，也不改变权重。 */
 function combatBasicName(school,used,serial){
- var pool=fanPool(school),i;
+ var pool=fanPool(school),extra=COMBAT_BASIC_EXTRA[school]||['破势击','穿云掌','断岳刺','回风印','裂空劲'],i;
  for(i=0;i<pool.length;i++)if(!used[pool[i]]){used[pool[i]]=1;return pool[i];}
- var base=(school||'力道')+'·起手式';
- var n=serial||1,name=base+String(n).padStart(2,'0');
- while(used[name]){n++;name=base+String(n).padStart(2,'0');}
+ for(i=0;i<extra.length;i++)if(!used[extra[i]]){used[extra[i]]=1;return extra[i];}
+ /* 八格上限下通常不会走到这里；兜底仍用正式招式式名，不再生成「起手式01」。 */
+ var n=1,name;
+ do{name=(school||'力道')+'·破势'+n;n++;}while(used[name]);
  used[name]=1;return name;
 }
 function moveWheelList(){
@@ -9657,13 +9890,16 @@ async function duel(eT,label,opts){
  }
  /* v1.0.13 分段出手：我方先连出 nP 式，敌方再连出 nE 式（不再交替） */
  var myW=0,enW=0,wjCut=1; /* v1.0.20：五禁玄光气对敌折扣 */
+ /* v2.14：四属性效果累积值；增益只强化后续出手，防御/控制在双方出手后结算。 */
+ var myMoves=[],myBuffMul=1,myGuardMul=1,myControlMul=1,myAttackN=0;
+ var enBuffMul=1,enGuardMul=1,enControlMul=1,enAttackN=0;
  await say('—— 我方出手段 ——','battle');
  for(var i=0;i<nP;i++){
   /* v1.1.11 修复（玩家反馈：逆流河未认主却能使用杀招）：河内封禁蛊虫与杀招——
      本场仅允许【普通肘击】（固定权重 opts.playerElbow），不落杀招轮、不吃境界/杀招加成。 */
   if(opts.playerElbow!=null){
    var evE=Math.max(0,Math.round(opts.playerElbow));
-   myW+=evE;
+   myMoves.push(evE);myW+=evE;
    log('我方第'+(i+1)+'式【普通肘击】+'+evE,'battle');
    await say('我方第'+(i+1)+'式【普通肘击】权重 '+evE+' · 累计 '+myW+'（河内封禁杀招·仅限肘击）','battle');
    continue;
@@ -9672,7 +9908,7 @@ async function duel(eT,label,opts){
   while(again){
    again=false;
    var ml=moveWheelList();
-   var mvi=await W('我方杀招轮·第'+(i+1)+'式',label,ml.map(function(m,j){return [m.name,wheelWeight(m),undefined,PALETTE[(j*2+3)%PALETTE.length]];}),{small:true});
+   var mvi=await W('我方杀招轮·第'+(i+1)+'式',label,ml.map(function(m,j){return [combatMoveLabel(m),wheelWeight(m),undefined,combatMoveColor(m)];}),{small:true});
    var mv=ml[mvi];
    var dv=await dynMoveVal(mv,nP); /* v1.2.9：加传本回合行动数（自由残缺变用） */
    var v=(dv!=null)?Math.round(dv*atkMul()*moveMulFor(mv))+realmAtk(mv):Math.round(moveBase(mv)*atkMul()*moveMulFor(mv))+realmAtk(mv); /* v1.0.14 境界加权重 */
@@ -9697,12 +9933,21 @@ async function duel(eT,label,opts){
     if(S.flags.wjUsed){v=0;await say('【五禁玄光气】本场已用过一次——此式封禁（权重 0）。','bad');}
     else{S.flags.wjUsed=true;wjCut=0.9;await say('【五禁玄光气】爆发——禁制五道，敌方本回合权重 ×0.9。','gold');}
    }
+   /* 四属性基础效果：攻击强化本式；增益累积到后续招式；防御/控制留待敌方出手后结算。 */
+   var myDir=combatMoveDir(mv);
+   if(myBuffMul>1)v=Math.round(v*myBuffMul);
+   if(myDir==='攻'){myAttackN++;v=Math.round(v*1.2);await say('【攻击属性】本式权重提升 20%。','gold');}
+   else if(myDir==='增'){myBuffMul*=1.2;await say('【增益属性】后续我方招式权重 ×'+myBuffMul.toFixed(2)+'。','gold');}
+   else if(myDir==='防'){myGuardMul*=0.8;await say('【防御属性】敌方最终总权重再降低 20%。','gold');}
+   else if(myDir==='控'){myControlMul*=0.65;await say('【控制属性】敌方最高单式权重再降低 35%。','gold');}
    v=trueBuff(mv,v); /* v1.2.9：慧剑/八转仙蛊屋终值增益 */
    if(S.flags.injured>0)v=Math.max(0,v-20); /* v1.2.5：重伤未愈·杀招权重-20 */
+   v=bloodMoveValue(mv,v); /* v2.10：仅血道招式本式×2 */
+   myMoves.push(v);
    myW+=v;
-   log('我方第'+(i+1)+'式【'+mv.name+'】+'+v,'battle');
+   log('我方第'+(i+1)+'式'+combatMoveLabel(mv)+' +'+v,'battle');
    if(specVoice(mv,v))speakMove(mv.name); /* v1.1.8：统一判据；被禁用的那一次 v=0 不播报 */
-   await say('我方第'+(i+1)+'式【'+mv.name+'】权重 '+v+' · 累计 '+myW+(mv.isFill?'（基础招式补位）':''),'battle');
+   await say('我方第'+(i+1)+'式'+combatMoveLabel(mv)+' 权重 '+v+' · 累计 '+myW+(mv.isFill?'（基础招式补位）':''),'battle');
   }
  }
  await say('—— 我方出手完毕（'+nP+' 式 · 合计 '+myW+'）——','battle');
@@ -9712,32 +9957,50 @@ async function duel(eT,label,opts){
   /* v1.1.7：敌方杀招盘支持 opts.enemyMoves 专属配置（[{name,val}]），否则回退通用 ENEMY_MOVES */
   var emi,efx;
   if(opts.enemyMoves&&opts.enemyMoves.length){
-   emi=await W('敌方杀招轮·第'+(j2+1)+'式·'+((opts.enemySchool||'')+''),label,opts.enemyMoves.map(function(m,j){return [m[0],m[1],undefined,PALETTE[(j*3+5)%PALETTE.length]];}),{small:true});
-   efx={name:opts.enemyMoves[emi][0],val:opts.enemyMoves[emi][1]};
-  }else if(S.lv<6){ /* v1.2.9：凡人期敌人 → 通用杀招盘二（普通攻击01~05 + 凡道杀招·拼死一搏） */
-   emi=await W('通用杀招盘二·第'+(j2+1)+'式',label,MORTAL_ENEMY_MOVES.map(function(m,j){return [m,1,undefined,PALETTE[(j*3+7)%PALETTE.length]];}),{small:true});
-   efx={name:MORTAL_ENEMY_MOVES[emi],val:Math.round(opts.perMove||enemyMoveVal(eT))};
+   var enemySpecs=opts.enemyMoves.map(enemyMoveSpec);
+   emi=await W('敌方杀招轮·第'+(j2+1)+'式·'+((opts.enemySchool||'')+''),label,enemySpecs.map(function(m,j){return [combatMoveLabel(m),m.weight,undefined,combatMoveColor(m)];}),{small:true});
+   efx={name:enemySpecs[emi].name,val:enemySpecs[emi].val,dir:enemySpecs[emi].dir};
+  }else if(S.lv<6){ /* v2.10：凡人期按敌方流派显示具名招式；未标流派时回退旧通用池 */
+   var mortalPool=genericEnemyMoves(opts.enemySchool,false);
+   emi=await W('通用杀招盘二·第'+(j2+1)+'式',label,mortalPool.map(function(m,j){return [combatMoveLabel({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)}),1,undefined,combatMoveColor({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)})];}),{small:true});
+   efx={name:mortalPool[emi],val:Math.round(opts.perMove||enemyMoveVal(eT)),dir:genericEnemyMoveDir(mortalPool[emi],emi,opts.enemySchool)};
   }else{
-   emi=await W('敌方杀招轮·第'+(j2+1)+'式',label,ENEMY_MOVES.map(function(m,j){return [m,1,undefined,PALETTE[(j*3+7)%PALETTE.length]];}),{small:true});
-   efx={name:ENEMY_MOVES[emi],val:Math.round(opts.perMove||enemyMoveVal(eT))};
+   var immortalPool=genericEnemyMoves(opts.enemySchool,true);
+   emi=await W('敌方杀招轮·第'+(j2+1)+'式',label,immortalPool.map(function(m,j){return [combatMoveLabel({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)}),1,undefined,combatMoveColor({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)})];}),{small:true});
+   efx={name:immortalPool[emi],val:Math.round(opts.perMove||enemyMoveVal(eT)),dir:genericEnemyMoveDir(immortalPool[emi],emi,opts.enemySchool)};
   }
   if(efx.name==='打爽了，再抽两次'){ /* v1.2.6：凤九歌专属——命中追加两次抽取（每场限一次·防链） */
    if(!opts._redrawDone){opts._redrawDone=true;nE+=2;j2--;await say('凤九歌打得兴起——『打爽了，再抽两次』！','gold');}
    else await say('凤九歌兴犹未尽——弦音已落，本回合不再加抽。','battle');
    continue;
   }
-  var ev2=efx.val;enW+=ev2;enMoves.push(ev2);
-  log('敌方第'+(j2+1)+'式【'+efx.name+'】+'+ev2,'battle');
-  await say('敌方第'+(j2+1)+'式【'+efx.name+'】权重 '+ev2+' · 累计 '+enW,'battle');
+  var ev2=efx.val;
+  var enDir=combatMoveDir(efx);
+  if(enBuffMul>1)ev2=Math.round(ev2*enBuffMul);
+  if(enDir==='攻'){enAttackN++;ev2=Math.round(ev2*1.2);await say('【敌方·攻击属性】本式权重提升 20%。','bad');}
+  else if(enDir==='增'){enBuffMul*=1.2;await say('【敌方·增益属性】后续敌方招式权重 ×'+enBuffMul.toFixed(2)+'。','bad');}
+  else if(enDir==='防'){enGuardMul*=0.8;await say('【敌方·防御属性】我方最终总权重再降低 20%。','bad');}
+  else if(enDir==='控'){enControlMul*=0.65;await say('【敌方·控制属性】我方最高单式权重再降低 35%。','bad');}
+  enW+=ev2;enMoves.push(ev2);
+  log('敌方第'+(j2+1)+'式'+combatMoveLabel(efx)+' +'+ev2,'battle');
+  await say('敌方第'+(j2+1)+'式'+combatMoveLabel(efx)+' 权重 '+ev2+' · 累计 '+enW,'battle');
  }
  if(S.flags.konglieErase&&enMoves.length){ /* v1.1.8 空裂：抹除敌方权重最高的一式 */
   S.flags.konglieErase=false;
-  var mx=Math.max.apply(null,enMoves);enW-=mx;
+  var mxI=0;for(var kx=1;kx<enMoves.length;kx++)if(enMoves[kx]>enMoves[mxI])mxI=kx;
+  var mx=enMoves[mxI];enMoves[mxI]=0;enW-=mx;
   await say('【空裂】空间崩裂——抹除敌方最高权重攻势 '+mx+'！（敌方合计 -'+mx+'）','gold');
  }
+ /* 四属性对双方总账生效：防御削弱对方总权重，控制压制对方最高单式。 */
+ if(myControlMul<1&&enMoves.length){var eMaxI=0;for(var ecI=1;ecI<enMoves.length;ecI++)if(enMoves[ecI]>enMoves[eMaxI])eMaxI=ecI;var eOld=enMoves[eMaxI];enMoves[eMaxI]=Math.round(eOld*myControlMul);enW=enMoves.reduce(function(a,b){return a+b;},0);await say('我方控制招式生效——敌方最高单式 '+eOld+' → '+enMoves[eMaxI]+'。','battle');}
+ if(enControlMul<1&&myMoves.length){var mMaxI=0;for(var mcI=1;mcI<myMoves.length;mcI++)if(myMoves[mcI]>myMoves[mMaxI])mMaxI=mcI;var mOld=myMoves[mMaxI];myMoves[mMaxI]=Math.round(mOld*enControlMul);myW=myMoves.reduce(function(a,b){return a+b;},0);await say('敌方控制招式生效——我方最高单式 '+mOld+' → '+myMoves[mMaxI]+'。','bad');}
+ if(myGuardMul<1){var enBeforeGuard=enW;enW=Math.round(enW*myGuardMul);await say('我方防御招式生效——敌方总权重 '+enBeforeGuard+' → '+enW+'。','gold');}
+ if(enGuardMul<1){var myBeforeGuard=myW;myW=Math.round(myW*enGuardMul);await say('敌方防御招式生效——我方总权重 '+myBeforeGuard+' → '+myW+'。','bad');}
+ await say('【四属性结算明细】我方：攻击 '+myAttackN+' 式（每式×1.2），后续增益×'+myBuffMul.toFixed(2)+'，防御压低敌方总权重×'+myGuardMul.toFixed(2)+'，控制压低敌方最高单式×'+myControlMul.toFixed(2)+'。敌方：攻击 '+enAttackN+' 式（每式×1.2），后续增益×'+enBuffMul.toFixed(2)+'，防御压低我方总权重×'+enGuardMul.toFixed(2)+'，控制压低我方最高单式×'+enControlMul.toFixed(2)+'。','gold');
  await say('—— 敌方出手完毕（'+nE+' 式 · 合计 '+enW+'）——','battle');
- var mul=1;if(S.flags.molu)mul*=1.5;if(hasSchool('血道'))mul*=2;
- var bgB=bloodGodBonus(); /* v1.1.5：血神子被动——结算额外加一次对应等级普攻权重 */
+ var mul=S.flags.molu?1.5:1; /* v2.10：魔罗仍全局×1.5；血道×2已在每式血道招式中结算 */
+ var bgB=bloodGodBonus(); /* v1.1.5：血神子被动——额外普攻权重 */
+ if(bgB>0&&hasSchool('血道'))bgB=Math.round(bgB*2); /* v2.10：血神子本身属血道，被动额外权重保留血道增幅 */
  if(bgB>0){myW=Math.round((myW+bgB)*mul);await say('【血神子】血魂自生——结算额外计入 '+bgB+' 权重（'+bloodGodTier()+'转普攻量级）。','gold');}
  else myW=Math.round(myW*mul);
  enW=Math.max(1,Math.round(enW*wjCut)); /* v1.0.20：五禁玄光气折扣生效 */
@@ -12890,11 +13153,15 @@ async function backRound(eT,label,onWin,opts){
  async function winOnce(){if(!rewarded){rewarded=true;await onWin();bloodKill(eT);}}
  for(var at=0;at<2;at++){
   if(await duel(eT,label,opts)){
-   await winOnce();
-   if(selfOutcome){await injuryTick();return true;} /* 已由 onWin 裁定敌方去留，不再二次结算 */
+   if(selfOutcome){await winOnce();await injuryTick();return true;} /* 已由 onWin 裁定敌方去留，不再二次结算 */
    var er=await enemyDefeat(eT,label,at===0);
-   if(er==='retry'&&at===0){await say(label+'——敌将缠战！','battle');if(await duel(eT,label,opts)){await winOnce();await injuryTick();return true;}await playerDefeat(eT,label,false,opts.deathName||null,null,null,opts);await injuryTick();return true;}
-   await injuryTick();return true;
+   if(er==='retry'&&at===0){
+    await say(label+'——敌将缠战！','battle');
+    if(await duel(eT,label,opts)){await enemyDefeat(eT,label,false);await winOnce();await injuryTick();return true;}
+    await playerDefeat(eT,label,false,opts.deathName||null,null,null,opts);
+    await injuryTick();return false;
+   }
+   await winOnce();await injuryTick();return true;
   }
   var pr=await playerDefeat(eT,label,at===0,opts.deathName||null,null,null,opts);
   if(pr==='retry'&&at===0){await say(label+'——再战！','battle');continue;}
@@ -13240,17 +13507,13 @@ async function dragonBattle(){
    dragonAdds=sqV;
    await say('三气归来·第'+phase+'重——复活强化 ×'+sqK[sqi]+'，龙公以「乱龙拳·三气归来强化」压来（权重 '+sqV+'）！','bad');
   }else{
-   var dmi1=await W('龙公杀招轮·第一式','龙公抽招',DRAGON_MOVES.map(function(m,j){return [m[0],1,undefined,PALETTE[(j*3+2)%PALETTE.length]];}),{small:true});
+   var dmi1=await W('龙公杀招轮·第一式','龙公抽招',DRAGON_MOVES.map(function(m,j){return [m[0],m[2],undefined,PALETTE[(j*3+2)%PALETTE.length]];}),{small:true});
    dm1=DRAGON_MOVES[dmi1];
-   var dmi2=await W('龙公杀招轮·第二式','龙公抽招',DRAGON_MOVES.map(function(m,j){return [m[0],1,undefined,PALETTE[(j*3+5)%PALETTE.length]];}),{small:true});
+   var dmi2=await W('龙公杀招轮·第二式','龙公抽招',DRAGON_MOVES.map(function(m,j){return [m[0],m[2],undefined,PALETTE[(j*3+5)%PALETTE.length]];}),{small:true});
    dm2=DRAGON_MOVES[dmi2];
    [dm1,dm2].forEach(function(dm){
-    if(dm[0]==='乱龙拳')dragonAdds+=250;
-    else if(dm[0]==='撼世龙锤')dragonAdds+=200;
-    else if(dm[0]==='龙爪击')dragonAdds+=190;
-    else if(dm[0]==='气呼山')dragonAdds+=180;
-    else if(dm[0]==='龙啸波')dragonAdds+=160;
-    else if(dm[0]==='随身闪'){st.P-=150;dragonAdds+=50;}
+    dragonAdds+=Number(dm[1])||0;
+    if(dm[0]==='随身闪')st.P-=150;
     else if(dm[0]==='九龙纹护身')st.P-=180;
     else if(dm[0]==='龙御上宾')st.dragonX=true;
    });
@@ -14629,6 +14892,174 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  }
 })();
 
+/* ══ v2.07：各时代原著人物交互 ═══════════════════════════════════════
+   凡人期进入时代事件池，升仙后进入本时代游历池；均为一局一次。
+   玩家与尊者本人的相遇一律按游戏原创处理，不改变原著主线、生死与归属；
+   幽魂时期不安排幽魂本尊现身，以青家遗孤青仇承接人物交互。
+   选项0为流派/修为积累，选项1为道心与道德，选项2为道缘，沿用既有结算口径。
+   ===================================================================== */
+var ERA_CHAR_EVENTS=[
+ {era:0,phase:'mortal',n:'元始仙尊·山门问窍',char:'元始仙尊',school:'气道',w:9,actId:'growth',basis:'游戏原创相遇（元始仙尊与气道为原著背景）',note:'山门石阶、开窍孩童与问答均为原创；不把玩家写成元始门下，也不改写元始仙尊生平。',
+  lines:['山门外的石阶上，一个布衣老者正替几个孩童按脉开窍。他指节粗大，袖口沾着炉灰，孩子们只叫他「先生」。','轮到你时，他没有问你灵窍几成，只问：「你修行，是为了活得久，还是为了让别人活得下去？」','山风掠过，石阶下的气墙微微起伏。老者把一枚最普通的元气蛊放在你掌心，等你开口。'],
+  opts:[['求长生：只说自己想活得更久',38],['护乡里：说想让族人不再受兽潮与气墙之苦',34],['问山外：反问山外是否还有别的道',28]],
+  res:['老者笑了笑，没有评判：「想活得久不是错，怕的是活久了，忘了自己为何要活。」他教你一段最基础的开窍吐纳。','老者点头：「先想别人，再想自己，这条路难走，却走得远。」他替你把掌心元气蛊的纹路理顺，气墙在你身前稳了一瞬。','老者抬手指向云外：「山外有山，道外有道。你肯问，便不算白来。」他没有留你，只把石阶的方向让开。'],
+  rel:['请教','受其指点','论道']},
+ {era:1,phase:'mortal',n:'星宿仙尊·棋摊残局',char:'星宿仙尊',school:'星道',w:9,actId:'growth',basis:'游戏原创相遇（星宿仙尊与智道/星道为原著背景）',note:'夜市棋摊、残局与问答均为原创；不把棋局写成星宿仙尊留下的真实布局。',
+  lines:['夜市尽头，一名披星纹外袍的女子在摊前独自下棋。棋盘上黑白子各缺一角，围观者都说这局已死。','她抬眼看你：「你说，死局里先动哪一枚子？」','摊主小声说，这位客人已坐了三夜，只等人接话。'],
+  opts:[['动边角：先救最不起眼的一子',36],['动中腹：直取最显眼的一处',34],['不动：先问这局为谁而摆',30]],
+  res:['你把边角一子挪开半步，整片死气竟松了一线。女子看了许久：「救最不起眼的，才有后来。」她随手把一枚旧星石推给你。','你直取中腹，棋势骤紧。女子摇头：「看得见的地方，人人都想动。你先动，便先被人算。」她仍把残局走完，让你看清后面三步。','你没有落子，只问这局为谁而摆。女子静了片刻：「为一个不肯认输的人。」她收起棋盘，临走前替你点了一句观星的次序。'],
+  rel:['对弈','受其点拨','论势']},
+ {era:2,phase:'mortal',n:'无极魔尊·石壁量心',char:'无极魔尊',school:'律道',w:9,actId:'conflict',basis:'游戏原创相遇（无极魔尊与律道为原著背景）',note:'石壁、炭线与规矩问答均为原创；不代表无极魔尊真实经历，也不把玩家写成其门下。',
+  lines:['疯魔窟外的石壁下，一个披发男人蹲在地上，用炭条把一条歪斜的线描了又描。旁人说他又疯了，他只当没听见。','他忽然把炭条递给你：「这条线若必须直，你说该削左边，还是削右边？」','石壁上刻满密密麻麻的规矩，却没有一条写「为什么」。'],
+  opts:[['削左边：先保住大多数人走的路',36],['削右边：先保住最弱的那一段',34],['不削：重画一条新的线',30]],
+  res:['你削去左边。男人盯着线看了一会：「多数人好走，少数人就被削掉了。」他没有说你错，只在石壁角落添了一行小字。','你削去右边。男人笑了一声：「护住最弱的，代价通常由你来付。」他把炭条折断半截，递给你当作记认。','你没有削，重新画了一条。男人沉默很久：「定规矩的人，最怕的不是错，是以为自己只能照着错下去。」他让开石壁，任你写下一条。'],
+  rel:['论律','辩难','受其点拨']},
+ {era:3,phase:'mortal',n:'狂蛮魔尊·兽皮角力',char:'狂蛮魔尊',school:'力道',w:9,actId:'conflict',basis:'游戏原创相遇（狂蛮魔尊、力道与变化道为原著背景）',note:'部族篝火、兽皮角力与猎场赌约均为原创；不把玩家写成狂蛮部众，也不改写其生平。',
+  lines:['部族篝火旁，一个赤膊巨汉把一张兽皮拍在石头上，扬声道：「赢我一次，这张皮归你；输了，替我守一夜猎场。」','他手臂上的旧伤像兽爪，笑起来却毫无恶意。围观的人说，这人每年雪季都会来，没人知道他叫什么。','他伸出手，等你。'],
+  opts:[['角力：跟他硬掰手腕',34],['比猎：不用蛮力，比谁先找到兽迹',36],['不赌：请他先说说为何年年到此',30]],
+  res:['你跟他掰到手臂发麻，最终还是被他按在石上。巨汉大笑，把兽皮塞给你：「输了也守约，算你有种。」他替你揉开腕上的淤青。','你没有比力气，只沿雪地找兽迹。等你指出兽群换道的方向，巨汉收了笑：「力气会老，眼睛不会。」他把猎场最好的位置让给你。','你没有下注，只问他为何年年到此。他望着火堆说：「来看看还有没有人记得怎么跟山打交道。」临走时，他把兽皮留在你脚边。'],
+  rel:['角力','比猎','对饮']},
+ {era:4,phase:'mortal',n:'红莲魔尊·渡口悔舟',char:'红莲魔尊',school:'宙道',w:9,actId:'growth',basis:'游戏原创相遇（红莲魔尊与宙道/宿命为原著背景）',note:'旧渡口、补舟与悔意问答均为原创；不把玩家写成红莲真传继承者，也不改写光阴长河节点。',
+  lines:['旧渡口边，一个红衣男人坐在破舟上补网。船头挂着一盏不亮的灯，他却补得很认真。','「若有朝一日你能回到某一天，」他头也不抬，「你会回去改一件事，还是回去看一个人？」','河面泛红，像被晚霞浸过。他把手里的梭子递给你。'],
+  opts:[['改一件事：把错的改回来',36],['看一个人：只见一面，不说话',34],['不回去：过去就让它过去',30]],
+  res:['你接过梭子，说想改一件错事。红衣男人没有抬头：「改得回来的是事，改不回来的是人。」他把网结打得更紧，像是要把什么留住。','你说只想再看一个人。他的手停了一瞬：「看一眼不算贪心。怕的是看完还想再留一天。」他把那盏不亮的灯递给你。','你说不回去。红衣男人终于抬头，看了你很久：「能这么说的人，多半已经回过一次了。」他没有追问，只把舟推离岸边。'],
+  rel:['论悔','受其点拨','相交']},
+ {era:5,phase:'mortal',n:'元莲仙尊·画坊补笔',char:'元莲仙尊',school:'木道',w:9,actId:'growth',basis:'游戏原创相遇（元莲仙尊、木道与画道为原著背景）',note:'山谷画坊、残荷补笔与问答均为原创；不把画坊写成元莲仙尊亲设地点，也不涉及豆神宫本体。',
+  lines:['中洲山谷的小画坊里，一个青衫画师正为一幅残荷补叶。他画得很慢，笔尖却从不迟疑。','「这画缺一笔，」他把笔递给你，「你补叶，还是补水？」','画坊外，几株青莲在风里轻晃。画师说，画完这一笔，这幅画就不再是他的了。'],
+  opts:[['补叶：让残荷看起来还活着',36],['补水：让枯意留在画里',34],['不补：留白也是一种画',30]],
+  res:['你补了一片新叶。青衫画师看了半晌：「活是活了，可枯意没了。」他没有改你的笔，只在叶脉旁添了一点淡墨。','你补了水。枯荷映在水里，反倒比先前更像活着。画师点头：「有些生机，不在叶上。」他把调墨的方法讲给你听。','你搁下笔。画师笑了：「留白最难，因为人人都想把它填满。」他把画挂在墙上，任风吹得纸角轻响。'],
+  rel:['补笔','论画','受其点拨']},
+ {era:6,phase:'mortal',n:'盗天魔尊·空门旧片',char:'盗天魔尊',school:'偷道',w:9,actId:'growth',basis:'游戏原创相遇（盗天魔尊、偷道与空门追寻为原著背景）',note:'西漠夜市、半块铜片与空门传闻均为原创；铜片不是真实空门入口，也不写成盗天本人遗物。',
+  lines:['西漠夜市的角落里，一个口音古怪的汉子摆着一堆没有标签的旧货。他手里捏着半块铜片，反复对着灯火看。','「小兄弟，」他压低声音，「你见过一扇门，推开之后不是屋子，是别的地方吗？」','铜片边缘刻着半扇门的轮廓，另一半被人为磨掉了。'],
+  opts:[['细看铜片：帮他辨认纹路',36],['反问来历：先问他是谁',34],['不碰：告诉他空门只是传闻',30]],
+  res:['你借灯细看，认出半扇门上的纹路并非西漠常见样式。汉子眼睛一亮，随即又暗下去：「你也只认得半扇。」他把铜片收回怀里，却把一条商路暗线告诉了你。','你没有看铜片，只问他是谁。汉子愣了一下，笑道：「一个想回家的人。」他不肯多说，临走前把一枚旧币塞给你，说日后可换一次消息。','你告诉他空门只是传闻。汉子点点头，没有争辩，只把铜片收好：「传闻也是有人见过，才传得起来。」他推着货担走进夜色。'],
+  rel:['相助','试探','相交']},
+ {era:7,phase:'mortal',n:'巨阳仙尊·王庭分炙',char:'巨阳仙尊',school:'运道',w:9,actId:'growth',basis:'游戏原创相遇（巨阳仙尊与运道/王庭为原著背景）',note:'雪地分肉、运气问答均为原创；玩家不带黄金血脉，也不获得巨阳真传或王庭身份。',
+  lines:['王庭外的雪地里，一个金发男人支起铁架分烤肉。排队的人很多，他给每个人的份量都一样，连最瘦小的孩子也不例外。','轮到你时，他多看了你一眼：「你说，运气是天给的，还是人分出来的？」','他把最后一小块肉在手里掂了掂，没有立刻放进谁的碗里。'],
+  opts:[['天给：运气自有定数',34],['人分：分得公，才有运',36],['自己争：谁有本事谁多拿',30]],
+  res:['你说运气是天给的。金发男人把肉放进你碗里：「等天给的人多，天记不住。」他仍给你添了一勺热汤。','你说运是人分出来的。他笑了，把最后一小块肉分成两半，一半给你，一半给了排在后面的老人：「分得公，才有人肯跟你走。」','你说谁有本事谁多拿。他没有生气，只把肉放回架上：「争来的肉香，可争久了，就没人愿意排队了。」他让你自己切一块。'],
+  rel:['受赠','论运','较量']},
+ {era:8,phase:'mortal',n:'青仇·灭门余生',char:'青仇',school:'魂道',w:9,actId:'conflict',basis:'游戏原创相遇（青家被幽魂灭族、青鬼沙漠为原著背景）',note:'焦黑村口、断剑少年与去留选择均为原创；青家已灭族，不写成族群延续，也不改写青仇的复仇主线。',
+  lines:['焦黑的村口，一个少年抱着一柄断剑坐在废墟里。他不哭，也不赶你走，只盯着远处被魂雾遮住的天。','「你来晚了，」他说，「该烧的都烧完了。」','他手背上有一道未愈的魂痕。你问他要不要一起离开，他摇头：「我得记住路，日后还要回来。」'],
+  opts:[['留下帮他掩埋族人',36],['劝他先活下去，再谈报仇',34],['不劝：把随身的干粮留给他',30]],
+  res:['你留下来，和他一起把能辨认的遗骨逐一掩埋。少年始终没哭，只在最后一捧土落下时，把断剑插在坟前。他记下了你的名字。','你劝他先活下去。他沉默很久，说：「活着不难，难的是活着还记得。」他没有答应，却把断剑从怀里放下，先接过了你递来的水。','你没有劝，只把干粮放在他脚边。少年看了你一眼，没有道谢，也没有拒绝。你走出很远，才听见身后传来很轻的一声「多谢」。'],
+  rel:['相助','劝诫','赠粮']},
+ {era:9,phase:'mortal',n:'乐土仙尊·施粥问善',char:'乐土仙尊',school:'土道',w:9,actId:'growth',basis:'游戏原创相遇（乐土仙尊仁善理念与灾后休养为原著背景）',note:'粥棚、最后一碗粥与分配选择均为原创；不写成乐土亲设净土，也不替玩家立道德结论。',
+  lines:['灾后的粥棚前，一个布衣僧人把最后一勺粥舀进碗里。排队的人还剩两个：一个壮年，一个病弱老人。','僧人把碗放在案上，问你：「只剩一碗。你说，该给谁？」','他自己也饿着，却没有先动勺。'],
+  opts:[['给老人：他更撑不住',36],['给壮年：他能干活，能救更多人',34],['分半碗：两人都先垫一口',30]],
+  res:['你把碗推给老人。僧人点头，又取来一块干饼掰给壮年：「今天先活下来，明天再谈谁该活。」壮年接过饼，低头道谢。','你把碗给壮年。僧人没有反对，只让壮年先去把塌渠的木桩扶正：「能干活的人，先担一份责。」老人则被他扶到棚下歇息。','你把粥分成两半。僧人看着两只半碗，说：「都吃不饱，可都还愿意等下一锅。」他把自己那份也添了进去。'],
+  rel:['施粥','论善','相助']},
+ {era:0,phase:'immortal',n:'元始仙尊·炉前问气',char:'元始仙尊',school:'气道',w:9,basis:'游戏原创相遇（元始仙尊与三气/古炼炉为原著背景）',note:'古炼炉遗址与三气问答均为原创；不把玩家写成元始亲传，也不改写其生平与天庭建立。',
+  lines:['你以蛊仙之身回到远古一处古炼炉遗址。炉火未熄，一个布衣老者坐在炉前，把三缕颜色不同的气按在炉盖上。','「三气不是三种力量，」他头也不抬，「是你肯先舍哪一口气。」炉中气浪翻涌，映出你一路走来的取舍。','他让出一块炉石：「坐下。说说你如今最舍不得的是什么。」'],
+  opts:[['说寿元：承认自己怕死',36],['说道统：怕自己所学失传',34],['说故人：怕故人先走',30]],
+  res:['你说怕死。老者没有笑你：「怕死的人才肯炼气，不怕死的人多半已经死了。」他教你一段收敛气机的法门。','你说怕道统失传。老者把三气合成一缕：「传下去的不是法子，是肯教人的心。」他让你在炉前记下一段最基础的讲法。','你说怕故人先走。老者沉默良久，把炉火压小：「留住人难，留住他们教你的东西，倒还有可能。」他没有再问。'],
+  rel:['论道','受其指点','相交']},
+ {era:1,phase:'immortal',n:'星宿仙尊·星盘问对',char:'星宿仙尊',school:'智道',w:9,basis:'游戏原创相遇（星宿仙尊与智道/星道为原著背景）',note:'观星台、星盘与问答均为原创；不把星盘写成星宿仙尊留下的真实布局。',
+  lines:['观星台上，星盘自行转动。一名星纹长袍的女子立在盘心，指尖悬在一颗将坠未坠的星子上。','「你已升仙，」她说，「可你看星时，看的是吉凶，还是看它为何在那里？」','星盘边缘，几颗暗星正被新的光点挤开。她让你选一颗，说明理由。'],
+  opts:[['选将坠的暗星：先看它为何熄灭',36],['选新亮的光点：先看它能照多久',34],['都不选：先问星盘为谁而转',30]],
+  res:['你指向暗星。女子点头：「肯看熄灭的人，才不容易被新光骗。」她把一段推演星轨的次序讲给你听。','你指向新光。女子淡淡一笑：「亮得早的，未必照得久。」她仍把新光的来处指给你看，让你自己判断。','你没有选，只问星盘为谁而转。女子收回手：「为一个不肯认命的人。」星盘停了一瞬，又自行转起来。'],
+  rel:['论势','受其点拨','对弈']},
+ {era:2,phase:'immortal',n:'无极魔尊·九虚残局',char:'无极魔尊',school:'律道',w:9,basis:'游戏原创相遇（无极魔尊与律道/九虚为原著背景）',note:'九虚残阵与改规矩问答均为原创；不把玩家写成无极门下，也不改写疯魔窟封门节点。',
+  lines:['九虚残阵深处，一个披发男人坐在断柱上，把九枚石子在掌心排来排去。阵中的规则随他指节一动便改一分。','「你走到这里，」他说，「是靠守规矩，还是靠找到规矩的缺口？」','他把九枚石子推到你面前：「改一条。改完，你得自己走进去。」'],
+  opts:[['守规矩：先按旧阵走一遍',34],['找缺口：改一条最不起眼的',36],['不改：问他这些规矩是谁定的',30]],
+  res:['你按旧阵走了一遍，阵势稳却处处受制。男人看着你走完：「守得住，才有资格谈改。」他把其中一枚石子的用法讲透。','你改了一条最不起眼的规矩，阵中立刻空出一道细缝。男人笑了：「缺口从来不在最显眼的地方。」他让你自己走进那道缝。','你问他规矩是谁定的。男人把石子撒开：「定规矩的人早走了，守规矩的人还在。」他没有逼你改，只让你带着这个问题离开。'],
+  rel:['论律','受其点拨','辩难']},
+ {era:3,phase:'immortal',n:'狂蛮魔尊·力祭对饮',char:'狂蛮魔尊',school:'力道',w:9,basis:'游戏原创相遇（狂蛮魔尊、力道与变化道为原著背景）',note:'力祭台、兽骨与问答均为原创；不把玩家写成狂蛮部众，也不改写其本人经历。',
+  lines:['力祭台上，巨汉把一坛烈酒推给你。台下兽骨堆成山，风一吹便发出低沉的呜咽。','「力道练到后来，」他抹了把嘴，「你是想把山推开，还是想让自己变成山？」','他抬手在石台上按出一个深坑：「选一个。按下去，让我看看你的道。」'],
+  opts:[['推山：以力破力',36],['成山：以势承势',34],['都不选：先问他为何在此祭力',30]],
+  res:['你一拳按进石台，碎石四溅。巨汉大笑：「推得开山，未必承得住山。」他仍把运力的关窍讲给你，让你少走一段弯路。','你没有硬推，只把力道沉进脚下，石台纹丝不动。巨汉收了笑：「能承住，才算把力练到自己身上。」他与你对饮一碗。','你问他为何在此祭力。巨汉望着兽骨堆：「给那些没能活下来的。」他没有再劝你选，只把酒坛留给你。'],
+  rel:['角力','对饮','受其点拨']},
+ {era:4,phase:'immortal',n:'红莲魔尊·光阴一叶',char:'红莲魔尊',school:'宙道',w:9,basis:'游戏原创相遇（红莲魔尊与宙道/光阴长河为原著背景）',note:'光阴渡口、红叶映旧日均为原创；不改写宿命蛊节点，也不把红叶写成真实光阴长河入口。',
+  lines:['光阴渡口的水面浮着一片红叶。红衣男人站在岸边，说这片叶子能映出你过去的一天。','「只一天，」他提醒，「看完不能改。你还看吗？」','叶子在你掌心微微发烫，水面已经浮出旧日的影子。'],
+  opts:[['看：选最想再看的一天',36],['不看：过去不必再翻',34],['把叶子还给他：先问他看过哪一天',30]],
+  res:['你看了。旧日的光影一闪而过，你终于看清当时忽略的一处细节。红衣男人没有问你看的是什么，只说：「看清了，就别再用它罚自己。」','你没有看，把叶子放回水面。红衣男人点头：「能不看的人，多半已经放下了。」他仍把一段辨识光阴痕迹的方法讲给你。','你把叶子递回去，问他看过哪一天。他沉默很久：「看过。所以才守在这里。」他没有说哪一天，只把渡口让开。'],
+  rel:['论悔','相交','受其点拨']},
+ {era:5,phase:'immortal',n:'元莲仙尊·画中问心',char:'元莲仙尊',school:'木道',w:9,basis:'游戏原创相遇（元莲仙尊、木道与画道为原著背景）',note:'莲池画壁与问答均为原创；不提前把神帝城或其完成形态当作本时期现成场景。',
+  lines:['莲池边的画壁上，一层层旧画叠在一起。青衫画师站在壁前，笔尖悬着，却不落。','「你看这壁，」他说，「是画盖住了墙，还是墙托住了画？」','他让开半步，把笔交给你：「今日你画一笔，明日它便可能是别人的墙。」'],
+  opts:[['画墙：先让墙承住画',36],['画心：先让画说出自己的意思',34],['不画：先问这壁原先是什么',30]],
+  res:['你先看墙的裂纹，再落笔。青衫画师点头：「知道墙会塌，画才不会乱。」他把辨别旧画层序的方法教给你。','你画了一笔自己的意思。画师看了许久：「画有心，可心也要有地方落。」他没有改你的笔，只替你补稳了底色。','你问这壁原先是什么。画师让开整面墙，露出最底下一层旧痕：「是一堵挡风的土墙。」他让你自己决定要不要再画。'],
+  rel:['补笔','论画','受其点拨']},
+ {era:6,phase:'immortal',n:'盗天魔尊·空门一诺',char:'盗天魔尊',school:'偷道',w:9,basis:'游戏原创相遇（盗天魔尊、偷道与空门追寻为原著背景）',note:'黯淡蛊虫与空门问答均为原创；遁空蛊未能使盗天进入空门，不把玩家遭遇写成真实空门入口。',
+  lines:['西漠深处，一个中年男人把一枚黯淡的蛊放在沙上。蛊身有门形纹路，却始终合不拢。','「我炼了很久，」他说，「还是差一线。你说，门能不能被偷走？」','他抬头看你，眼里没有疯意，只有一种很旧的执拗。'],
+  opts:[['能偷：偷的是门后的东西',36],['不能偷：门是路，不是物',34],['不答：先问他为何非要回去',30]],
+  res:['你说能偷。男人眼睛亮了一瞬，随即又摇头：「偷得走东西，偷不走路。」他把蛊身上那道合不拢的纹路指给你看。','你说门是路，不是物。男人沉默很久：「路也能被截断。」他把蛊收回袖中，却把一段跨域潜行的关窍讲给你。','你问他为何非要回去。男人望着西漠尽头：「家里还有人在等。」他没有再说，只把蛊埋回沙里。'],
+  rel:['相助','论道','相交']},
+ {era:7,phase:'immortal',n:'巨阳仙尊·真阳赐宴',char:'巨阳仙尊',school:'运道',w:9,basis:'游戏原创相遇（巨阳仙尊与运道/真阳楼为原著背景）',note:'真阳楼外赐宴与押运问答均为原创；玩家不带黄金血脉，也不获得巨阳真传。',
+  lines:['八十八角真阳楼外，金发男人摆了一桌简单的酒菜。楼上金光流转，楼下却只有粗瓷碗。','「你修到这一步，」他给你斟酒，「是靠算计每一分运，还是靠敢赌一次？」','他把一枚旧铜钱按在桌上，正面朝上：「押一面。输了，只当我请你喝酒。」'],
+  opts:[['算运：先看清每一处得失',36],['赌运：押自己没算过的一面',34],['不押：先问他为何在楼外设宴',30]],
+  res:['你说靠算计。金发男人点头：「算得清的人，输得少，也赢得少。」他把一枚旧铜钱翻过来，让你看背面的磨痕。','你押了没算过的一面。铜钱落下，果然是背面。男人大笑：「敢赌的人，才有机会见到算不出的运。」他仍把赌局的门道讲给你。','你没有押，只问他为何在楼外设宴。男人望向高楼：「楼上的人算得太久，忘了粗瓷碗里的酒是什么味。」他与你碰了一碗。'],
+  rel:['论运','较量','受其点拨']},
+ {era:8,phase:'immortal',n:'青仇·魂潮夜话',char:'青仇',school:'魂道',w:9,basis:'游戏原创相遇（青家被幽魂灭族、青鬼沙漠为原著背景）',note:'魂潮荒原与问答均为原创；不安排幽魂本尊现身，也不改写青仇的复仇主线与青家灭族事实。',
+  lines:['魂潮退去的荒原上，一个背断剑的男人坐在骨堆旁。他已是蛊仙，眼里却没有半点轻松。','「你见过幽魂，」他说，「你说，一个人被灭了全族，往后活着，还算不算青家人？」','魂雾在他身周聚散。他没有请你帮忙，只把这个问题放在你面前。'],
+  opts:[['算：记得的人还在，就算',36],['不算：族没了，人得另立门户',34],['不答：先问他自己怎么想',30]],
+  res:['你说记得的人还在，就算。青仇握剑的手松了一瞬：「记得，也得有人肯听。」他把青鬼沙漠里一处旧路标指给你，作为答谢。','你说族没了，人得另立门户。青仇沉默很久：「另立门户，也得先有人活下来。」他没有反驳，只把魂潮退去的时辰告诉你。','你反问他自己怎么想。青仇望着魂雾：「我若知道，就不会坐在这里。」他仍把一段稳定魂息的吐纳法教给你。'],
+  rel:['论道','相助','相交']},
+ {era:9,phase:'immortal',n:'乐土仙尊·渡魂一灯',char:'乐土仙尊',school:'土道',w:9,basis:'游戏原创相遇（乐土仙尊仁善理念与渡魂意象为原著背景）',note:'渡魂渡口、旧灯与渡人选择均为原创；不把渡口写成乐土亲设地点，也不替玩家判定善恶。',
+  lines:['渡魂渡口，一个僧人提着一盏旧灯，替过河的亡魂照路。河上雾很重，灯却照得很远。','「你已升仙，」他说，「若只能渡一个人过河，你渡谁？」','他把灯递给你，河面浮出几张你认得的旧面孔。'],
+  opts:[['渡故人：先渡自己牵挂的',36],['渡陌生人：先渡无人记得的',34],['不渡：让他们自己走',30]],
+  res:['你把灯照向故人。僧人没有阻拦，只说：「牵挂不是错，别让牵挂变成只看得见一个人。」他替你扶稳灯柄。','你把灯照向陌生亡魂。僧人点头：「无人记得的，最容易被漏下。」他把一段安魂的念法教给你。','你没有渡，把灯放回岸上。僧人看着河面：「肯让他们自己走，也是一种送。」他没有再劝，只把灯留给你。'],
+  rel:['论善','受其指点','相助']},
+ {era:10,phase:'mortal',n:'方源·同门夜谈',char:'方源',school:'气道',w:10,actId:'growth',secondLife:true,region:'南疆',birthLike:'青茅山',basis:'游戏原创相遇（青茅山学堂与方源第二世早年为原著背景）',note:'玩家不是方源，不获得其身份、记忆、春秋蝉或主角机缘；对话不泄露重生与后续布局，也不改写方源主线。',
+  lines:['月色压在青茅山的屋檐上。学堂后的石阶旁，一个与你同届的少年正把一摞旧书重新捆好，动作很慢，却一根绳结都不肯错。','他抬眼看你，目光先落在你的袖口和鞋底，才落到脸上：「这么晚还不睡，是丢了东西，还是想找什么东西？」','他没有报名字。学堂里人人都知道，他叫方源。'],
+  opts:[['直说：问他如何在短时间里开窍',36],['试探：反问他为何总在夜里整理旧书',34],['不问：只把捡到的书签还给他',30]],
+  res:['方源把绳结收紧，淡淡道：「窍是自己开的，别人替不了。」他没有多说，只把一页写废的吐纳次序递给你，让你自己看哪里错了。','「旧书便宜，」他说，「翻烂了不心疼。」你听得出这不是全部缘由，但他已经低头继续捆书，摆明了不想再谈。','他接过书签，指腹在边角停了一下：「多谢。」就这两个字，却比先前那句问话真了些。他临走前告诉你，药园后墙夜里不太平。'],
+  rel:['请教','试探','相交']},
+ {era:10,phase:'immortal',n:'陆畏因·南疆论善',char:'陆畏因',school:'土道',w:10,secondLife:true,basis:'游戏原创相遇（陆畏因承接乐土真传、南疆善后为原著背景）',note:'陆畏因不得提前到乐土时期；本事件只写其后世南疆善后，不把乐土真传写成统一宗门，也不替玩家判定善恶。',
+  lines:['南疆的雨林深处，一个背着旧书箱的男人在渡口替人修补木桥。他的鞋底沾满泥，袖口却别着一枚乐土真传的旧印。','「你从北边来，」他说，「见过那些被大战碾过的村子吗？」','他把一块新木板按进桥缝，等你回答。'],
+  opts:[['见过：说战争从不只死在前线',36],['没见过：坦白自己只顾修行',34],['反问：修补一座桥能救多少人',30]],
+  res:['陆畏因把钉子敲正：「见过的人，才肯多走一步。」他与你谈了很久战后如何安置流民与蛊师，临别时把一段调养元气的法子留给你。','「只顾修行也不是罪，」他说，「可怕的是修到后来，连自己顾过什么都不记得。」他没有说教，只让你替他扶住桥板。','「一座桥救不了多少人，」他抬头看雨，「可没有桥，一个也过不来。」他把乐土一脉整理伤患的次序讲给你听。'],
+  rel:['论善','受其指点','相助']}
+];
+var _ERA_CHAR_INDEX=null,_ERA_CHAR_LEN=-1;
+function getEraCharEvent(n){
+ if(!_ERA_CHAR_INDEX||_ERA_CHAR_LEN!==ERA_CHAR_EVENTS.length){
+  _ERA_CHAR_INDEX={};_ERA_CHAR_LEN=ERA_CHAR_EVENTS.length;
+  for(var i=0;i<ERA_CHAR_EVENTS.length;i++)_ERA_CHAR_INDEX[ERA_CHAR_EVENTS[i].n]=ERA_CHAR_EVENTS[i];
+ }
+ return _ERA_CHAR_INDEX[n]||null;
+}
+async function eraCharEventDispatch(name,phase){
+ var e=getEraCharEvent(name),i,c;
+ if(!e||e.phase!==phase||e.era!==S.eraIdx)return false;
+ if(hasMark('已见·'+name))return false;
+ if(e.secondLife&&!isSecondLife())return false;
+ if(e.region&&S.region!==e.region)return false;
+ if(e.birthLike&&String(S.birth||'').indexOf(e.birthLike)<0)return false;
+ if(phase==='mortal'&&S.lv>=6)return false;
+ if(phase==='immortal'&&S.lv<6)return false;
+ if(!eventEraAllowed(name)||!travelEventEraAllowed(name)||!nameAllowed(name))return false;
+ for(i=0;i<e.lines.length;i++)await say(e.lines[i],i===0?'gold':'sys');
+ c=await optW(name,e.opts);
+ if(e.res&&e.res[c])await say(e.res[c],c===0?'good':'gold');
+ if(phase==='mortal'){
+  if(c===0)await mortalGrowthReward(e.school||mortalEraRewardSchool(e.era),name);
+  else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await say('道心+1，道德+1。','good');}
+  else{S.flags.daoYuan=(S.flags.daoYuan||0)+1;await say('道缘+1。','good');}
+ }else{
+  if(c===0){await mortalGrowthReward(e.school||mortalEraRewardSchool(e.era),name);S.lv=Math.min(9,S.lv+0.5);await say('修为+0.5。','gold');}
+  else if(c===1){S.dhIdx=Math.min(8,S.dhIdx+1);S.morIdx=Math.min(7,S.morIdx+1);await say('道心+1，道德+1。','good');}
+  else{S.flags.daoYuan=(S.flags.daoYuan||0)+1;gainLife(2);await say('道缘+1，寿元恢复2年。','good');}
+ }
+ if(e.rel&&e.rel[c])setSocialRelation('character',e.char,e.rel[c],name);
+ S.marks.push('已见·'+name);
+ chr(name);
+ if(typeof renderPanel==='function')renderPanel();
+ return true;
+}
+(function(){
+ var i,e,pool;
+ for(i=0;i<ERA_CHAR_EVENTS.length;i++){
+  e=ERA_CHAR_EVENTS[i];
+  if(e.phase!=='mortal')continue;
+  pool=ERA_MORTAL_EVENTS[e.era]||(ERA_MORTAL_EVENTS[e.era]=[]);
+  pool.push({n:e.n,w:e.w||8,g:(function(n,sl,rg,bl){return function(){return !hasMark('已见·'+n)&&(!sl||isSecondLife())&&(!rg||S.region===rg)&&(!bl||String(S.birth||'').indexOf(bl)>=0);};})(e.n,!!e.secondLife,e.region,e.birthLike)});
+  EVENT_ERA[e.n]={minEra:e.era,maxEra:e.era};
+  DEX_ERA_EVENTS.push(e.n);
+  if(!ERA_EVENT_REVIEW[e.era])ERA_EVENT_REVIEW[e.era]={};
+  ERA_EVENT_REVIEW[e.era][e.n]={actId:e.actId||'growth',kind:'人物交互',status:'已核对',basis:e.basis,note:e.note};
+ }
+})();
+
 try{Object.freeze(EVENT_ERA);}catch(e){__timelineFrozen=false;__timelineErr+='EVENT_ERA: '+String(e)+'; '}
 if(window.__TIMELINE){window.__TIMELINE._frozen=__timelineFrozen;window.__TIMELINE._err=__timelineErr;}
 (function(){
@@ -14684,6 +15115,8 @@ var DEX_TRAVEL_EVENTS = [
  '龙鲸洞天·功德方尖碑','兽灾洞天·百兽化身',
  /* v1.25 南疆余波 */
  '三王传承余波','白骨山·血海余烬','义天山前夜',
+ /* v2.07 各时代升仙后人物交互 */
+ '元始仙尊·炉前问气','星宿仙尊·星盘问对','无极魔尊·九虚残局','狂蛮魔尊·力祭对饮','红莲魔尊·光阴一叶','元莲仙尊·画中问心','盗天魔尊·空门一诺','巨阳仙尊·真阳赐宴','青仇·魂潮夜话','乐土仙尊·渡魂一灯','陆畏因·南疆论善',
  /* 各时代专属关键历练（元始/星宿/无极/狂蛮/红莲/盗天/巨阳/幽魂/元莲/乐土） */
  '三气初炼','开炉试蛊','气道问心','元始残炉','炼道论榜','三气归来迹','天庭外门试炼','定仙游遗迹','推演一劫','天庭残图','星宿意志','疯魔窟·初探','元境初封','魔尊落子','九虚反噬','光阴浮冰','兽潮前锋','变化试形','力道斗场','荒原遗骨','血皮之兆','狂蛮意志回响','光阴裂隙','昨日重逢','飞刃试锋','红莲残瓣','定命一掷','红莲意志回响','长毛老祖·三次炼蛊','遁空蛊之败','推杯换盏','疯魔窟·无极意志','落魄谷','无间道','真阳遗影','血脉祭台','运道赌局','黄金族盟约','北原王庭','巨阳余晖','魂潮夜行','无主福地','白骨帝座','万魂谷','幽魂回望','空城夺宝','青莲入画','木心问根','画道夺锋','枯木逢春','莲池论笔','元莲画意','净土立约','厚土问心',
  /* 通用蛊仙历练 */
