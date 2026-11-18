@@ -1,77 +1,4 @@
-
-
 <!DOCTYPE html>
-<!--
-AI 开发规范 · 新增杀招（v1.30）
-1. 新增杀招只向 SPEC_LIB.entries 追加一条记录，字段依次为：id / name / school / type / grade / dir / effectKey / trigger / effect / limit / holder / source / status；可选扩展字段按既有条目需要添加。
-2. 玩家可获得：holder:'玩家'，图鉴自动收录。敌方专属：holder:'敌方'，默认不进图鉴；确需收录时在该条目增加 dex:true。
-3. trigger 使用自然语言写清习得/触发路径（如“在某处习得”），不要写“——”“不可获得”等占位文字。
-4. 必须确认实际授予路径：learnSpec / addMove / grantBatchSpec / DREAM_SPEC_POOL 等；仅有数据登记不等于玩家可获得。
-5. 后续新增杀招只改 SPEC_LIB.entries.push(...)；不要再维护 SPEC_NAMES，也不要为单条新增手动修改 dexStatics、dexHint 或敌方过滤规则。
-6. 统计总表口径的批量杀招带 batch:true；batchEntries 由 SPEC_LIB.entries 惰性派生，新增条目只需 push 到 entries，不要手动维护 batchEntries。
-12. 新增时代池/出生地/种族事件，按时代异闻统一向 DEX_ERA_EVENTS 补一行；凡人期游历事件也必须同步图鉴并标注「凡人期游历」。凡人期游历由次数盘抽取4～6次，池中不得加入空白/反常占位签；新增升仙后游历/关键历练仍向 DEX_TRAVEL_EVENTS 补一行。
-13. v1.83 起，第三阶段按时期逐一重建六幕；v1.84 已完成无极魔尊时期（eraIdx 2），v1.85 完成狂蛮魔尊时期（eraIdx 3）第一轮重构；每期必须覆盖 ERA_EVENT_CATALOG、专属游历、关键历练与原有终局入口，并区分原著锚点、合理推断和游戏原创场景。不得把尊者本人、意志/遗产与后世组织活动混为一谈。
-8. v1.42 起，新增时代凡人事件须同步维护对应事件池 / DEX_ERA_EVENTS / EVENT_ERA；时代历史回响须标注原著明确内容、合理推断或游戏原创设定的依据层级；新增人物只按原著时间线与生死门控出场，不用凡人支线改写原著大事件。
-9. v1.44 起，人物交集写入 S.flags.socialMemory.characters，势力交集写入 S.flags.socialMemory.factions；只记录叙事关系，不把阶段性协作写成永久阵营归属。新增人物记忆须复用既有时代/生死/身份门控；新增时代池或游历事件仍按第7条同步图鉴。
-10. v1.45 起，重逢/交涉选项由 socialMemoryChoice(name) 统一提供；按人物/势力真实关系及上次回应分支，使用事件级去重键。
-11. v1.46 起，人物/势力关系统一经 getSocialRelation(type,name) / setSocialRelation(type,name,status,source) 读写；长期 status 与单次 lastResponse 分离，展示与事件判定不得绕过接口。
-12. v1.49 起，人物、剧情、蛊虫、流派、资源、境界等用词一律以《蛊真人》原著为准；不得套用其他修仙作品的惯用称呼。例：使用「寿蛊」，不得写成「寿元蛊」；不确定的术语先核对原著，不自行创造。
-13. v1.50 起，炼天第一世与第二世必须严格隔离：第一世不得进入第二世宿命大战、疯魔窟第九层、事实浮冰及星宿/巨阳复苏后的尊者布局；第二世专属事件须由 isSecondLife() 或等价前置门控。第一世若调用第二世终局函数，必须安全终止，不得继续推进。
-14. 版本号每次补丁递增；CHANGELOG 不必逐次追加，约每 3～5 次更新合并整理一次。合并前保留既有日志，不因跳过单次日志而省略 APP_VER、分享文件/战报版本及 __RUN_AUDIT.version 同步。
-15. v1.55 起，第二世专属关键历练即使只在第二世抽取池中加入，也必须登记进 LIFE_GATE；genericEvent / doTravail / doKeyTrial 等直接分发入口统一由 nameAllowed 复核，防止第一世绕过抽取池触发第二世剧情。
-16. 身份经历新增/改名须维护 ID_EVENTS 或 IDENTITY_EXTRA_EVENTS；事件图鉴由 identityEventNames() 动态派生，身份经历经身份线事件盘抽中后必须 dexAdd('ev',name)。新增家族/部族/独立身份类型须同步身份盘门槛、重要身份限制、立场权重与图鉴提示。
-16. v1.56 起，整体重构按「历史编年→时代剧情→人物势力→事件系统→转盘→玩家人生→整合测试」分阶段进行；先复核并迁移旧内容，不得直接清空重写。历史总编年与游戏十一时期分层：人祖纪元、太古时代作为前置历史层，不擅自占用 eraIdx；十一时期映射保持兼容。每个可玩时期按六幕登记，未完成史实核对的幕标记为待审计，不得把框架占位冒充已完成剧情。奖励仅保留修为、境界、才情、流派造诣、寿元、蛊虫、杀招、传承、剧情九类；不得把名声、人脉、情报等另立为奖励类别。
-17. v1.57 起，旧时代凡人事件先进入 ERA_EVENT_CATALOG 盘点索引；未逐条核对前 actId 留空、status 标记待审计，不得凭标题猜测六幕归属；索引只读，不得改变旧事件池权重、门控和结算。
-18. v1.58 起，逐时期审计 ERA_EVENT_CATALOG：归幕只表示玩家遭遇内容在六幕结构中的整理位置，不等于原著史实的精确时间顺序；basis 必须区分原著明确背景、合理推断与游戏原创场景，原著背景不得冒充原著场景。未核对的事件继续保持待审计。
-19. v1.59 起，无极时期事件必须区分疯魔窟/疯魔九虚阵/魔音的原著背景与游戏原创的役工、道场开放、石壁、九种回声等具体场景；不得把原创阶段（如「尚未封门」「魔音尚不杀人」）写成原著事实。玩家与无极的相遇、对话和关系均须标为游戏原创。
-20. v1.60 起，狂蛮时期事件须区分原著明确的力道、变化道、兽人习俗及狂蛮相关传承，与游戏原创的部族日常、兽图、盟誓和玩家支线；不得把凡人部族场景写成狂蛮魔尊本人真实经历，也不得把后世真传内容提前泄露为当时凡人已知。
-20. v1.68 起，区分原著历史大时代与游戏 eraIdx：人祖/太古为不可玩前置层；远古、上古、中古、近古分别映射 eraIdx 0–1、2–4、5–7、8–9；eraIdx 10 是当代/方源时代，项目可简称炼天时代，但不另立为古代历史纪元。六幕是玩家剧情组织顺序，不代表原著史实的精确发生顺序；历史回响不得冒充当代实景。
-21. v1.61 起，红莲时期事件须区分红莲以爱情蛊损伤宿命蛊与后世宿命大战中宿命蛊被摧毁的时间节点；光阴飞刃不得误归红莲魔尊（原著相关梦境传承指向中洲薄家）；春秋蝉重生、光阴长河、红莲真传等原著设定不得被改写成凡人可随意使用的能力或遗迹。红莲时期凡人事件中的昨日重影、死者复生、渡口、改命符、红雨等具体场景，若无原著依据，必须明确标为游戏原创。
-22. v1.62 起，元莲时期事件须区分元莲仙尊以木道成尊、兼修画道及其留下豆神宫/画道布置等原著背景，与玩家看青莲、画壁题名、画工往来、托梦等游戏原创场景；豆神宫与帝君城后来合并为神帝城，不能把完成形态的神帝城及其壁画世界提前当作元莲时代已经存在。天元宝莲凡蛊产出元石，晋升至六转天元宝皇莲后才产出仙元；不得混写为凡蛊直接产出真元或仙元。
-23. v1.92 起，盗天魔尊时期事件须区分本杰孙为天外之魔、开创偷道、追寻空门、与长毛老祖合作炼制遁空蛊、留下十道真传等原著内容，与玩家窥见空门、街市行窃、雪人潜入墨人城、梦见本杰孙、残图与商旅传闻等游戏原创场景；盗天真传的天外之魔继承门槛不得泛化为所有普通传承，遁空蛊虽炼成却未能使盗天进入空门。不得把玩家原创遭遇写成盗天魔尊本人经历，也不得将空门传闻、残图或梦境误作真实真传入口。
-24. v1.64 起，巨阳仙尊时期事件须区分巨阳以运道成尊、开创运道，北原黄金血脉、王庭福地、八十八角真阳楼及三大运道真传等原著内容，与血祭夜、族谱记名、运道赌局、赛马、弃子逃亡、日蚀传言及王庭分肉等游戏原创场景；血脉身份不等于血道，具体血祭仪式与血脉印记不得冒充原著史实。巨阳仙尊建立八十八角真阳楼，长毛老祖参与炼制并将其提升至八转；王庭之争与十年一度的北原风雪/王庭福地传统须按原著背景表述；不得把长生天后世势力活动、劫运坛及炼天第二世的北原布局倒置为巨阳在世时期的凡人可见事件。
-25. v1.65 起，幽魂魔尊时期事件须区分幽魂以魂道成尊、开创魂道、青家被年轻时期的幽魂灭族、青鬼沙漠与青仇形成等原著背景，与空村、白骨原野、无主蛊群、灭门旧宅、荒地元泉、魂灯及魂碑等玩家原创遭遇；不得把玩家遇见的残魂、魂灯或魂碑写成幽魂本尊现身或原著遗迹。青家已被灭族，不得出现青家后人仍以原族群延续；青家遗藏、豆神宫与青仇的关联须按原著线索表述。幽魂死后本体残魂在生死门沉迷死境布局，七名分魂越过逆流河后创建影宗；影宗余烬只能作为幽魂身后/后世历史回响，不得写成幽魂在世时已公开活动的现成势力或把玩家发现的据点、密令当作原著遗物。
-26. v1.66 起，乐土仙尊时期事件须区分乐土在幽魂之后以仁善与和平理念修复五域、抑制魂道杀戮，留下五域真传、蓝龙鲸洞天与镇魔悔哭海等原著内容，与施粥、石窟、灯会、安葬、渡口、钟声及行愿回灯等玩家原创遭遇；不得把游戏原创净土、钟楼、行脚僧或渡口写成乐土仙尊亲历/亲设的原著地点。镇魔悔哭海位于蓝龙鲸洞天，相关封魔传闻不得泛化为凡人海域普遍异象；陆畏因是后世南疆真传承接者，不得写成乐土时期已与玩家同行的人物。乐土仙尊以德行感化世人、平息幽魂之后的乱局，不等于所有魂道传承或魂兽在其时期彻底消失。
-27. v1.67 起，方源时代事件须严格区分方源第一世与第二世：第一世为其五百年经历，末期炼成并催动春秋蝉，绝境中以命为代价重生；第二世回到青茅山，携带记忆但仍从凡人阶段重新开始。玩家不是方源，不因选择炼天时代、青茅山出生或触发人物事件而自动获得方源身份、记忆、蛊虫、资质与原著主角机缘。春秋蝉是时间道仙蛊，不存在本项目「春秋蝉蜕」事件所写的原著空壳；蝉蜕、金纹与玩家捡拾均属游戏原创。方源同门、狐仙福地旧迹、凤九歌命运余音、五域气潮迁徙等第二世节点必须保留 LIFE_GATE；第一世不得触发宿命大战、宿命蛊被毁、五域界壁消失、五域气潮及大时代后续。第一世版「时代余烬·炼天」只写当时凡人可见的商路、家族与魔道纷争；第二世版才可回响宿命大战后的历史。五域气潮发生在宿命大战、宿命蛊被毁及五域界壁消失之后，具体迁徙、商路与玩家旧识均为原创；龙公旧令只作游戏原创历史文书，不得冒充原著遗物。花酒行者、古月一族、白凝冰、古月方正、古月青书、贾金生、商心慈、商睚、凤九歌与龙公等人物及背景须服从原著生平和存亡，不得因玩家支线改写其主线。
-28. v1.69 起，人物/势力时间线必须区分「本人在世」「死后意志/残念」「真传/遗产」「后世组织活动」；尊者本人、分魂、地灵、意志不得混作同一出场状态。长毛老祖与琅琊地灵分开登记；血海老祖是巨阳仙尊死后若干年才发展起来的分身，最早不得早于巨阳之后；薄青、墨瑶属于近古后段，不能提前到红莲时期。影宗在幽魂死后由七名分魂创建；「影宗余烬」是历史回响，不得建立玩家与现存影宗的接触关系。人物真传抽取若无合时代候选，不得回退到未过滤的全量人物名单。尊者杀招归属按原著来源核对：光阴飞刃不列为红莲尊者招式；万我是方源第一世创制、第二世继续改良，血神子源于血海老祖。巨阳时期的「黄金血脉」只记血脉/族谱回响，不自动登记玩家接触长生天；势力阶段性合作只记录叙事接触，不自动形成永久阵营归属。
-
-AI 开发规范 · 终局控制流（v1.35 起）
-规则：ending() 使用 END_SENTINEL 结束当前异步链；新增 catch 时必须先判断 e&&e.end 并原样 throw，
-不得把终局信号当作普通错误吞掉。finally 可用于释放锁，但不得阻断异常继续传播。
-
-AI 开发规范 · 新增结局（v1.33 起；v1.37 起 opts 可附 epilogue 后世评语；v1.38 起重点结局有专属史书短评；v1.39 起签文关联结果、事件支持文本变奏；v1.40 起门控擦肩叙事与世人侧写；v1.41 起空事件/反常签须保持纯叙事且不登记普通事件）
-规则：新增结局只需【一句 ending(...)】，图鉴自动收录。
-DEX_ENDINGS 是未触发结局的静态占位表，由 gen-endings.js 从 ending() 字面量及
-战斗配置 deathName 字面量自动生成；新增结局后重跑脚本，不手工维护列表。
-END_META 仍由人工维护分组 / tier / hint 覆盖；不要自动生成或覆盖 END_META。
-不要再手动改 DEX_ENDINGS / END_META / LINE_ORDER / dexStatics / dexHint / dexRender。
-
-【写法一 · 最简（推荐大多数情况）】
-  await ending('新结局名', '一句谶语');
-  → 图鉴自动收录；谶语即图鉴 hint。
-  → 分组：名字含「·」时取前缀（且 LINE_NAME 已登记），否则归 other。
-
-【写法二 · 精确声明】
-  await ending('新结局名', '结局弹窗长谶语', {
-    line: '剑道',                   // 分组 key，需在 LINE_NAME 已登记
-    tier: 3,                        // 1 死亡/失败 · 2 普通 · 3 高光/成尊
-    hint: '图鉴里显示的短谶语'      // 省略则用第 2 参数 quote
-  });
-
-【新增分组】
-  先在 LINE_NAME 加一行：'新线':'新线中文名'
-  再在 LINE_ORDER 数组里插入 '新线'（放在 other 之前）。
-  然后在 ending() 的 opts.line 里使用。
-
-【禁止】
-  × 不要再往 DEX_ENDINGS 里手动 push 结局名。
-  × 不要再往 END_META 里手动写单条结局元数据（永久固定且需覆盖运行时兜底除外）。
-  × 不要用「其他/other」以外的占位分组名。
-
-【兜底行为】
-  - 未登记进 END_META 的结局，运行时自动写入 _endingDynamic，图鉴仍可见。
-  - 静态 END_META 优先于动态区；冲突时静态胜。
--->
 <html class="theme-star" data-page-node-id="MHUAzqWWh27n7pajmfScjd" lang="zh-CN" data-game-export-copy="1"><head data-page-node-id="oj2fWBR43inVolY8tbBoxn">
 <meta data-page-node-id="rhkEoL8euuI9smTiCpd9kd" charset="utf-8">
 <meta data-page-node-id="sVi0sq63sgumNQyHbDwJjQ" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
@@ -175,6 +102,51 @@ html,body{max-width:100%;overflow-x:hidden}body{-webkit-tap-highlight-color:tran
 #dexTabs{display:flex;gap:8px;margin:2px 0 8px}
 #dexTabs button{border:1px solid var(--line);background:#FFF;border-radius:999px;padding:6px 14px;font-size:13px;color:#6B6455;cursor:pointer}
 #dexTabs button.on{background:#3A3A3A;color:#FFF;border-color:#3A3A3A}
+/* v2.01 典籍：原著设定资料库 */
+#codexOverlay{position:fixed;inset:0;background:rgba(245,241,232,.985);z-index:60;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:26px 16px 60px;cursor:pointer}
+#codexOverlay.hidden{display:none}
+/* v2.04 名场面：人物对话演出 */
+#sceneOverlay{position:fixed;inset:0;background:rgba(8,11,20,.92);z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer}
+#sceneOverlay.hidden{display:none}
+#sceneCard{width:100%;max-width:520px;background:linear-gradient(165deg,#1B2233,#101521);border:1px solid rgba(212,175,55,.4);border-radius:18px;padding:20px 18px 14px;cursor:default;box-shadow:0 24px 60px rgba(0,0,0,.6);color:#E8E2D2}
+#sceneHead{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(212,175,55,.22);padding-bottom:8px}
+#sceneTitle{font-size:14px;font-weight:800;letter-spacing:2px;color:#E8C56A}
+#sceneDots{font-size:9px;color:#C79A2E;letter-spacing:2px}
+#sceneBody{min-height:190px;padding:18px 4px 10px;display:flex;flex-direction:column;justify-content:center}
+#sceneWho{font-size:12.5px;font-weight:700;color:#C79A2E;letter-spacing:1px;margin-bottom:8px}
+#sceneText{font-size:15.5px;line-height:1.9;color:#EDE7D8;white-space:pre-wrap}
+#sceneText.narr{color:#A9A293;font-style:italic}
+#sceneFoot{display:flex;justify-content:space-between;gap:10px;padding-top:8px;border-top:1px solid rgba(212,175,55,.18)}
+#sceneNext,#sceneExit{border:none;border-radius:999px;padding:9px 20px;font-size:13.5px;cursor:pointer;font-family:inherit}
+#sceneNext{background:linear-gradient(180deg,#E8C56A,#C79A2E);color:#0B0F1A;font-weight:700}
+#sceneExit{background:transparent;color:#8C8577;border:1px solid rgba(212,175,55,.25)}
+#codexCard{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px;cursor:default}
+#codexCard h3{font-size:15px;margin:0 0 6px;color:#6B6455;letter-spacing:2px}
+#codexTabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin:0 0 2px;scrollbar-width:none}
+#codexTabs::-webkit-scrollbar{display:none}
+#codexTabs button{flex:none;border:1px solid var(--line);background:#FFF;border-radius:999px;padding:5px 11px;font-size:12.5px;line-height:1.6;color:#6B6455;white-space:nowrap;cursor:pointer}
+#codexTabs button.on{background:#3A3A3A;color:#FFF;border-color:#3A3A3A}
+#codexSearchWrap{margin:0 0 6px}
+#codexSearch{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;background:var(--paper2);color:var(--ink);outline:none;font-family:inherit}
+.codexItem{padding:9px 2px;border-bottom:1px dashed var(--line);cursor:pointer}
+.codexItem:active{opacity:.55}
+.ci-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ci-top b{font-size:14px;color:#3A3A3A}
+.ci-top em{font-style:normal;font-size:11px;color:#A87B1F;border:1px solid rgba(168,123,31,.35);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.ci-sub{font-size:12.5px;color:#8C8C8C;margin-top:3px;line-height:1.6}
+.codexGroupHead{font-size:13px;font-weight:800;letter-spacing:2px;color:#6B6455;margin:12px 0 4px;padding:4px 0 2px;border-bottom:1px solid var(--line)}
+.codexGroupHead:first-child{margin-top:0}
+.codexDetailName{font-size:20px;font-weight:900;color:#161616;margin:6px 0 4px;line-height:1.4}
+.codexDetailSub{font-size:13px;color:#8C8C8C;line-height:1.6}
+.codexMeta{margin:8px 0 2px}
+.codexMeta span{display:inline-block;font-size:11.5px;color:#A87B1F;border:1px solid rgba(168,123,31,.35);border-radius:999px;padding:2px 9px}
+.codexText{font-size:14px;line-height:1.85;color:#4A4436;margin:12px 0 0;text-align:justify;word-break:break-word}
+.codexBullets{margin:10px 0 0 18px;padding:0}
+.codexBullets li{font-size:13.5px;line-height:1.85;color:#4A4436;margin:3px 0}
+.codexRel{font-size:12.5px;line-height:1.7;color:#8C8C8C;margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+.codexSrc{font-size:11.5px;line-height:1.6;color:#A9A292;margin-top:6px}
+.codexBack{border:none;background:none;color:#8C8C8C;font-size:13px;padding:2px 0 8px;cursor:pointer;font-family:inherit}
+.codexEmpty{text-align:center;color:#8C8C8C;font-size:13px;padding:20px 0}
 #achvToast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-8px);z-index:70;background:#3A3A3A;color:#FFF;font-size:13.5px;font-weight:700;padding:9px 18px;border-radius:999px;box-shadow:0 4px 14px rgba(80,70,50,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 #achvToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #logList{font-size:13px;line-height:1.8;color:#5A5548}
@@ -696,6 +668,22 @@ html.perf-low #logCard{
 .theme-star #achvCard .achvLine span,.theme-star #dexCard .achvLine span{color:var(--faint)}
 .theme-star #dexTabs button{background:rgba(21,27,43,.72);color:var(--faint);border-color:var(--glass-line)}
 .theme-star #dexTabs button.on{background:linear-gradient(180deg,#E8C56A,#C79A2E);color:#0B0F1A;border-color:transparent}
+.theme-star #codexOverlay{background:rgba(8,11,20,.95)}
+.theme-star #codexCard{background:linear-gradient(160deg,rgba(28,36,56,.96),rgba(15,21,35,.96));border-color:rgba(212,175,55,.34);box-shadow:0 28px 70px rgba(0,0,0,.62),var(--glass-inset)}
+.theme-star #codexCard h3{color:var(--gold)}
+.theme-star #codexTabs button{background:rgba(21,27,43,.72);color:var(--faint);border-color:var(--glass-line)}
+.theme-star #codexTabs button.on{background:linear-gradient(180deg,#E8C56A,#C79A2E);color:#0B0F1A;border-color:transparent}
+.theme-star #codexSearch{background:rgba(21,27,43,.72);color:var(--ink);border-color:var(--glass-line)}
+.theme-star .ci-top b{color:var(--ink)}
+.theme-star .ci-sub{color:var(--faint)}
+.theme-star .codexItem{border-bottom-color:rgba(212,175,55,.14)}
+.theme-star .codexGroupHead{color:var(--gold);border-bottom-color:rgba(212,175,55,.22)}
+.theme-star .codexDetailName{color:#F0E7D6}
+.theme-star .codexDetailSub{color:var(--faint)}
+.theme-star .codexText,.theme-star .codexBullets li{color:var(--ink)}
+.theme-star .codexRel{color:var(--faint);border-top-color:rgba(212,175,55,.18)}
+.theme-star .codexSrc{color:#8E887A}
+.theme-star .codexBack{color:var(--faint)}
 .theme-star #achvToast{background:rgba(21,27,43,.96);color:var(--gold-hi);border:1px solid var(--glass-line);box-shadow:0 6px 20px rgba(0,0,0,.55)}
 
 /* —— 分享 / 终局按钮 —— */
@@ -835,6 +823,7 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
     <button data-page-node-id="i5bPhGSS9AYtg3x7kv27aI" class="opSide" id="chronBtn" title="查看履历"><!--pnid:llNnjnwe5knQnqzVuMRDfH-->履历</button>
     <button class="opSide" id="achvBtn" title="成就：查看已解锁/未解锁成就（跨局累计）">成就</button>
     <button class="opSide" id="dexBtn" title="图鉴：杀招/结局/事件/时代收录进度（跨局累计）">图鉴</button>
+    <button class="opSide" id="codexBtn" title="典籍：原著五域九天、尊者、人物、蛊虫、杀招、仙蛊屋与大事">典籍</button>
     <button class="opSide on" id="voiceBtn" title="人声播报：开">播报</button>
   </div>
   <div data-page-node-id="PaXC8YA7Jjha8Xq1TkQ36q" id="keyHint"><!--pnid:iBUkmp3qLwWSdvyKPJcqPz-->点击 / 回车 / 空格 开转 · 抽后可「逆流」再转一次（R 键·消耗春秋蝉）· 「跳过」按钮或回车空格可快进叙事 · 「指定」模式下点盘面扇区定落点（过程盘耗 1 次／命运盘耗 2 次）· 「播报」开关人声</div>
@@ -847,6 +836,8 @@ html.perf-low.theme-star #overlay:not(.hidden){animation:none}
 <div id="achvToast" aria-hidden="true"></div>
 <div class="hidden" id="chgOverlay"><div id="chgCard"><h3>更新日志 <span class="chgVer" id="chgVer"></span></h3><div id="chgList"></div><button id="chgClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
 <div class="hidden" id="dexOverlay"><div id="dexCard"><h3>图鉴 <span id="dexCnt"></span></h3><div id="dexTabs"></div><div id="dexList"></div><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px"><button id="saveExportBtn2" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导出成就与图鉴存档（Base64）">导出存档</button><button id="saveImportBtn2" class="opSide" style="width:auto;min-width:92px;height:40px;border-radius:999px;padding:0 14px" title="导入成就与图鉴存档">导入存档</button></div><button id="dexClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
+<div class="hidden" id="codexOverlay"><div id="codexCard"><h3>典籍 <span id="codexCnt"></span></h3><div id="codexTabs"></div><div id="codexSearchWrap"><input id="codexSearch" type="search" autocomplete="off" placeholder="搜索人物 / 蛊虫 / 杀招 / 地名 / 流派…"></div><div id="codexList"></div><button id="codexClose" style="display:block; margin:18px auto 0; border:none; border-radius:999px; background:#3A3A3A; color:#fff; padding:10px 22px; font-size:14px">关 闭</button></div></div>
+<div class="hidden" id="sceneOverlay"><div id="sceneCard"><div id="sceneHead"><span id="sceneTitle"></span><span id="sceneDots"></span></div><div id="sceneBody"><div id="sceneWho"></div><div id="sceneText"></div></div><div id="sceneFoot"><button id="sceneExit">退出</button><button id="sceneNext">继续</button></div></div></div>
 <div data-page-node-id="e8EU2916vRrUywQEWaCPc2" class="hidden" id="overlay">
   <div data-page-node-id="Bmn5LabTXmbA0v9uge7Lyg" id="endCard">
     <div data-page-node-id="5o6KxTUhAISditMeYq46fu" id="endTitle"></div>
@@ -1085,10 +1076,45 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
-var APP_VER='v2.00'; /* 定版基线：v1.94–v1.99 审计收束；后续补丁递增次版本 */
+var APP_VER='v2.06'; /* v2.06：炼天时期原著剧情事件接入；撤下主界面剧情按钮 */
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡；v1.92 起累计补齐重构阶段日志。 */
 var CHANGELOG=[
+ {v:'v2.06',items:[
+  ['new','炼天时期（时代 10）新增 8 则原著剧情事件：界壁消散·跨域行商、宿命既碎·问命人、炼蛊大会·外围坊市、逆流河·渡口、影宗残部·暗市、大爱盟·招揽、疯魔窟·外围异象、三尊并立·说书人。'],
+  ['new','事件全部接入时代池、时代异闻图鉴与编年目录；第二世专属，玩家只在外围参与，不获取方源身份、记忆与主角机缘。'],
+  ['fix','撤下主界面「剧情」按钮，原著对话演出统一收在典籍内，避免额外功能入口。同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v2.05',items:[
+  ['new','主界面新增「剧情」按钮：一键直达名场面列表，不必再进典籍翻分类。'],
+  ['new','名场面增至 15 段：新增方源登仙明志、魔道求索、大爱仙尊仙蛊管够三段原著独白。'],
+  ['fix','剧情与典籍共用同一浮层与搜索，分享文件时名场面浮层会自动复位；同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v2.04',items:[
+  ['new','典籍新增「名场面」分类：12 段人物对话与场景演出，逐句点击推进，可随时退出。'],
+  ['new','收录青茅山开窍与血祭冰封、三叉山仙前炼蛊、真阳楼借道死蛊、义天山夺舍仙胎、天庭捏碎宿命、逆流河道心独白、紫山托孤、凤九歌一去不回、武庸出渊、盗天归乡、狂蛮的浪漫。'],
+  ['new','台词以原著名场面为准，旁白补足场景；每段标注原著节点与依据，只作回放阅读，不参与转盘与结算。'],
+  ['fix','名场面浮层支持按钮推进、退出、点遮罩关闭与 Esc 关闭；分享文件时会自动复位。同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v2.03',items:[
+  ['new','典籍新增「剧情详解」10 条：前世五百年、卷一至卷六逐卷详解（含关键地点、人物、蛊虫与转折）、终局三尊并立、方源马甲志、纪元历法。'],
+  ['new','六卷详解按「重生开局—白骨三叉山—北原真阳楼—义天山仙胎—宿命大战—疯魔窟成尊」完整串联主线，可直接在典籍中通读全书脉络。'],
+  ['new','方源马甲志单列常山阴、气海老祖、梦求真、大爱仙尊、炼天魔尊五重身份；纪元历法说明远古通史、第一世与今生六卷三层时间坐标。'],
+  ['fix','剧情条目只作文本资料，不改变任何转盘权重、事件池、境界与结局；同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v2.02',items:[
+  ['new','典籍扩容 42 条：新增六卷卷目、十一尊者真传、十绝体、年/月/日蛊等蛊虫、神帝城等仙蛊屋、天莲派等势力；典籍总条目增至 308 条。'],
+  ['new','各时代凡人见闻扩充 20 则（时代 0–9 每代两则）：开窍授徒、校历之争、道场量尺、化形试胆、画中雀、祭天择日、骨灯照影、义仓分米等，均按「原著时代背景＋游戏原创基层场景」标注依据。'],
+  ['new','新事件沿用 ERA_MORTAL_EXTRA 批量注册，自动进入时代池、已见门控、时代异闻图鉴与编年目录，并同步归入各时代六幕整理表。'],
+  ['fix','修正典籍扩容块插入位置：原先早于分类数组初始化会导致整段脚本中断，现移至全部典籍数据之后。'],
+  ['fix','典籍与时代事件均为内容层扩充，不改转盘权重、奖励数值、境界上限、成尊条件与第一世/第二世门控；同步 APP_VER 与 __RUN_AUDIT.version。']
+ ]},
+ {v:'v2.01',items:[
+  ['new','新增「典籍」面板：收录五域九天、修行境界、十一尊者、流派、蛊虫、杀招、仙蛊屋、秘境地名、人物、势力、大事战役、人祖传、语录共 13 类 266 条原著设定。'],
+  ['new','典籍支持分类切换、跨类关键词搜索、条目详情与相关条目索引；每条标注「原著明确 / 游戏改编 / 读者流传」等依据层级。'],
+  ['fix','典籍为纯只读资料层，不改事件权重、奖励数值、境界上限、成尊条件与第一世/第二世门控。'],
+  ['fix','同步 APP_VER 与 __RUN_AUDIT.version；浮层支持点遮罩与 Esc 关闭，导出游戏文件时自动复位。']
+ ]},
  {v:'v2.00',items:[
   ['new','正式定版：收束 v1.94–v1.99 审计与修复线为稳定基线（转盘概率、成长寿元、操作体验、系统整合、兼容回归）。'],
   ['fix','版本标识统一为 v2.00（APP_VER、标题标签、__RUN_AUDIT.version、分享文件/战报）；__RUN_AUDIT.milestone 记录定版系列说明。'],
@@ -2505,11 +2531,11 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['人族基层聚落与异人势力压力构成时代环境；具体村落、使团与气脉分配争端均为游戏原创。','天庭及门派制度作为元始仙尊留下的历史影响呈现，不将后世天庭全部组织细节提前到本时期。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家在部族聚落与山林之间求生，先从一次气墙冲突认识气道手段，再通过荒林寻蛊接触真正的蛊虫风险。开局不发放境界奖励，先让玩家知道如何避险、观察和选择。',goal:'活下来，获得第一段可用的蛊虫机缘，并认识当地修行者的行事方式。',events:['气墙初试','山道伏兽'],basis:'游戏原创设定（以远古人族处境与气道背景为时代环境）',boundary:'不把玩家写成元始仙尊门下，也不虚构与元始仙尊的必然会面。'},
-   {id:'growth',name:'人物成长',plot:'玩家在荒林寻蛊与气道残篇之间作出取舍；升仙后再以古炼炉遗址、气道洞府、三气古井、三气初炼和开炉试蛊检验积累。成长来自探索、炼制与承担风险，而不是连续抽到免费境界提升。',goal:'通过探索、炼蛊和正式历练形成自己的气道与炼道根基。',events:['荒林寻蛊','气道残篇','荒坡寻蛊','古寨炼摊'],travelEvents:['古炼炉遗址','气道洞府','三气古井'],trialEvents:['三气初炼','开炉试蛊'],basis:'游戏原创设定 / 合理推断（气道传承可能留有残篇）',boundary:'不把凡人阶段的零散心得包装成尊者完整传承或原著秘法；古炉与洞府均为游戏原创场景。'},
-   {id:'conflict',name:'时代矛盾',plot:'天地人三气的争论落到气脉资源分配，气脉分田引出旧契，旧契又揭出夜袭气渠的危机；异人来使则让玩家面对交易与族群戒备。三段经历有前后因果，最终以守渠、设伏或撤离收束。',goal:'在资源争端与族群压力之间作出取舍，并亲自承担一次有明确胜负后果的战斗。',events:['天地人三气论','气脉分田','异人来使','气脉旧契','气脉夜袭','气脉巡渠'],basis:'原著明确内容（天地人三气体系、人族与异人背景）＋游戏原创场景',boundary:'街头论争、气脉争端、使团、旧契与夜袭均为游戏原创，不宣称是原著记载的具体史事。'},
+   {id:'growth',name:'人物成长',plot:'玩家在荒林寻蛊与气道残篇之间作出取舍；升仙后再以古炼炉遗址、气道洞府、三气古井、三气初炼和开炉试蛊检验积累。成长来自探索、炼制与承担风险，而不是连续抽到免费境界提升。',goal:'通过探索、炼蛊和正式历练形成自己的气道与炼道根基。',events:['荒林寻蛊','气道残篇','荒坡寻蛊','古寨炼摊','开窍授徒'],travelEvents:['古炼炉遗址','气道洞府','三气古井'],trialEvents:['三气初炼','开炉试蛊'],basis:'游戏原创设定 / 合理推断（气道传承可能留有残篇）',boundary:'不把凡人阶段的零散心得包装成尊者完整传承或原著秘法；古炉与洞府均为游戏原创场景。'},
+   {id:'conflict',name:'时代矛盾',plot:'天地人三气的争论落到气脉资源分配，气脉分田引出旧契，旧契又揭出夜袭气渠的危机；异人来使则让玩家面对交易与族群戒备。三段经历有前后因果，最终以守渠、设伏或撤离收束。',goal:'在资源争端与族群压力之间作出取舍，并亲自承担一次有明确胜负后果的战斗。',events:['天地人三气论','气脉分田','异人来使','气脉旧契','气脉夜袭','气脉巡渠','山民会盟'],basis:'原著明确内容（天地人三气体系、人族与异人背景）＋游戏原创场景',boundary:'街头论争、气脉争端、使团、旧契与夜袭均为游戏原创，不宣称是原著记载的具体史事。'},
    {id:'turning',name:'重大转折',plot:'一次性的三气异动让玩家意识到天地人三气并非市井争论中的简单名目；三气碑与气道问心进一步迫使玩家判断气与自身修行的关系，元始残炉则把感悟推向真正的试炼。',goal:'判断三气异象对自身修行的意义，并在传承遗迹前承担风险。',events:['三气异动'],travelEvents:['三气碑'],trialEvents:['气道问心','元始残炉'],basis:'游戏原创设定（以原著天地人三气体系为背景）',boundary:'不把玩家感知的异象说成原著中某次天地大劫或元始仙尊的关键历史事件；碑刻与残炉遭遇为游戏原创。'},
    {id:'ending',name:'时代终局',plot:'时代收束以玩家个人道路为中心：炼道论榜检验公开论道与炼制成果，随后通过元始时期专属收束、争尊尝试与个人结局，结算玩家在气道、炼道及三气方向上的选择。元始仙尊的原著历史不因玩家结局而被替代。',goal:'决定守道、传法、归隐或争尊；失败与退让也应是有效收束。',events:[],trialEvents:['炼道论榜'],route:"ysFinale() / tryEraZun(\'ys\')",basis:'游戏原创玩家结局（以元始仙尊的原著道统为背景）',boundary:'玩家成就只属于本局分支，不改写元始仙尊本人创立天庭、开创气道的既定历史。'},
-   {id:'legacy',name:'历史遗产',plot:'时代余烬、元始遗训与天庭旧制呈现后世如何理解元始仙尊的历史影响；三气归来迹则让玩家决定是否把个人感悟化为杀招雏形。天庭创立及门派制度属于原著历史锚点；遗训石壁、基层讲述与历练场景均按游戏原创处理。',goal:'辨认真正的历史影响与后人附会，决定自己留下何种传承与技艺。',events:['时代余烬·元始','元始遗训','天庭旧制'],trialEvents:['三气归来迹'],basis:'原著明确内容（元始创立天庭、推动门派制度）＋游戏原创历史回响',boundary:'元始遗训不得作为元始仙尊原著原话；三气归来为玩家原创杀招路线，不是元始仙尊原著招式。'}
+   {id:'legacy',name:'历史遗产',plot:'时代余烬、元始遗训与天庭旧制呈现后世如何理解元始仙尊的历史影响；三气归来迹则让玩家决定是否把个人感悟化为杀招雏形。天庭创立及门派制度属于原著历史锚点；遗训石壁、基层讲述与历练场景均按游戏原创处理。',goal:'辨认真正的历史影响与后人附会，决定自己留下何种传承与技艺。',events:['时代余烬·元始','元始遗训','天庭旧制','元始仙尊·门派初立'],trialEvents:['三气归来迹'],basis:'原著明确内容（元始创立天庭、推动门派制度）＋游戏原创历史回响',boundary:'元始遗训不得作为元始仙尊原著原话；三气归来为玩家原创杀招路线，不是元始仙尊原著招式。'}
   ]
  },
  1:{
@@ -2520,8 +2546,8 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['天庭已由元始仙尊创立，星宿时期呈现其延续、扩展与智道/星道体系影响；不得把后世十大古派及后期天庭完整组织形态提前。','地方书院、驿站星门、招贤与外门考核均为游戏原创制度侧写；天庭的历史地位与星宿辅佐天庭属于原著背景。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从观星夜课、天庭招贤或地方驿站的星象异闻进入时代。开局重点不是立刻得到仙尊布局，而是认识天庭已经存在的秩序：有人希望借天庭谋求出路，也有人只想在星象与商路变化中保住生计。',goal:'建立玩家在星宿时代的社会位置，分清天庭制度背景与基层原创遭遇。',events:['天庭招贤'],basis:'原著明确内容（天庭由元始仙尊创立、星宿承接并辅佐天庭）＋合理推断/游戏原创场景',boundary:'不把玩家写成星宿仙尊亲传，不把天庭招贤流程说成原著明确制度。'},
-   {id:'growth',name:'人物成长',plot:'玩家在观星、棋局与智道论道中积累判断能力。星野观测提供凡人可理解的星象经验；星宿棋痕与星棋续局则让玩家接触后人对智道布局的揣摩，但棋盘不是星宿仙尊的真实布局原件。升仙后可继续探索星象福地外围，并接受星宿棋局等专属历练。',goal:'让智道、星道成长来自观察、推演与历练，不把凡人见闻夸大为尊者真传。',events:['观星夜课','棋盘残局','智道论道','智道书院','星野观测','星宿棋痕','星棋续局'],travelEvents:['星象福地外围'],trialEvents:['星宿棋局','天庭外门试炼','定仙游遗迹'],basis:'游戏原创设定 / 合理推断（以星宿仙尊智道、星道背景为依托）',boundary:'旧亭棋痕与民间棋局仅是后人揣摩；不得宣称玩家复原星宿仙尊真实棋局。'},
-   {id:'conflict',name:'时代矛盾',plot:'天庭招贤带来资源与名额竞争，星门传令和地方星象异变又使驿道、传讯与修行秩序承压。玩家需要判断该协助传令、查验消息，还是保留自身力量；冲突来自制度执行与地方利益，不是提前揭露星宿对三位魔尊的全部布局。',goal:'让玩家面对天庭秩序在地方的实际影响，并承担一次信息或资源选择的后果。',events:['星门传令'],basis:'游戏原创设定（以天庭延续与星宿辅佐天庭的原著背景为参照）',boundary:'驿站急令、星门检查及地方利益冲突均为原创，不作为原著记载的具体天庭政令。'},
+   {id:'growth',name:'人物成长',plot:'玩家在观星、棋局与智道论道中积累判断能力。星野观测提供凡人可理解的星象经验；星宿棋痕与星棋续局则让玩家接触后人对智道布局的揣摩，但棋盘不是星宿仙尊的真实布局原件。升仙后可继续探索星象福地外围，并接受星宿棋局等专属历练。',goal:'让智道、星道成长来自观察、推演与历练，不把凡人见闻夸大为尊者真传。',events:['观星夜课','棋盘残局','智道论道','智道书院','星野观测','星宿棋痕','星棋续局','星盘问命'],travelEvents:['星象福地外围'],trialEvents:['星宿棋局','天庭外门试炼','定仙游遗迹'],basis:'游戏原创设定 / 合理推断（以星宿仙尊智道、星道背景为依托）',boundary:'旧亭棋痕与民间棋局仅是后人揣摩；不得宣称玩家复原星宿仙尊真实棋局。'},
+   {id:'conflict',name:'时代矛盾',plot:'天庭招贤带来资源与名额竞争，星门传令和地方星象异变又使驿道、传讯与修行秩序承压。玩家需要判断该协助传令、查验消息，还是保留自身力量；冲突来自制度执行与地方利益，不是提前揭露星宿对三位魔尊的全部布局。',goal:'让玩家面对天庭秩序在地方的实际影响，并承担一次信息或资源选择的后果。',events:['星门传令','校历之争','星宿仙尊·天庭推演'],basis:'游戏原创设定（以天庭延续与星宿辅佐天庭的原著背景为参照）',boundary:'驿站急令、星门检查及地方利益冲突均为原创，不作为原著记载的具体天庭政令。'},
    {id:'turning',name:'重大转折',plot:'星象异变让玩家发现，天象并非总能被旧图解释。推演一劫、天庭残图与星宿意志构成逐级深入的历练：从推演自身劫数，到辨认残图风险，最终才可能接触星宿意志。每一步都需能力与门槛，不把意志残响写成仙尊本人现身。',goal:'由普通星象观察推进到高风险推演，形成玩家自己的智道/星道道路选择。',events:['星象异变'],trialEvents:['推演一劫','天庭残图','星宿意志'],basis:'游戏原创设定（以原著星宿仙尊布局与意志遗留为背景）',boundary:'具体异变、残图与玩家接触意志的过程属于游戏剧情；不声称残图是原著真实天庭总图。'},
    {id:'ending',name:'时代终局',plot:'星宿时期的终局回到玩家自身：天庭记名、星宿真意、星念与智道/星道选择决定不同收束。玩家可以留在天庭体系、另辟道路、封存真意或归隐；无论结局如何，都不改变星宿仙尊辅佐天庭、阻挡魔尊的原著历史。',goal:'以玩家自己的修行路线与选择收束本局，不替代星宿仙尊的历史使命。',events:[],route:'xxFinale() / tryEraZun(\'xx\')',basis:'游戏原创玩家结局（以星宿仙尊原著历史作用为背景）',boundary:'玩家的天庭记名、星宿真意及结局均为本局原创分支，不改写原著尊者布局。'},
    {id:'legacy',name:'历史遗产',plot:'天庭旧册、星轨刻石与时代余烬呈现后人如何记录星宿时期。旧册的缺页、驿道刻石与民间侧写都是游戏原创；原著明确的历史遗产是星宿仙尊以智道辅佐天庭并留下深远影响，而不是这些具体物件。',goal:'辨认真实历史影响与后世附会，决定是否将自己的推演方法传给后来者。',events:['天庭旧册','星轨刻石','时代余烬·星宿'],basis:'原著明确内容（星宿辅佐天庭、布局阻挡三位魔尊）＋游戏原创历史回响',boundary:'不把天庭旧册、星轨刻石或玩家所得残图说成原著明确记载的星宿遗物。'}
@@ -2535,8 +2561,8 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['疯魔窟与无极求道是原著历史锚点；外围集市、役工招募、北原行脚修士及临时聚落均为游戏原创。','不提前引入后世天庭完整组织、长生天后期势力形态或方源时代的疯魔窟探索者。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从北原风雪、窟外役工与道场外围的日常进入无极之世。疯魔窟仍是时代中最醒目的求道工程，但玩家接触到的只是外围秩序、临时营地和生计压力；不把凡人阶段写成直接参与无极推衍天道。',goal:'交代北原环境与玩家在疯魔窟外围的身份，建立“靠近道场但不进入核心”的边界。',events:['疯魔窟役工','道场役工','雪原借宿'],basis:'原著明确内容（无极营建疯魔窟）＋游戏原创基层场景',boundary:'招募、外门役工、岩棚借宿均为原创，不宣称原著记载过这些具体事件。'},
-   {id:'growth',name:'人物成长',plot:'玩家在九虚残页、无极石壁与阵材易市之间辨认真假：阵纹可以提供学习线索，却不等于完整阵图；普通石料也不能因为靠近疯魔窟就被当作真传。灰袍人的“一块石头”问答则作为一段独立原创人物互动。',goal:'通过辨材、识阵与谨慎选择积累修行经验，不把零散残件包装成无极真传。',events:['九虚残页','无极石壁','一块石头','阵材易市'],basis:'原著明确内容（疯魔九虚阵与无极求道背景）＋游戏原创遭遇',boundary:'残页、石壁、集市阵材和玩家所得均为原创，不是原著明确遗物或真传。'},
-   {id:'conflict',name:'时代矛盾',plot:'道场营建与周边生计并非总能兼顾。魔音初啼使行脚者对窟外异响心生戒备，凶地兽潮又让临时营地面对真实伤亡风险；玩家需要在自保、救人和保全资源之间取舍。凡人时期与无极的相遇仍是小范围原创支线，不代表玩家进入尊者布局。',goal:'让玩家面对窟外生存压力与个人选择，并保留偶遇人物支线的独立性。',events:['魔音初啼','凶地兽潮','偶遇凡人时期无极'],basis:'原著明确内容（疯魔窟魔音、无极求道背景）＋游戏原创冲突',boundary:'采药队、兽潮、魔音初啼的具体场景及偶遇互动均为原创，不改变原著历史。'},
+   {id:'growth',name:'人物成长',plot:'玩家在九虚残页、无极石壁与阵材易市之间辨认真假：阵纹可以提供学习线索，却不等于完整阵图；普通石料也不能因为靠近疯魔窟就被当作真传。灰袍人的“一块石头”问答则作为一段独立原创人物互动。',goal:'通过辨材、识阵与谨慎选择积累修行经验，不把零散残件包装成无极真传。',events:['九虚残页','无极石壁','一块石头','阵材易市','道场量尺'],basis:'原著明确内容（疯魔九虚阵与无极求道背景）＋游戏原创遭遇',boundary:'残页、石壁、集市阵材和玩家所得均为原创，不是原著明确遗物或真传。'},
+   {id:'conflict',name:'时代矛盾',plot:'道场营建与周边生计并非总能兼顾。魔音初啼使行脚者对窟外异响心生戒备，凶地兽潮又让临时营地面对真实伤亡风险；玩家需要在自保、救人和保全资源之间取舍。凡人时期与无极的相遇仍是小范围原创支线，不代表玩家进入尊者布局。',goal:'让玩家面对窟外生存压力与个人选择，并保留偶遇人物支线的独立性。',events:['魔音初啼','凶地兽潮','偶遇凡人时期无极','雪线让路'],basis:'原著明确内容（疯魔窟魔音、无极求道背景）＋游戏原创冲突',boundary:'采药队、兽潮、魔音初啼的具体场景及偶遇互动均为原创，不改变原著历史。'},
    {id:'turning',name:'重大转折',plot:'九虚回响把玩家从市井传闻带到阵法危险边缘。升仙后，疯魔窟·初探、元境初封、魔尊落子、九虚反噬与光阴浮冰构成递进历练：先确认自身能否进入，再面对任务、阵法反噬与浮冰取舍。每一步都保留既有门槛与结算。',goal:'将凡人阶段的零散见闻推进为升仙后的高风险历练，承接原有无极线与关键历练系统。',events:['九虚回响'],trialEvents:['疯魔窟·初探','元境初封','魔尊落子','九虚反噬','光阴浮冰'],basis:'原著明确内容（疯魔九虚阵、元境、光阴浮冰及无极求道背景）＋游戏原创玩家历练',boundary:'关键历练是玩家原创分支；不改变无极推衍天道的原著目标、结果或历史顺序。'},
    {id:'ending',name:'时代终局',plot:'道场封门标记玩家所能接触的外围阶段告一段落。无论玩家选择离开、保留线索或继续追索，原有无极成尊尝试、再遇无极与后续时代结算仍按既有逻辑执行；不以普通玩家结局替代无极魔尊的历史。',goal:'收束玩家在疯魔窟外围的阶段经历，同时保留原有无极成尊尝试与后续分支入口。',events:['道场封门'],route:"tryEraZun('wj') / wujiReencounter() / era2LaterLife()",basis:'游戏原创玩家阶段收束（以无极魔尊原著历史为背景）',boundary:'不改写无极成尊、疯魔窟营建或后续历史节点；不新增自动触发的终局。'},
    {id:'legacy',name:'历史遗产',plot:'时代余烬·无极与石壁守夜记录后人如何理解疯魔窟和无极求道。前者只作原著历史背景下的凡人侧写，后者是玩家选择引出的原创后续；二者都不能被误认成无极本人留下的确切遗训。',goal:'区分原著历史锚点、后世传闻与玩家原创留痕。',events:['时代余烬·无极','石壁守夜'],basis:'原著明确内容（无极营建疯魔窟、推衍天道与永生之秘）＋游戏原创历史回响',boundary:'石壁、守夜人、石屑凭证与玩家后续均为原创，不作为原著真传或仙尊遗命。'}
@@ -2550,7 +2576,7 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['部族、猎队、临时盟誓与兽栏分配均为游戏原创基层组织；不得提前套用后世北原黄金家族、王庭福地或巨阳体系。','异人猎场只呈现玩家视角下的足迹、工具与冲突，不把其写成原著某次狂蛮本人参与的战争。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从兽潮避难与部族迁徙进入荒原。先要判断土墙能否守住、队伍该往何处撤，再在迁徙踏痕中辨认兽迹与人迹。开局强调活命和观察，不把玩家直接推入尊者传承。',goal:'建立荒原生存压力与玩家的基层身份，理解兽潮和迁徙对普通部族的影响。',events:['兽潮避难','迁徙踏痕'],basis:'游戏原创设定（荒兽、北原荒原与部族生存为时代背景）',boundary:'兽潮、土墙、迁徙路线与玩家护送均为原创场景，不指定为狂蛮魔尊本人经历。'},
-   {id:'growth',name:'人物成长',plot:'玩家从剥皮换衣、生吃兽核与狂蛮兽图接触变化、力道及荒兽习性。变化道遗骨则提醒玩家，形态变化并非只有外形模仿，贸然追逐力量也可能留下难以解释的后果。升仙后再由变化试形、荒原遗骨等历练检验积累。',goal:'让力道与变化道成长来自观察、适应和承担风险，不把凡人见闻夸大成狂蛮真传。',events:['剥皮换衣','生吃兽核','狂蛮兽图','变化道遗骨'],travelEvents:['兽骨堆','变形草滩'],trialEvents:['变化试形','荒原遗骨'],basis:'原著明确内容（力道、变化道、兽人习俗与荒兽图腾背景）＋游戏原创玩家经历',boundary:'玩家所得兽图、遗骨与变化心得均为原创；不等同狂蛮本人披制兽皮、吞吃太古荒兽或形成图腾的原著经历。'},
+   {id:'growth',name:'人物成长',plot:'玩家从剥皮换衣、生吃兽核与狂蛮兽图接触变化、力道及荒兽习性。变化道遗骨则提醒玩家，形态变化并非只有外形模仿，贸然追逐力量也可能留下难以解释的后果。升仙后再由变化试形、荒原遗骨等历练检验积累。',goal:'让力道与变化道成长来自观察、适应和承担风险，不把凡人见闻夸大成狂蛮真传。',events:['剥皮换衣','生吃兽核','狂蛮兽图','变化道遗骨','化形试胆','图腾补笔'],travelEvents:['兽骨堆','变形草滩'],trialEvents:['变化试形','荒原遗骨'],basis:'原著明确内容（力道、变化道、兽人习俗与荒兽图腾背景）＋游戏原创玩家经历',boundary:'玩家所得兽图、遗骨与变化心得均为原创；不等同狂蛮本人披制兽皮、吞吃太古荒兽或形成图腾的原著经历。'},
    {id:'conflict',name:'时代矛盾',plot:'角力定份与兽骨分帐把强者优先的生存逻辑落到具体分配；部落招婿、部族盟誓又让个人去留与部族利益相互牵扯。异人猎场将族群戒备推向边界，但玩家看到的只是局部冲突，不掌握整个时代的族群真相。',goal:'面对资源分配、婚配与族群关系，选择承担冲突或保全自身。',events:['角力定份','部落招婿','部族盟誓','兽骨分帐','异人猎场'],basis:'游戏原创设定（以荒原部族、异人与兽人习俗的原著背景为参照）',boundary:'角力分配、招婿、盟誓与猎场追踪均为原创基层冲突，不作为原著明确部族制度或狂蛮史事。'},
    {id:'turning',name:'重大转折',plot:'变化走火让玩家亲眼看见形态失控的代价。升仙后，兽潮前锋、力道斗场、血皮之兆与狂蛮意志回响构成逐级试炼：从荒原战斗到力道与变化道选择，最终才可能触及狂蛮意志。',goal:'把凡人阶段的求生经验推进为升仙后的力道、变化道专属历练，并保留原有门槛与风险。',events:['变化走火'],travelEvents:['力祭台'],trialEvents:['兽潮前锋','力道斗场','血皮之兆','狂蛮意志回响'],basis:'原著明确内容（狂蛮开创力道、变化道及相关传承背景）＋游戏原创玩家历练',boundary:'关键历练是玩家原创分支；不改变狂蛮魔尊的历史，也不提前泄露后世完整传承。'},
    {id:'ending',name:'时代终局',plot:'兽图盟约收束玩家与部族之间的承诺。随后仍由原有狂蛮终局逻辑判断是否尝试成尊，并依据狂蛮真传、血皮传承、部落之婿、兽性标记及流派境界等既有条件结算个人结局。',goal:'让玩家决定留在部族、携眷迁徙或走向自己的修行道路；不替代狂蛮魔尊原著历史。',events:['兽图盟约'],route:"kmFinale() / tryEraZun('km')",basis:'游戏原创玩家结局（以狂蛮魔尊原著历史为背景）',boundary:'保留原有 kmFinale 与 tryEraZun 成尊条件、顺序及结算；玩家结局不改写狂蛮的原著经历。'},
@@ -2565,8 +2591,8 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['城镇、摆渡人、漏刻匠、河灯会与改命小贩均为游戏原创基层人物/组织，不冒充原著势力。','红莲真传、光阴长河与春秋蝉只在原有升仙后游历、关键历练及门槛满足时出现；凡人事件不得直接授予真传、仙蛊或改写宿命的能力。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从城镇更漏失灵与更漏校时进入红莲之世。计时器失准、工匠争论与日常作息混乱都是基层生活问题；玩家先学会辨认人为故障与无法解释的异象，不把寻常漏刻当成光阴长河入口。',goal:'建立玩家在红莲时代城镇中的普通身份，先从时间秩序的日常问题认识宙道氛围。',events:['时漏失灵','更漏校时'],basis:'游戏原创设定（宙道与光阴长河为原著体系背景）',boundary:'漏刻停摆、匠人修补与城镇作息争议均为原创，不代表红莲魔尊曾在此地留下宙道设施。'},
-   {id:'growth',name:'人物成长',plot:'玩家从飞刃传闻与红莲棋局接触市井对宙道、宿命与逆流河的想象。传闻可能借用了真实杀招或历史名词，却不能据此掌握光阴飞刃，也不能把商贩的旧地图当成红莲真传路线。',goal:'学会分辨原著历史名词、后世附会与市井骗局，积累自己的宙道见闻。',events:['飞刃传闻','红莲棋局'],basis:'原著明确内容（光阴飞刃、红莲与逆流河相关背景）＋游戏原创传闻',boundary:'光阴飞刃的相关梦境传承指向中洲薄家/薄青；地图与传闻均为原创，不让玩家实际习得该杀招或取得真传。'},
-   {id:'conflict',name:'时代矛盾',plot:'老死复生与改命小贩把人们对生死、命数的恐惧推到街头：有人希望死者再开口，有人愿为一张改命符付出代价。河灯寄名则让失散、离世与远行者的名字重新引发争执；玩家必须决定如何面对他人的执念。',goal:'让玩家在真实的人情纠葛中处理宿命观念，不以超自然力量轻易解决生死与因果。',events:['老死复生','改命小贩','河灯寄名'],basis:'游戏原创设定（宿命蛊与红莲抗命历史为背景）',boundary:'死者坐起、改命符、河灯寄名与人物选择均为原创；不代表凡人复生、真正改写宿命或触及爱情蛊。'},
+   {id:'growth',name:'人物成长',plot:'玩家从飞刃传闻与红莲棋局接触市井对宙道、宿命与逆流河的想象。传闻可能借用了真实杀招或历史名词，却不能据此掌握光阴飞刃，也不能把商贩的旧地图当成红莲真传路线。',goal:'学会分辨原著历史名词、后世附会与市井骗局，积累自己的宙道见闻。',events:['飞刃传闻','红莲棋局','旧信重至'],basis:'原著明确内容（光阴飞刃、红莲与逆流河相关背景）＋游戏原创传闻',boundary:'光阴飞刃的相关梦境传承指向中洲薄家/薄青；地图与传闻均为原创，不让玩家实际习得该杀招或取得真传。'},
+   {id:'conflict',name:'时代矛盾',plot:'老死复生与改命小贩把人们对生死、命数的恐惧推到街头：有人希望死者再开口，有人愿为一张改命符付出代价。河灯寄名则让失散、离世与远行者的名字重新引发争执；玩家必须决定如何面对他人的执念。',goal:'让玩家在真实的人情纠葛中处理宿命观念，不以超自然力量轻易解决生死与因果。',events:['老死复生','改命小贩','河灯寄名','重来的一天'],basis:'游戏原创设定（宿命蛊与红莲抗命历史为背景）',boundary:'死者坐起、改命符、河灯寄名与人物选择均为原创；不代表凡人复生、真正改写宿命或触及爱情蛊。'},
    {id:'turning',name:'重大转折',plot:'昨日重影与红莲夜雨让玩家遭遇无法用常理解释的短暂异象；光阴渡口则以寓言方式逼迫玩家面对是否愿意为昨日付出代价。升仙后，光阴裂隙、昨日重逢、飞刃试锋、红莲残瓣、定命一掷与红莲意志回响构成原有递进历练，仍按既有门槛结算。',goal:'把凡人时期的疑问推进为升仙后的宙道历练，同时守住普通人不能随意穿梭光阴的边界。',events:['昨日重影','红莲夜雨','光阴渡口'],travelEvents:['光阴渡口'],trialEvents:['光阴裂隙','昨日重逢','飞刃试锋','红莲残瓣','定命一掷','红莲意志回响'],basis:'原著明确内容（光阴长河、春秋蝉、红莲真传与宙道杀招背景）＋游戏原创玩家遭遇',boundary:'凡人渡口、昨日重影与红雨均为原创寓言；升仙后历练沿用原有触发条件，不将其改写成原著红莲历史事件。'},
    {id:'ending',name:'时代终局',plot:'红莲残瓣与渡口归信收束玩家个人的遗憾与承诺：残瓣只是玩家线索，不是红莲魔尊遗物；归信支线由玩家此前选择解锁。随后仍由原有 hlFinale 与 tryEraZun 判断玩家是否尝试成尊，并结算宙道终局。',goal:'让玩家决定放下昨日、追寻未竟之事或守住当下，同时保留原有红莲时代结局与成尊入口。',events:['红莲残瓣','渡口归信'],route:"hlFinale() / tryEraZun('hl')",basis:'游戏原创玩家结局（以红莲魔尊的原著历史为背景）',boundary:'保留原有 hlFinale、tryEraZun 成尊条件与奖励；玩家结局不改写红莲以爱情蛊损伤宿命蛊的历史，也不提前摧毁宿命蛊。'},
    {id:'legacy',name:'历史遗产',plot:'宿命旧说与时代余烬·红莲记录后人如何理解红莲魔尊。原著明确的历史锚点是红莲曾损伤宿命蛊并留下后续布局；民间祭师、说书版本与玩家听闻均为原创侧写。后世宿命大战中宿命蛊被方源摧毁，不属于本时代当下。',goal:'辨清红莲时期真实历史、后世结果与民间附会，决定如何记录这段历史。',events:['宿命旧说','时代余烬·红莲'],travelEvents:['红莲池残','昨日集市'],basis:'原著明确内容（红莲以爱情蛊损伤宿命蛊、留下红莲真传及后续布局）＋游戏原创历史回响',boundary:'不把宿命蛊受损写成当场毁灭；不把后世宿命大战、方源或凤九歌的关键行动提前到红莲时代。'}
@@ -2580,7 +2606,7 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['画坊、灵圃、采药人、矿彩商贩及地方水渠管理均为游戏原创基层场景，不冒充原著组织。','豆神宫属于元莲留下的原著历史背景；帝君城与神帝城的后续形成只作为后世历史，不提前作为本时期现成势力或建筑。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从中洲山谷的灵植采种与青莲初绽进入元莲之世。先辨认灵植成熟与母株保护，再从木道生机的日常表现认识这个时代的修行风貌。青莲只是原创遭遇，不是元莲仙尊遗迹。',goal:'建立玩家作为普通采药人或行脚蛊师的身份，以观察、采集和守护开启本时期经历。',events:['青莲初绽'],basis:'游戏原创设定（以元莲仙尊木道背景为时代参照）',boundary:'枯枝抽芽、灵植结种与玩家采集均为原创场景，不对应元莲仙尊本人经历或真传。'},
-   {id:'growth',name:'人物成长',plot:'玩家在画壁留名、丹青问心与画道旧闻中接触画道；天元宝莲的市井仿品则让玩家学会辨认真实蛊虫效用。升仙后，青莲池、木道长阶、木心问根、画道夺锋与莲池论笔继续检验木道和画道积累。',goal:'让木道与画道成长来自辨识、临摹、守护和正式历练，不把凡人画作或仿品误当尊者传承。',events:['木灵采种','画壁留名','丹青问心','画道旧闻','木道新芽','画坊修卷','元莲画意','天元宝莲'],travelEvents:['青莲池','木道长阶'],trialEvents:['木心问根','画道夺锋','莲池论笔'],basis:'原著明确内容（元莲以木道成尊、兼修画道、天元宝莲一系）＋游戏原创玩家经历',boundary:'玩家所见画壁、画师与仿品均为原创；三转天元宝莲产出元石，六转天元宝皇莲才产出仙元。'},
+   {id:'growth',name:'人物成长',plot:'玩家在画壁留名、丹青问心与画道旧闻中接触画道；天元宝莲的市井仿品则让玩家学会辨认真实蛊虫效用。升仙后，青莲池、木道长阶、木心问根、画道夺锋与莲池论笔继续检验木道和画道积累。',goal:'让木道与画道成长来自辨识、临摹、守护和正式历练，不把凡人画作或仿品误当尊者传承。',events:['木灵采种','画壁留名','丹青问心','画道旧闻','木道新芽','画坊修卷','元莲画意','天元宝莲','画中雀','古树诊脉'],travelEvents:['青莲池','木道长阶'],trialEvents:['木心问根','画道夺锋','莲池论笔'],basis:'原著明确内容（元莲以木道成尊、兼修画道、天元宝莲一系）＋游戏原创玩家经历',boundary:'玩家所见画壁、画师与仿品均为原创；三转天元宝莲产出元石，六转天元宝皇莲才产出仙元。'},
    {id:'conflict',name:'时代矛盾',plot:'木脉争水把灵植生长与地方资源分配推到台前，画料失窃则让画坊学徒、管事与匠人陷入信任危机。玩家必须在查证、协调、作证和追索之间选择；冲突来自基层利益，不是豆神宫内部布局。',goal:'在水源、灵材与工坊生计的矛盾中作出选择，并承担由此产生的人情后果。',events:['木脉争水','画料失窃'],basis:'游戏原创设定（木道资源与画道工坊作为时代背景）',boundary:'水闸争端、画料失窃、学徒纠纷及各方人物均为原创，不改写元莲仙尊历史或豆神宫原著布局。'},
    {id:'turning',name:'重大转折',plot:'青莲托梦与画中天地把玩家从寻常画意带向更深的自我审视。梦中人影不确认为元莲意志；画中天地与枯木逢春等升仙后历练仍按原有门槛与结算推进，玩家只能走自己的木道、画道之路。',goal:'从凡人阶段的木画见闻转向升仙后的高风险历练，明确玩家经历与尊者历史的边界。',events:['青莲托梦'],travelEvents:['画中天地'],trialEvents:['枯木逢春'],basis:'游戏原创设定（以元莲画道布置与木道背景为参照）',boundary:'梦境、画坊修卷和画中天地均为玩家原创经历；不将梦中人认作元莲本人、意志或分身。'},
    {id:'ending',name:'时代终局',plot:'画工留名承接玩家此前对元莲画意的选择，收束与画工的交往及题跋去向。随后由既有 lotusFinale 与 tryEraZun 判断玩家是否争尊，并结算个人道路；玩家结局不替代元莲仙尊以木道成尊的原著历史。',goal:'决定续写天地、传画授徒或归于山林，保留原有元莲终局与成尊门槛。',events:['画工留名'],route:"lotusFinale() / tryEraZun('yl')",basis:'游戏原创玩家结局（以元莲仙尊的原著历史为背景）',boundary:'不改动 lotusFinale、tryEraZun 的原有条件、奖励与结算；玩家成就不改变元莲仙尊历史。'},
@@ -2596,7 +2622,7 @@ var ERA_PLOT_REBUILD={
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从西漠商路与荒漠夜宿进入盗天之世。驼铃夜宿让玩家先面对水囊、驼兽与商队分工；指缝里的风则以一线异光留下关于门与远方的疑问。两者都只是普通人的旅途经历，不意味着真实空门就在眼前。',goal:'建立玩家在中古跨域商路上的普通身份，先从行旅生存与陌生异象认识时代。',events:['驼铃夜宿','指缝里的风'],basis:'游戏原创设定（以西漠商旅、空门传闻与盗天追寻归乡的原著背景为参照）',boundary:'夜宿商队、水囊争执与指缝异光均为原创；不将异光认定为空门入口，也不写成盗天本人留下的现场。'},
    {id:'growth',name:'人物成长',plot:'玩家在街市无影、盗天遗梦与遁空蛊残图之间逐渐理解偷道与宇道的危险边界：易容行窃只是凡人经历，梦中本杰孙与护道人沙枭是游戏原创梦境，残图也不能复原遁空蛊。升仙后再由黑市·见面不相识、长毛老祖·三次炼蛊与推杯换盏检验玩家的流派积累。',goal:'让偷道、宇道成长来自观察、辨伪与承担代价，不把凡人见闻直接变成尊者真传。',events:['街市无影','盗天遗梦','遁空蛊残图'],travelEvents:['黑市·见面不相识'],trialEvents:['长毛老祖·三次炼蛊','推杯换盏'],basis:'原著明确内容（本杰孙开创偷道、与长毛老祖合作炼蛊）＋游戏原创玩家经历',boundary:'梦境、街市行窃、残图与玩家所得均为原创；不等同习得见面不相识仙道杀招或获得遁空蛊配方。'},
-   {id:'conflict',name:'时代矛盾',plot:'六转哄八转与雪人夜行把玩家卷入强者交涉和异人城邦冲突；异域账册则让跨域贸易中的货物去向、经手责任与商路信任成为现实问题。玩家面对的只是局部利益冲突，不掌握本杰孙的归乡布局，也不替代原著中的异人历史。',goal:'在强弱悬殊的交涉、异人冲突与商贸纠纷中作出选择，承担人情或资源后果。',events:['六转哄八转','雪人夜行','异域账册'],basis:'游戏原创设定（雪人、墨人等异人族群及跨域商贸为世界背景）',boundary:'两名八转蛊仙的争执、雪人潜入墨人城及账册纠纷均为原创场景，不是原著记载的本杰孙经历或异人大战。'},
+   {id:'conflict',name:'时代矛盾',plot:'六转哄八转与雪人夜行把玩家卷入强者交涉和异人城邦冲突；异域账册则让跨域贸易中的货物去向、经手责任与商路信任成为现实问题。玩家面对的只是局部利益冲突，不掌握本杰孙的归乡布局，也不替代原著中的异人历史。',goal:'在强弱悬殊的交涉、异人冲突与商贸纠纷中作出选择，承担人情或资源后果。',events:['六转哄八转','雪人夜行','异域账册','失窃的账册','异乡口音'],basis:'游戏原创设定（雪人、墨人等异人族群及跨域商贸为世界背景）',boundary:'两名八转蛊仙的争执、雪人潜入墨人城及账册纠纷均为原创场景，不是原著记载的本杰孙经历或异人大战。'},
    {id:'turning',name:'重大转折',plot:'盗天空门把玩家听闻的异象与本杰孙毕生追寻的目标联系起来，但商队传闻仍不是真实入口。升仙后，盗天空间、遁空蛊之败、疯魔窟·无极意志与落魄谷构成高风险历练：空间裂缝可能带来机缘，也可能让玩家付出代价；遁空蛊炼成不等于空门可入。',goal:'从凡人阶段的空门传闻推进到升仙后的空间历练，明确玩家所得与本杰孙原著结局的边界。',events:['盗天空门'],travelEvents:['盗天空间'],trialEvents:['遁空蛊之败','疯魔窟·无极意志','落魄谷'],basis:'原著明确内容（盗天追寻空门、遁空蛊与疯魔窟背景）＋游戏原创玩家历练',boundary:'玩家历练沿用既有触发门槛与结算；遁空蛊未能使本杰孙进入空门，不能把玩家的裂缝经历写成原著历史改写。'},
    {id:'ending',name:'时代终局',plot:'十道真传与归乡残页分别收束尊者传承门槛和玩家个人旅途。十道真传只对符合天外之魔条件者开放；归乡残页承接玩家此前对本杰孙旧闻的选择。随后仍由原有 dtFinale 与 tryEraZun 判断玩家是否争尊，并结算空穴、真传、杀招及个人结局。',goal:'让玩家决定如何面对偷道、归乡与传承，同时保留原有盗天终局与成尊条件。',events:['归乡残页'],trialEvents:['无间道'],route:"dtFinale() / tryEraZun('dt')",basis:'原著明确内容（盗天十道真传与天外之魔继承门槛）＋游戏原创玩家结局',boundary:'保留 dtFinale、tryEraZun 的原有条件、奖励与结算；不改变十道真传的天外之魔门槛，也不让玩家结局替代本杰孙未能进入空门的原著结果。'},
    {id:'legacy',name:'历史遗产',plot:'本杰孙旧闻、长毛炼场与时代余烬·盗天记录后人如何理解这位异乡来客。原著锚点是本杰孙为天外之魔、开创偷道、追寻归乡并与长毛老祖合作炼蛊；说书版本、毛民炼场、商旅衰败与玩家听闻均为原创侧写。',goal:'区分本杰孙的原著经历、后世传闻与玩家原创见闻，决定如何保存这段异乡故事。',events:['十道真传','本杰孙旧闻','长毛炼场','时代余烬·盗天'],basis:'原著明确内容（本杰孙天外之魔身份、偷道开创、与长毛老祖合作炼蛊）＋游戏原创历史回响',boundary:'长毛炼场与商旅传闻不是原著明确历史地点；不把盗天遗梦当作真实记忆传承，也不把遁空蛊残图当作配方。'}
@@ -2611,8 +2637,8 @@ var ERA_PLOT_REBUILD={
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从北原风雪、部族营地与血祭夜进入巨阳之世。血祭夜是地方部族为祈求熬过寒季举行的原创仪式；玩家先面对祭品分配、族人戒备与风雪行路，再从血脉祠堂的旧谱中听见巨阳后裔的传闻。',goal:'建立玩家在北原基层部族中的身份，区分真实血脉传承与地方原创祭仪。',events:['血祭夜'],travelEvents:['血脉祠堂'],basis:'原著明确内容（巨阳后裔与北原黄金血脉背景）＋游戏原创基层仪式',boundary:'血祭仪式、祭文、血脉印记及祠堂内的具体族谱均为原创；血脉身份不等于血道修为，也不证明玩家属于巨阳直系。'},
    {id:'growth',name:'人物成长',plot:'运道小赌、运道签摊与北原赛马让玩家从市井赌局、签文和草原竞逐中体会运道的诱惑与风险。升仙后，运石市集与运道赌局继续检验玩家对运道资源的辨识；这些经历只能形成个人心得，不会自动取得巨阳真传。',goal:'让运道成长来自观察、判断与承担输赢，不把民间赌局包装成尊者真传。',events:['运道小赌','北原赛马','运道签摊'],travelEvents:['运石市集'],trialEvents:['运道赌局'],basis:'原著明确内容（巨阳开创运道并留下运道真传）＋游戏原创玩家经历',boundary:'签文、赛马与凡人赌局均为原创；运道气息和心得不是三大运道真传，也不代表掌握真实运道仙蛊。'},
-   {id:'conflict',name:'时代矛盾',plot:'族谱记名与黄金血脉把名分、婚盟和资源继承推到台前；北原婚盟让年轻人的去留与部族生存发生冲突，牧场争界则让两支部族为冬季牧道和牲畜越界争执。王庭分肉承接玩家此前对巨阳王庭旧闻的选择，呈现普通族人如何在血脉名分之外争取一份口粮。',goal:'让玩家面对血脉名分、部族联姻与冬季资源分配的现实冲突，并承担选择后果。',events:['族谱记名','黄金血脉','北原婚盟','牧场争界','王庭分肉'],trialEvents:['血脉祭台','黄金族盟约'],basis:'原著明确内容（黄金血脉后裔与北原王庭体系背景）＋游戏原创基层冲突',boundary:'族谱登记、旁支继承争执、婚盟议事、牧场界碑与分肉规矩均为游戏原创推演；血脉不等于血道，不能把玩家盟约写成原著正式封爵制度。'},
-   {id:'turning',name:'重大转折',plot:'弃子逃亡让玩家看见黄金血脉内部也有被排斥者；日蚀传言则把巨阳崇拜与运道异象混成一场未经证实的民间传闻。升仙后，真阳残柱与真阳遗影把玩家带到王庭福地和八十八角真阳楼的历史边缘，但残柱、幻影与玩家所得仍受既有门槛约束。',goal:'由基层血脉冲突推进到王庭福地与真阳楼相关的高风险探索，辨别遗产与附会。',events:['弃子逃亡','日蚀传言','雪原断道'],travelEvents:['真阳残柱'],trialEvents:['真阳遗影'],basis:'原著明确内容（王庭福地、八十八角真阳楼与巨阳遗产）＋游戏原创玩家遭遇',boundary:'日蚀、巨阳眨眼、血脉发热与雪原断道均为原创异闻；玩家见到的残柱/幻影不等于进入真阳楼核心，也不改变原著王庭福地历史。'},
+   {id:'conflict',name:'时代矛盾',plot:'族谱记名与黄金血脉把名分、婚盟和资源继承推到台前；北原婚盟让年轻人的去留与部族生存发生冲突，牧场争界则让两支部族为冬季牧道和牲畜越界争执。王庭分肉承接玩家此前对巨阳王庭旧闻的选择，呈现普通族人如何在血脉名分之外争取一份口粮。',goal:'让玩家面对血脉名分、部族联姻与冬季资源分配的现实冲突，并承担选择后果。',events:['族谱记名','黄金血脉','北原婚盟','牧场争界','王庭分肉','祭天择日','巨阳仙尊·血脉议席'],trialEvents:['血脉祭台','黄金族盟约'],basis:'原著明确内容（黄金血脉后裔与北原王庭体系背景）＋游戏原创基层冲突',boundary:'族谱登记、旁支继承争执、婚盟议事、牧场界碑与分肉规矩均为游戏原创推演；血脉不等于血道，不能把玩家盟约写成原著正式封爵制度。'},
+   {id:'turning',name:'重大转折',plot:'弃子逃亡让玩家看见黄金血脉内部也有被排斥者；日蚀传言则把巨阳崇拜与运道异象混成一场未经证实的民间传闻。升仙后，真阳残柱与真阳遗影把玩家带到王庭福地和八十八角真阳楼的历史边缘，但残柱、幻影与玩家所得仍受既有门槛约束。',goal:'由基层血脉冲突推进到王庭福地与真阳楼相关的高风险探索，辨别遗产与附会。',events:['弃子逃亡','日蚀传言','雪原断道','雪灾前夜'],travelEvents:['真阳残柱'],trialEvents:['真阳遗影'],basis:'原著明确内容（王庭福地、八十八角真阳楼与巨阳遗产）＋游戏原创玩家遭遇',boundary:'日蚀、巨阳眨眼、血脉发热与雪原断道均为原创异闻；玩家见到的残柱/幻影不等于进入真阳楼核心，也不改变原著王庭福地历史。'},
    {id:'ending',name:'时代终局',plot:'巨阳王庭收束玩家对北原王庭旧制、黄金血脉与巨阳遗产的理解；北原王庭历练仍按原有门槛与结算推进。随后由既有 jyFinale 与 tryEraZun 判断玩家是否尝试成尊，并结算血脉、运道与个人道路的不同终局。',goal:'决定继承北原旧制、以运道自立或离开王庭体系，保留原有巨阳终局与成尊条件。',events:[],trialEvents:['北原王庭'],route:"jyFinale() / tryEraZun('jy')",basis:'原著明确内容（巨阳王庭、王庭福地与八十八角真阳楼）＋游戏原创玩家结局',boundary:'保留 jyFinale、tryEraZun 的原有条件、奖励与结算；玩家结局不改写巨阳仙尊开创运道、建立王庭福地及八十八角真阳楼的原著历史。'},
    {id:'legacy',name:'历史遗产',plot:'时代余烬·巨阳记录后人如何理解运道、黄金血脉与北原王庭。巨阳本人、死后意志、长生天洞天及后世黄金血脉组织必须分开；长毛老祖参与炼制八十八角真阳楼并提升至八转，是不可遗漏的合作边界。巨阳余晖历练则沿用原有触发条件，不把玩家的幻象遭遇当作巨阳本人现身。',goal:'辨认巨阳的原著历史、死后遗产与后世组织形态，决定如何保存自己的北原见闻。',events:['巨阳王庭','时代余烬·巨阳'],trialEvents:['巨阳余晖'],basis:'原著明确内容（巨阳开创运道、黄金血脉、王庭福地、八十八角真阳楼及长毛老祖参与炼制）＋游戏原创历史回响',boundary:'长生天的洞天阶段与后世组织活动分层；巨阳意志不等同巨阳本人；不将血祭、族谱、分肉或幻影称为原著明确仪式与事件。'}
   ]
@@ -2625,8 +2651,8 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['荒村、商队、魂材集市、采药者与临时避难点均为游戏原创基层场景；魂道、魂兽及魂材作为原著世界背景，不代表这些具体组织与交易曾被原著记载。','影宗是幽魂死后由七名分魂秘密建立的组织；幽魂在世时期不得提前出现影宗公开据点、完整组织体系或后世成员。','青家已经被幽魂灭族；青鬼沙漠、豆神宫遗藏与青仇形成的历史链条不能被改写为青家仍有完整族群、宗族议事或后代传承。','乐土仙尊在幽魂之后；不得提前引入乐土门人、镇魔悔哭海、后世影宗人物及方源时代的影宗复兴布局。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从空村拾遗与断桥夜渡进入幽魂之世。荒村留下的锅灶、蛊材与失散者痕迹只是普通人的灾后残局；断桥夜渡则让玩家在粮药运输与山洪险路之间作出选择。开局先建立基层求生处境，不把一地惨状指认为幽魂魔尊的某次屠戮。',goal:'建立玩家在近古时代荒村与商路中的普通身份，区分时代杀伐氛围与具体原创遭遇。',events:['空村拾遗','断桥夜渡'],travelEvents:['荒野寻蛊'],basis:'游戏原创设定（近古荒村、商路与野外蛊虫环境为背景）',boundary:'空村、山洪断桥、粮药商队与玩家救援均为原创；不指定为幽魂魔尊亲历或某次原著战场。'},
-   {id:'growth',name:'人物成长',plot:'无主蛊群与荒地元泉让玩家在野外资源中求生，魂材易市则把魂兽残材、材料真伪与残留怨气带入市井。升仙后，魂道残卷与无主福地历练沿用既有门槛，玩家获得的只是自身修行机会，不会因为靠近幽魂时代就自动取得尊者真传。',goal:'让成长来自辨材、探索和谨慎取舍，避免把普通魂材误写成幽魂真传或高阶魂道秘法。',events:['无主蛊群','荒地灵泉','魂材易市'],travelEvents:['魂道残卷'],trialEvents:['无主福地'],basis:'原著明确内容（魂道、魂兽与元泉等世界体系）＋游戏原创玩家遭遇',boundary:'无主蛊群、荒地元泉、魂材集市与残卷均为玩家原创经历；不代表原著明确遗物、幽魂真传或固定修行地。'},
-   {id:'conflict',name:'时代矛盾',plot:'白骨原野与魂兽过境让普通人面对战后尸骨、魂兽威胁与魂材诱惑。升仙后魂潮夜行把危险提升到魂流冲击，玩家可以潜行避开，也可以冒险劈开潮头；冲突始终是玩家自己的生存选择，不把尸骨原野写成幽魂某次明确战场。',goal:'呈现魂道盛行时代对基层生灵的压力，并让玩家在避险、救助与争夺资源之间承担后果。',events:['白骨原野','魂兽过境'],trialEvents:['魂潮夜行'],basis:'原著明确内容（魂道与魂兽背景）＋游戏原创荒村遭遇',boundary:'白骨遍野、魂兽经过荒村及玩家收集魂材均为原创；不据此推定幽魂魔尊亲自驱赶魂兽或在此地发动过原著战役。'},
+   {id:'growth',name:'人物成长',plot:'无主蛊群与荒地元泉让玩家在野外资源中求生，魂材易市则把魂兽残材、材料真伪与残留怨气带入市井。升仙后，魂道残卷与无主福地历练沿用既有门槛，玩家获得的只是自身修行机会，不会因为靠近幽魂时代就自动取得尊者真传。',goal:'让成长来自辨材、探索和谨慎取舍，避免把普通魂材误写成幽魂真传或高阶魂道秘法。',events:['无主蛊群','荒地灵泉','魂材易市','骨灯照影'],travelEvents:['魂道残卷'],trialEvents:['无主福地'],basis:'原著明确内容（魂道、魂兽与元泉等世界体系）＋游戏原创玩家遭遇',boundary:'无主蛊群、荒地元泉、魂材集市与残卷均为玩家原创经历；不代表原著明确遗物、幽魂真传或固定修行地。'},
+   {id:'conflict',name:'时代矛盾',plot:'白骨原野与魂兽过境让普通人面对战后尸骨、魂兽威胁与魂材诱惑。升仙后魂潮夜行把危险提升到魂流冲击，玩家可以潜行避开，也可以冒险劈开潮头；冲突始终是玩家自己的生存选择，不把尸骨原野写成幽魂某次明确战场。',goal:'呈现魂道盛行时代对基层生灵的压力，并让玩家在避险、救助与争夺资源之间承担后果。',events:['白骨原野','魂兽过境','残魂附契'],trialEvents:['魂潮夜行'],basis:'原著明确内容（魂道与魂兽背景）＋游戏原创荒村遭遇',boundary:'白骨遍野、魂兽经过荒村及玩家收集魂材均为原创；不据此推定幽魂魔尊亲自驱赶魂兽或在此地发动过原著战役。'},
    {id:'turning',name:'重大转折',plot:'灭门旧宅是与青家旧恨不同的原创灭门事件；玩家不能把每一座空宅都归因于幽魂。青家旧恨则回望年轻明幽与青家的真实冲突，并把青鬼沙漠、豆神宫遗藏与青仇的后续关联放在历史层面理解。升仙后白骨帝座、万魂谷与幽魂回望构成逐级加深的魂道试炼，其中幽魂回望可提高既有关注度，仍受原有风险机制约束。',goal:'辨认普通灭门惨案与幽魂灭青家的原著历史差别，并在魂道高危历练中承担既有代价。',events:['灭门旧宅','青家旧恨'],trialEvents:['白骨帝座','万魂谷','幽魂回望'],basis:'原著明确内容（年轻幽魂灭青家、青鬼沙漠与青仇关联）＋游戏原创玩家支线',boundary:'灭门旧宅为原创，不得与青家灭族混为一谈；青家已灭族，不能出现仍以青家名义延续的族人组织；历练中的帝影、幽影与目光按原有事件表现，不自动等同幽魂本尊现身。'},
    {id:'ending',name:'时代终局',plot:'幽魂之世的终局沿用原有万魂之夜、关注度、幽魂临世与个人结局分支；无主空城的夺宝历练也仍按既有结算进行。玩家可以在万魂之夜中求生、蛰伏或面对幽魂，但任何个人结局都不改变幽魂以魂道成尊、其后身死及残魂布局的原著历史。',goal:'决定玩家如何度过万魂之夜，并保留原有幽魂终局、关注度与成尊条件。',events:['余烬密令'],trialEvents:['空城夺宝'],route:"hunhunFinale() / tryEraZun('hy')",basis:'游戏原创玩家结局（以幽魂魔尊原著历史为背景）',boundary:'保留 hunhunFinale、hunhunShowdown 与 tryEraZun 的既有触发、奖励、战斗与结算；玩家不能以结局改写幽魂生死、青家灭族或影宗创建的历史。'},
    {id:'legacy',name:'历史遗产',plot:'魂灯夜话、幽魂魂碑与时代余烬·幽魂呈现凡人如何理解魂道与死亡；影宗余烬则只在幽魂死后，作为分魂创建影宗的后世回响出现。玩家听到的传闻、魂灯与碑刻都是原创侧写，不能被当作幽魂本尊遗物、生死门入口或影宗真实密令。',goal:'分清幽魂生前的尊者历史、死后的残魂布局与后世影宗活动，保存自己所见而不把传闻当作真相。',events:['魂灯夜话','幽魂魂碑','影宗余烬','时代余烬·幽魂'],trialEvents:[],basis:'原著明确内容（幽魂开创魂道、青家灭族、死后残魂与分魂创建影宗）＋游戏原创历史回响',boundary:'魂灯、姓名魂碑、废弃据点与旧令均为原创；影宗由幽魂死后七名分魂秘密建立，不能写成其生前公开势力或玩家可确认的原著遗物。'}
@@ -2641,8 +2667,8 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['乐土以仁善与德行感化世人、平息幽魂之后乱局有原著依据；具体净土、施粥棚、行脚僧、钟楼、渡口、灾后村落与地方规约均为游戏原创，不冒充乐土亲设的原著地点或制度。','五域真传是乐土留下的传承布局；门人传承活动与乐土本人在世时的行动分层，不把所有讲法者都认定为乐土亲传。','乐土时期的魂道影响逐渐受到抑制，但魂道传承、魂兽与既有魂道修行者并未因此全部消失；不把本时期写成魂道被彻底清除。','蓝龙鲸洞天与镇魔悔哭海按原著地点关系呈现；凡人海边听闻、海鸟预警与普通海域风浪均为原创，不得与悔哭海本体混同。'],
   acts:[
    {id:'opening',name:'时代开局',plot:'玩家从净土施粥与灾田复耕进入乐土之世。幽魂时代的杀戮与魂道灾祸留下许多破败聚落，但眼前的饥民、塌渠与荒田都需要普通人一点点收拾。玩家先决定如何救急、如何让幸存者重新生活，而不是一开始就接触尊者真传。',goal:'建立幽魂之后五域休养的基层视角，让仁善理念落实为眼前可执行的救助与重建。',events:['净土施粥','灾田复耕'],basis:'原著明确内容（乐土在幽魂之后平息乱局、推动五域休养）＋游戏原创灾后村落场景',boundary:'施粥棚、荒田、水渠与村民争议均为原创，不是乐土仙尊本人亲设的净土或原著记载的具体救灾事件。'},
-   {id:'growth',name:'人物成长',plot:'厚土石窟与渡口问心让玩家从土道承载、安顿众生的角度审视修行；乐土行愿则把仁善理念化为普通人能理解的行动准则。升仙后可走访净土边，继续以土道与人道历练检验自身，而不是把听闻行愿文当成得到乐土完整真传。',goal:'以土道为主轴、兼顾人道与道心，令成长来自承担、辨识和持续实践。',events:['厚土石窟','渡口问心','乐土行愿'],travelEvents:['净土边'],basis:'原著明确内容（乐土以土道成尊、仁善理念影响五域）＋游戏原创寓言场景',boundary:'石窟、渡口与行愿文为原创；不把它们说成乐土本人修行地、亲笔遗训或真传入口。'},
-   {id:'conflict',name:'时代矛盾',plot:'万家灯会与净土遗规呈现灾后秩序如何重建：善意需要落实为分粮、守规与彼此担责。魂兽余患则提醒玩家，乐土平息幽魂之后的乱局不代表魂道影响和魂兽一夜绝迹；玩家需要在保护村民与避免无谓杀戮之间作出判断。',goal:'让玩家处理善意与现实资源、危险之间的冲突，不把仁善简化成毫无代价的宽纵。',events:['万家灯会','净土遗规','魂兽余患'],travelEvents:['厚土祭'],basis:'原著明确内容（乐土平息乱局、抑制魂道杀戮）＋游戏原创灾后社会与魂兽遭遇',boundary:'灯会、施粥规约、近村魂兽及玩家处置均为原创；魂道与魂兽并未被乐土彻底消灭，且本事件不涉及镇魔悔哭海。'},
+   {id:'growth',name:'人物成长',plot:'厚土石窟与渡口问心让玩家从土道承载、安顿众生的角度审视修行；乐土行愿则把仁善理念化为普通人能理解的行动准则。升仙后可走访净土边，继续以土道与人道历练检验自身，而不是把听闻行愿文当成得到乐土完整真传。',goal:'以土道为主轴、兼顾人道与道心，令成长来自承担、辨识和持续实践。',events:['厚土石窟','渡口问心','乐土行愿','义仓分米'],travelEvents:['净土边'],basis:'原著明确内容（乐土以土道成尊、仁善理念影响五域）＋游戏原创寓言场景',boundary:'石窟、渡口与行愿文为原创；不把它们说成乐土本人修行地、亲笔遗训或真传入口。'},
+   {id:'conflict',name:'时代矛盾',plot:'万家灯会与净土遗规呈现灾后秩序如何重建：善意需要落实为分粮、守规与彼此担责。魂兽余患则提醒玩家，乐土平息幽魂之后的乱局不代表魂道影响和魂兽一夜绝迹；玩家需要在保护村民与避免无谓杀戮之间作出判断。',goal:'让玩家处理善意与现实资源、危险之间的冲突，不把仁善简化成毫无代价的宽纵。',events:['万家灯会','净土遗规','魂兽余患','渡口补桥'],travelEvents:['厚土祭'],basis:'原著明确内容（乐土平息乱局、抑制魂道杀戮）＋游戏原创灾后社会与魂兽遭遇',boundary:'灯会、施粥规约、近村魂兽及玩家处置均为原创；魂道与魂兽并未被乐土彻底消灭，且本事件不涉及镇魔悔哭海。'},
    {id:'turning',name:'重大转折',plot:'归土安魂让玩家直面战争与杀戮留下的亡者；悔哭海传闻则把视野引向乐土在蓝龙鲸洞天的镇魔悔哭海。玩家只能从凡人传闻理解其存在，不能因此进入洞天或参与乐土当年的布置。升仙后以厚土问心、渡魂长夜历练，面对承苦、渡魂与自我取舍。',goal:'从个人救助推进到对死亡、悔悟与仁善边界的理解，建立尊者历史与凡人传闻的距离。',events:['归土安魂','悔哭海传闻'],trialEvents:['厚土问心','渡魂长夜'],basis:'原著明确内容（镇魔悔哭海位于蓝龙鲸洞天、乐土以仁善感化与镇压魔头）＋游戏原创凡人传闻',boundary:'悔哭海不在普通海域，玩家听闻不等于抵达蓝龙鲸洞天；渡魂长夜与厚土问心为游戏历练，不冒充乐土原著真传内容。'},
    {id:'ending',name:'时代终局',plot:'乐土钟声与行愿回灯收束玩家在灾后重建中的选择；净土立约、人道辨难、乐土钟鸣与善念试炼继续检验玩家是否愿意承担自己选择的代价。随后仍由原有 paradiseFinale 与 tryEraZun 判断玩家是否尝试成尊，个人结局不替代乐土仙尊的历史。',goal:'决定守护一方、送魂归途或继续行脚，并保留原有乐土时代结局与成尊条件。',events:['乐土钟声','行愿回灯'],trialEvents:['净土立约','人道辨难','乐土钟鸣','善念试炼'],route:"paradiseFinale() / tryEraZun('lt')",basis:'游戏原创玩家结局（以乐土仙尊的原著历史为背景）',boundary:'保留 paradiseFinale、tryEraZun 的既有触发、奖励与成尊条件；陆畏因及后世南疆真传承接者不提前出场。'},
    {id:'legacy',name:'历史遗产',plot:'时代余烬·乐土与乐土门人传法呈现后人如何理解乐土的仁善理念及五域真传。玩家听闻的是不具名门人、后继传承者的原创讲述；镇魔悔哭海的原著地点仍在蓝龙鲸洞天，不与普通净土、钟楼或海边传闻混同。',goal:'分清乐土本人、五域真传及后世门人活动，记录仁善理念如何在不同地域延续。',events:['时代余烬·乐土','乐土门人传法'],travelEvents:['渡魂渡口'],trialEvents:[],basis:'原著明确内容（乐土土道成尊、仁善理念、五域真传、蓝龙鲸洞天与镇魔悔哭海）＋游戏原创历史回响',boundary:'行脚僧、传法地点、净土规约与渡魂渡口均为原创；陆畏因只属于更后世南疆真传承接脉络，不是乐土时期同行者。'}
@@ -3924,7 +3950,7 @@ function auditCompatRegression(){
  return out;
 }
 
-window.__RUN_AUDIT={version:'v2.00',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem,allSystems:auditAllSystems,compat:auditCompatRegression,milestone:{name:'v2.00-stable',series:['v1.94','v1.95','v1.96','v1.97','v1.98','v1.99','v2.00'],note:'转盘/成长/体验/整合/兼容审计收束定版；非玩法重写'}};
+window.__RUN_AUDIT={version:'v2.06',difficulty:ERA_DIFFICULTY,rewardCategories:REWARD_CATEGORIES,audit:auditRunIsolation,peopleFactions:auditPeopleFactions,dispatchLegacy:auditLegacyDispatchBranches,dispatchGeneric:auditGenericEventDispatch,marks:auditMarkReferences,flags:auditFlagReferences,choices:auditChoiceConsequences,branchConflicts:auditBranchConflicts,socialRelations:auditSocialRelationConsistency,eventSettlement:auditEventSettlementClosure,mortalExtraRegistration:auditMortalExtraRegistration,eraPlot:auditEraPlotRebuild,starHostEventFlow:auditStarHostEventFlow,wujiEraPlot:auditWujiEraPlot,kuangManEraPlot:auditKuangManEraPlot,redLotusEraPlot:auditRedLotusEraPlot,yuanLianEraPlot:auditYuanLianEraPlot,thievingHeavenEraPlot:auditThievingHeavenEraPlot,juyangEraPlot:auditJuyangEraPlot,ghostSpectralEraPlot:auditGhostSpectralEraPlot,paradiseEraPlot:auditParadiseEraPlot,immortalTravelExpansion:auditImmortalTravelExpansion,fangYuanCombat:auditFangYuanCombatExpansion,mortalLinkContinuation:auditMortalLinkContinuation,wheelOnlyTriggers:auditWheelOnlyTriggers,mortalGrowthRewards:auditMortalGrowthRewards,yuanShiRewardBranches:auditYuanShiRewardBranches,yuanShiEventFlow:auditYuanShiEventFlow,identityStance:auditIdentityStancePrototype,mortalTravelDraws:auditMortalTravelDraws,dexCoverage:auditDexCoverage,wheelSystem:auditWheelSystem,growthSystem:auditGrowthSystem,uxSystem:auditUXSystem,allSystems:auditAllSystems,compat:auditCompatRegression,milestone:{name:'v2.00-stable',series:['v1.94','v1.95','v1.96','v1.97','v1.98','v1.99','v2.00'],note:'转盘/成长/体验/整合/兼容审计收束定版；非玩法重写'}};
 
 function eraAllowed(entry){
   if(!entry) return true;
@@ -13406,7 +13432,7 @@ function cleanGameHtml(){
  var wheel=root.querySelector('#wheelG');
  if(wheel){wheel.innerHTML='';wheel.style.removeProperty('transform');if(!wheel.getAttribute('style'))wheel.removeAttribute('style');}
  var flash=root.querySelector('#flash');if(flash){flash.textContent='';flash.classList.remove('show');}
- ['overlay','logOverlay','achvOverlay','chgOverlay','dexOverlay'].forEach(function(id){var el=root.querySelector('#'+id);if(el)el.classList.add('hidden');});
+ ['overlay','logOverlay','achvOverlay','chgOverlay','dexOverlay','codexOverlay','sceneOverlay'].forEach(function(id){var el=root.querySelector('#'+id);if(el)el.classList.add('hidden');});
  var spin=root.querySelector('#spinBtn');if(spin){spin.textContent='开 转';spin.classList.remove('ready');}
  var bga=root.querySelector('#bgmAudio');if(bga){bga.removeAttribute('src');bga.removeAttribute('autoplay');}
  /* 接收方不自动弹更新日志；仍可点击版本号手动查看。 */
@@ -14377,6 +14403,232 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  }
 })();
 /* v1.92：所有额外凡人事件注册完成后，再冻结时代门控与编年复核索引。 */
+/* v2.02：各时代凡人见闻扩充（每代两则）
+   入口沿用 ERA_MORTAL_EXTRA 批量注册：自动进入时代池、自动「已见」门控、
+   自动登记 EVENT_ERA / DEX_ERA_EVENTS / ERA_EVENT_REVIEW / ERA_EVENT_CATALOG。
+   依据层级：原著明确的时代背景＋游戏原创的基层场景，不冒充原著事件。 */
+(function(){
+ var add=[
+ /* 远古·元始 */
+ {era:0,n:'开窍授徒',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（原始仙尊传下开窍法、天庭推行门派制度）＋游戏原创基层场景',
+  note:'学舍试窍、名册与师资争执均为原创基层侧写，不指向原始仙尊本人亲临。',
+  desc:'聚落外的简陋学舍里，几名孩童正按新传下的开窍法逐一试窍。教习者只有一人，器具也不齐备；有家长希望先把自家孩子排进名册，也有人担心试窍失败会伤了孩子。你被请来帮忙核对名册与器具。',
+  options:[['按旧法逐项试窍',40],['先教识字与养蛊常识',35],['记录差异，暂缓开窍',25]],
+  outcomes:['你按旧法逐项核对年龄、体魄与空窍反应，替教习者排出一份可行的试窍次序，学舍总算没有乱作一团。','你先教孩子们辨认蛊材、记住养蛊禁忌，再谈开窍；进度慢了些，却少了几分盲闯的伤损。','你把各家资质差异与器具缺口一一记下，没有急着让所有孩子同日开窍，留待教习者分批处理。']},
+ {era:0,n:'山民会盟',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（人族在太古逐步立足、形成聚落与制度）＋游戏原创基层场景',
+  note:'水源会盟与立石为界为原创基层场景，不宣称原著记载过具体会盟。',
+  desc:'几处山民聚落因一条上游水源起了争执。猎户说溪水改道是兽群踩踏，农户却认定有人夜里筑坝。各寨都不愿先让一步，便约定在山口碰面。你带着旧年的水路记录赴会，众人等着你给个说法。',
+  options:[['立石为界，各守一段',40],['共同修渠，按户出工',35],['只记录各寨主张',25]],
+  outcomes:['你按旧年水路与山势立下界石，各寨虽不满意，却都认可了可查证的分界，争执暂时压下。','你提议共同修渠、按户出工，几寨勉强答应；水没有立刻变多，但至少没人再夜里偷筑坝。','你把各寨的主张与证据原样记下，没有替任何人裁断，约定来年水势清楚后再议。']},
+ /* 远古·星宿 */
+ {era:1,n:'星盘问命',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（星宿仙尊以智道、星道闻名，天庭重推演）＋游戏原创基层场景',
+  note:'星盘摊问命为原创市井场景，不宣称其推演等同于星宿仙尊本人布局。',
+  desc:'智道书院外的老蛊师摆着一方旧星盘，替人推演近日吉凶。摊前排队的人不少，有人说他算得准，也有人说不过是察言观色。老蛊师抬头看你，问要不要也推一盘。',
+  options:[['让老者推演，再自行核对',40],['借星盘对照自己的星图',35],['不問吉凶，只买一本历书',25]],
+  outcomes:['你听完推演，又对照自己记得的星象，发现其中确有几分门道；你记下可验证的部分，没有把话全当成定论。','你借星盘校正了自己的星图，补上几处先前忽略的刻度，对星道推演多了几分把握。','你没有问命，只买下历书。老者也不强求，临别时提醒你：星盘算的是势，不是人的决心。']},
+ {era:1,n:'校历之争',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（星宿仙尊推动智道推演、天庭重视历法与调度）＋游戏原创基层场景',
+  note:'两套历法相差一日为原创基层冲突，不涉及原著具体历法事件。',
+  desc:'驿站书吏发现两套历法竟差了一日：按旧历，运粮队明日就该出发；按新历，河道尚未解冻。两拨人各执一词，谁也不肯担误期的责任。驿丞把两本历册摆在你面前，让你帮忙核对。',
+  options:[['以星象实测校订',40],['沿用旧历，稳妥为先',35],['两历并列，注明差异',25]],
+  outcomes:['你连夜观测星位，又与旧年记录比对，确认新历的误差所在；运粮队按校正后的日子出发，未再空等。','你主张沿用旧历，宁可早走一日也不误期；队伍在河边多等了半日，总算没有出大错。','你把两套历法的差异逐条注明，交由驿丞上报，不擅自改动任何一册，避免把责任推给某一个人。']},
+ /* 上古·无极 */
+ {era:2,n:'道场量尺',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（无极魔尊以律道立道、疯魔窟为道场工程）＋游戏原创基层场景',
+  note:'道场外围统一度量衡为原创基层场景，不涉及疯魔窟核心推演。',
+  desc:'疯魔窟外围的道场正在统一量尺。各坊带来的旧尺长短不一，石料与阵材的尺寸因此频频对不上。匠人头目主张一律改用官尺，几个老匠人却担心旧活计全要返工。你被叫去核对几批已经下料的石件。',
+  options:[['按官尺统一重校',40],['保留各坊旧尺，另立换算',35],['实测折中，先保急件',25]],
+  outcomes:['你按官尺重新校过量具，又逐批核对石件，返工虽多，之后的尺寸终于不再出错。','你替各坊立下换算表，旧尺不必全弃，只是每批料都要注明出处，麻烦却稳妥。','你先量出急件的实际尺寸，按可用范围折中处理，既没耽误工期，也没把隐患留到最后。']},
+ {era:2,n:'雪线让路',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（北原严寒、无极时代疯魔窟外围的营建与迁徙）＋游戏原创基层场景',
+  note:'雪线南移与牧道争执为原创基层场景，不指向无极魔尊本人。',
+  desc:'雪线比往年更早南移，牧人赶着牲畜要下山，道场的运料队却占住了唯一的缓坡。双方都不肯让路：牲畜再等会掉膘，石料误了工期又要受罚。你站在坡口，看着越拉越长的队伍。',
+  options:[['让牲畜先过，石料后行',40],['合力清出一条新道',35],['记录雪线与路况，上报调停',25]],
+  outcomes:['你说服运料队先让牲畜下山，又替他们标出可通行的硬地；石料晚了半日，却没有一头牲畜折在坡上。','你带人清出一条侧道，虽窄，却能让牲畜与推车交替通过；众人累得不轻，路总算通了。','你没有替任何一方做主，只把雪线、坡道与两队时辰记清上报，避免争执继续扩大。']},
+ /* 上古·狂蛮 */
+ {era:3,n:'化形试胆',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（狂蛮魔尊开变化道、兽人部族崇尚变化与勇武）＋游戏原创基层场景',
+  note:'少年首次化形为原创部族习俗场景，不写成狂蛮魔尊本人经历。',
+  desc:'部族里一名少年到了首次化形的年纪。按规矩，他要在族人见证下变成一头与自身性情相合的兽形；可他在兽皮前站了许久，肩背已经发抖。族老没有催他，只让旁人退开些。你在人群外围看着。',
+  options:[['按族礼守夜见证',40],['先教他控制力道与呼吸',35],['劝他推迟，不必逞强',25]],
+  outcomes:['你按族礼守在火堆旁，不多言也不催促。天快亮时，少年终于完成了第一次变化，虽不完美，却站住了。','你教他先稳住呼吸、收住力道，少年第二次尝试时没有再被自己的变化反噬，族老朝你点了点头。','你劝他不必拿命逞强，少年虽不甘，还是退了下来；族老没有责罚，只说胆气可以慢慢养。']},
+ {era:3,n:'图腾补笔',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（狂蛮魔尊留下万兽图腾与变化道传承）＋游戏原创基层场景',
+  note:'补刻图腾为原创部族日常，不把玩家写成狂蛮真传持有者。',
+  desc:'部族祠堂外的万兽图腾被风雪磨蚀了几处，兽首与爪痕已经模糊。族老取出旧拓片，却发现拓片本身也残缺。有人主张照记忆补刻，有人坚持宁可留白也不乱添。你被请来辨认残痕。',
+  options:[['依旧拓片与原痕补刻',40],['让少年按记忆添笔',35],['只记录残痕，不擅改图腾',25]],
+  outcomes:['你以旧拓片对照石面残痕，只补上能确认的线条；图腾不算完整，却没有添出不属于它的兽形。','你让见过旧图的少年试添几笔，再由族老定夺；有人嫌不够像，但少年第一次参与了族中大事。','你没有动刀，只把残痕与拓片差异记下，建议等找到更完整的旧本再补，族老点头应下。']},
+ /* 上古·红莲 */
+ {era:4,n:'重来的一天',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（红莲魔尊以宙道反复回溯、宿命主题）＋游戏原创基层场景',
+  note:'玩家感到一日重复为原创体验，不宣称真实发生宙道回溯，也不涉及红莲本人。',
+  desc:'你醒来时，听见的敲门声、邻家的争吵与远处的更鼓都和昨日一模一样。你甚至记得午后会有一场小雨。可当你走到街口，那个本该摔倒的孩子仍站在原地，仿佛在等你做出不同的选择。',
+  options:[['按记忆避开昨日的祸事',40],['故意改变选择，看会怎样',35],['只记下细节，不声张',25]],
+  outcomes:['你提前挪开松动的石板，孩子没有摔倒；这一日其余的事也悄然偏转，你确信记忆并非错觉。','你故意走了另一条路，发现某些事仍会以别的方式发生；你开始明白，能改的只是极小的一角。','你没有声张，只把重复出现的细节一一记下；日落后，那些字迹仍在，像是这一日唯一的凭据。']},
+ {era:4,n:'旧信重至',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（宙道与光阴异常的时代背景）＋游戏原创基层场景',
+  note:'同一封信两次送达为原创异象，不写成红莲真传或春秋蝉效果。',
+  desc:'驿站的旧信架前，驿卒拿着一封已经送出的信发愣：收信人说昨日就收到过一封一模一样的，连封口的折痕都没差。信上写的只是家常，却让驿卒不敢再送。你正好在场。',
+  options:[['追查送信人与驿路记录',40],['直接把信交给收信人',35],['封存信件，报备驿站',25]],
+  outcomes:['你核对驿路与签收记录，发现两封信的时辰对不上；虽查不出缘由，至少排除了有人伪造。','你把信原样送到收信人手中，对方沉默良久，最终收下；这一封没有再来。','你没有擅自拆信，只将两封一并封存报备，留待日后有能者查证。']},
+ /* 中古·元莲 */
+ {era:5,n:'画中雀',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（元莲仙尊兼修画道、画道可藏生意）＋游戏原创基层场景',
+  note:'画中雀鸟轻动为原创画坊异闻，不写成元莲仙尊亲笔真迹。',
+  desc:'画坊角落里挂着一幅旧雀鸟图，落款已经模糊。午后无人时，你看见画中雀鸟的翅尖似乎动了一下；再看时，它又只是墨色。画师说这幅画收来多年，从未装裱，却一直没有虫蛀。',
+  options:[['请画师查验纸墨与落款',40],['以木道气息试探画意',35],['只作观赏，不深究',25]],
+  outcomes:['画师查过纸墨与印色，确认是旧物，却说不出画中生意从何而来；你们把它移到干燥处，再无异动。','你以木道气息轻轻试探，画中雀鸟似有回应；画师沉默半晌，只让你别把此事四处张扬。','你看了许久，没有伸手，也没有追问；离开时，画中雀鸟仍停在原处，像什么都没发生。']},
+ {era:5,n:'古树诊脉',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（元莲仙尊以木道成尊、木道重生机与地脉）＋游戏原创基层场景',
+  note:'为古树诊脉为原创村野场景，不宣称元莲仙尊本人出手。',
+  desc:'村口那株护村古树入秋后忽然枯黄，落叶比往年早了一月。里正请来一位木道蛊师，蛊师绕着树走了三圈，只说根下有问题，却不肯立刻动土。村民担心是地脉出了事。',
+  options:[['引水松土，先救枝叶',40],['以蛊虫探查根部',35],['记录病状，暂不动土',25]],
+  outcomes:['你带人引来活水、松开板结的土层，古树在半月后抽出新芽；根下的问题仍待细查，但树保住了。','你以蛊虫探入根部，发现一段旧石基阻住了水脉；村民合力移开石基，树势慢慢缓了过来。','你没有动土，只把枯黄范围、虫迹与地势记下，交给蛊师复核；古树又撑过了一个冬天。']},
+ /* 中古·盗天 */
+ {era:6,n:'失窃的账册',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（盗天魔尊开偷道、偷道手法诡异）＋游戏原创基层场景',
+  note:'商队账册失窃为原创市井案件，不指向盗天魔尊本人或盗天真传。',
+  desc:'一支商队的账册在夜里失窃。门窗完好，货箱也没有翻动，唯独记着赊欠与路线的册子不见了。商队怀疑出了内贼，伙计们却互相指认。你被请来查看现场。',
+  options:[['先查内贼与钥匙',40],['循偷道手法反查痕迹',35],['重记账目，不再追究',25]],
+  outcomes:['你核对钥匙与值夜次序，发现内贼确有疏漏；账册虽未全找回，至少洗清了几个无辜伙计。','你从窗缝的细痕与灰土判断，窃者手法极轻，不像寻常伙计；你记下线索，提醒商队改换存放处。','你劝商队先补记账目、稳住生意，不再把人力耗在互相猜疑上；赊欠虽乱，商路却没有断。']},
+ {era:6,n:'异乡口音',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（盗天魔尊为天外之魔、一生寻找回家的门）＋游戏原创基层场景',
+  note:'异乡旅人问路为原创场景，不写成盗天魔尊本人现身或真传入口。',
+  desc:'驿站里来了一名口音古怪的旅人。他不问商路，也不问蛊材，只反复打听“有没有一扇通向外面的门”。有人笑他痴，有人悄悄避远。旅人把一枚看不懂纹路的旧片放在桌上，说愿意用消息换一顿饭。',
+  options:[['为他指路，换那个消息',40],['先试探他的来历',35],['保持距离，不接他的东西',25]],
+  outcomes:['你给他指了近处的山路，他则说出几条少有人走的商道；那枚旧片你终究没有收。','你旁敲侧击问他的来处，他只说家乡在“很远的另一侧”；你判断他不是寻常流民，便不再深问。','你没有碰那枚旧片，只给他添了碗热汤；他道谢后离开，临行前仍在望天。']},
+ /* 中古·巨阳 */
+ {era:7,n:'祭天择日',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（巨阳仙尊开运道、北原王庭重气运与祭仪）＋游戏原创基层场景',
+  note:'基层祭天择日为原创场景，不写成巨阳仙尊亲自主持。',
+  desc:'部族准备祭天，族老与运道蛊师却为日子争执不下：一个说旧例不可改，一个说近来气运偏滞，宜换一日。祭品已经备好，族人都在等消息。你被请来旁听并核对旧例。',
+  options:[['按运道所示择日',40],['依祖制旧例举行',35],['两说并列，交族老公议',25]],
+  outcomes:['你对照星象与近年收成，认同运道蛊师所择的日子；祭仪顺利，族人心中也安定下来。','你主张依祖制举行，虽有人觉得气运未转，但仪式没有出岔子，族老也保住了权威。','你没有替任何一方定夺，只把两说与依据一并呈上，让族老公议；争执虽未立解，却没人再私下埋怨。']},
+ {era:7,n:'雪灾前夜',w:7,actId:'turning',kind:'日常遭遇',
+  basis:'原著明确内容（北原十年一度大雪灾、部族囤积与迁徙）＋游戏原创基层场景',
+  note:'雪灾前的基层取舍为原创场景，不涉及王庭福地名额与真阳楼机缘。',
+  desc:'大雪灾将至，营地里的粮、草与药材都不够所有人撑到最后。族老要你帮着拿主意：是开仓分米，还是先保种子与药材，抑或趁雪还没封山组织迁徙。三种做法都有人反对。',
+  options:[['开仓分米，先稳人心',40],['先保种子与药材',35],['组织迁徙，弃守旧营',25]],
+  outcomes:['你按户分米，又留下最低限度的种子；营地撑过了最冷的一段，虽紧，却没有人饿死。','你力主先保种子与药材，口粮配给收紧；有人抱怨，但开春后营地还有可种之物。','你带人提前南迁，旧营丢了大半；风雪过后回来，屋舍已塌，人却大多还在。']},
+ /* 近古·幽魂 */
+ {era:8,n:'骨灯照影',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（幽魂魔尊开魂道、魂灯与残魂意象）＋游戏原创基层场景',
+  note:'骨灯照影为原创市井场景，不写成幽魂本尊或原著遗迹。',
+  desc:'荒村的夜集上，有人摆出一盏骨灯，说能照见亡亲的影子。灯前围了不少人，却没人敢先上前。摊主把灯芯拨亮，火苗泛着青白；你看见灯影里似乎真有轮廓晃动。',
+  options:[['让他照灯，看看究竟',40],['先查验灯中魂气',35],['劝他收起骨灯',25]],
+  outcomes:['灯影晃动片刻便散了，摊主说不出所以然；你没有得到亡亲的音讯，却看清那不过是一缕残魂。','你以魂道手法探过灯芯，确认其中只是散乱魂气，便让摊主别再拿它招摇，免得惊扰活人。','你劝摊主收起骨灯，围观众人渐渐散去；夜集恢复了喧闹，只剩那点青白火苗还亮着。']},
+ {era:8,n:'残魂附契',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（魂道可寄魂、残魂与旧物相系）＋游戏原创基层场景',
+  note:'残魂附契为原创遭遇，不指向幽魂本人、影宗或原著遗物。',
+  desc:'村里拆旧屋时，从梁下翻出一张泛黄的契书。契上墨迹未散，夜里却有人听见屋中传来争执声。老人说这是当年分家的旧契，附着一缕不肯散的残魂。众人不敢烧，也不敢留。',
+  options:[['以魂道手法安抚残魂',40],['当着族人烧契断念',35],['封存旧契，另择处安置',25]],
+  outcomes:['你以魂道手法慢慢安抚，争执声渐弱；残魂散去前，契上浮出一行模糊的字，像是终于放下了什么。','你当众烧了旧契，火中传来一声短促的叹息，此后夜里再无声响；分家的旧怨却仍留在活人心里。','你没有烧契，只把它封进木匣、移到祠堂侧屋；夜里仍有轻响，却不再惊扰村人。']},
+ /* 近古·乐土 */
+ {era:9,n:'义仓分米',w:7,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（乐土仙尊以仁善、济世理念修复五域）＋游戏原创基层场景',
+  note:'义仓分米为原创基层场景，不写成乐土仙尊亲设的净土制度。',
+  desc:'灾后的义仓前排出长队。仓中粮食有限，管仓人拿着名册左右为难：按户均分，伤病与孤寡便撑不到秋收；若先照顾弱者，其余人家又难免怨言。你被请来帮忙核名。',
+  options:[['按户均分，余粮留种',40],['先给伤病与孤寡',35],['记账待秋收补还',25]],
+  outcomes:['你按户均分，又留出一份种子；队伍散得很慢，但没有人家空手回去。','你把伤病与孤寡排在前面，其余人家虽有不满，看到实情后也大多默许了。','你让各户按手印记账，约定秋收补还；有人嘀咕，却也承认这比当场争抢体面。']},
+ {era:9,n:'渡口补桥',w:7,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（乐土时代重修复、渡口与行旅往来）＋游戏原创基层场景',
+  note:'渡口补桥为原创基层场景，不写成乐土仙尊亲临。',
+  desc:'连日暴雨冲垮了渡口的木桥，两岸往来只能靠一条旧船。船家趁机抬价，运粮的、探亲的都被堵在岸边。里正召集人手修桥，却发现木料不够，只能先做取舍。',
+  options:[['合力修桥，先通人行',40],['先摆渡救人运粮',35],['绕路运粮，暂缓修桥',25]],
+  outcomes:['你带人先搭出仅供人行的窄桥，又留下船家运送重货；两岸总算恢复往来，价钱也被压了下来。','你主张先摆渡伤病与粮车，桥留到雨停再修；船家虽不情愿，在众人注视下也没敢再抬价。','你安排粮车绕远路，先把最急的几批送到；桥直到秋后才补上，绕路的损耗不小。']}
+ ],i,x,pool,rv;
+ for(i=0;i<add.length;i++){
+  x=add[i];
+  ERA_MORTAL_EXTRA.push(x);
+  pool=ERA_MORTAL_EVENTS[x.era]||(ERA_MORTAL_EVENTS[x.era]=[]);
+  pool.push({n:x.n,w:x.w||7,g:(function(n){return function(){return !hasMark('已见·'+n);};})(x.n)});
+  EVENT_ERA[x.n]={minEra:x.era,maxEra:x.era};
+  DEX_ERA_EVENTS.push(x.n);
+  rv=ERA_EVENT_REVIEW[x.era]||(ERA_EVENT_REVIEW[x.era]={});
+  rv[x.n]={actId:x.actId||'growth',kind:x.kind||'日常遭遇',status:'已核对',basis:x.basis,note:x.note||x.desc};
+  ERA_EVENT_CATALOG.push({id:'era'+x.era+'_凡人扩充v202_'+i,eraIdx:x.era,eraName:ERA_TIMELINE[x.era].name,
+   period:ERA_TIMELINE[x.era].chroniclePeriod||ERA_TIMELINE[x.era].period||'',name:x.n,weight:x.w||7,
+   hasGate:true,actId:rv[x.n].actId,actName:'时代侧写',status:'已核对',basis:x.basis,
+   kind:rv[x.n].kind,reviewNote:rv[x.n].note,source:'ERA_MORTAL_EXTRA'});
+ }
+})();
+
+/* v2.06：炼天时期（eraIdx 10）原著剧情事件
+   将参考资料中的宿命大战之后世界变化、五域往来、影宗余烬、大爱盟招揽、
+   疯魔窟外围与三尊并立等，改写为玩家可参与的凡人／低阶蛊师事件。
+   全部限第二世（LIFE_GATE），不获取方源身份、记忆与主角机缘；
+   依据层级：原著明确背景＋游戏原创基层场景，不冒充原著具体事件。 */
+(function(){
+ var add=[
+ {era:10,n:'界壁消散·跨域行商',w:8,secondLife:true,actId:'turning',kind:'时代转折',
+  basis:'原著明确内容（宿命蛊被毁、五域界壁消失、地脉相连，五域往来重开）＋游戏原创行商场景',
+  note:'跨域坊市、价目折算与押货争执均为原创，不等于原著具体商路记载。',
+  desc:'界壁消散后的头一个坊市设在中洲与南疆交界的旧驿。东海的水货、北原的皮张和南疆的蛊材摆在一处，两边的价目却怎么也折不到一起。驿丞把两本账推到你面前，等你拿个主意。',
+  options:[['按成色逐项折算',40],['先换少量，试水行情',35],['只做见证，不掺价',25]],
+  outcomes:['你按成色、损耗与路程逐项折算，争执从意气变成数目，两边的商队终于肯坐下来谈。','你只换了少量货试水，行情虽未摸透，却也没把本钱压在一句空话上。','你没有替任何一方定价，只把两边的说法原样记下；坊市照旧喧闹，至少没人掀桌。']},
+ {era:10,n:'宿命既碎·问命人',w:7,secondLife:true,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（宿命蛊被毁后天下命数不再被完全注定）＋游戏原创市井场景',
+  note:'问命老者与其卦辞为原创，不宣称其推演等同于原著任何尊者或星象体系。',
+  desc:'镇口来了个摆摊问命的老者。他说自宿命蛊碎后，星象再算不准人的死期，摊前看客不少，敢坐下的却没有几个。老者抬眼看你，把一枚磨得发亮的旧卦钱推了过来。',
+  options:[['坐下听他把话说完',40],['追问命数为何会乱',35],['不问吉凶，只买卦钱',25]],
+  outcomes:['你坐下来听完，老者说的多是含糊话；临走他却提醒你：往后的路，得自己拿主意。','你追问命数为何会乱，老者沉默半晌，只说天规断了一角，谁也算不准了；这话比卦辞更让你记牢。','你没有问命，只买下那枚卦钱。老者笑了笑，说留着做个念想也好。']},
+ {era:10,n:'炼蛊大会·外围坊市',w:7,secondLife:true,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（中洲炼蛊大会与炼道盛行）＋游戏原创散场坊市场景',
+  note:'外围坊市、残方买卖与估价均为原创，不写玩家进入大会核心或接触方源。',
+  desc:'中洲炼蛊大会散场后，外围坊市堆满未售出的蛊材与半截残方。有人趁乱抬价，也有人急着脱手换盘缠。你手里的本钱，只够赌一次。',
+  options:[['低价收残方，自行验看',40],['只买成色清楚的蛊材',35],['替买卖双方估价',25]],
+  outcomes:['你挑了几份来路清楚的残方，回去逐一验看；能用的不多，却也没花冤枉钱。','你只买成色分明、可当场验过的蛊材，价钱贵些，至少不必替别人的谎话买单。','你替双方估价，抽一点辛苦钱；散场时摊位空了，你的钱袋也还稳当。']},
+ {era:10,n:'逆流河·渡口',w:7,secondLife:true,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（逆流河水势逆乱、河段凶险）＋游戏原创渡口遭遇',
+  note:'渡口失踪与试渡为原创场景，不写成玩家进入逆流河核心或获得逆流护身印。',
+  desc:'逆流河下游的渡口近来常有人失踪。船家说河水会倒着走，撑到河心便被推回原处。你带着绳索与一张旧河道图来到岸边，对岸还有等渡的旅人。',
+  options:[['按旧图另寻浅滩',40],['随船家试渡一次',35],['劝旅人绕行上游',25]],
+  outcomes:['你按旧图找到一处水势较缓的浅滩，带人绕了过去；多走半日，总算没人再失踪。','你随船家试渡，船到河心果然被推回；你们及时收桨，虽狼狈，却看清了水势。','你劝旅人绕行上游，多数人听了，少数人不信；后来下游封渡，那几个人再没回来。']},
+ {era:10,n:'影宗残部·暗市',w:7,secondLife:true,actId:'conflict',kind:'日常遭遇',
+  basis:'原著明确内容（影宗在宿命大战后溃散、余部流散）＋游戏原创暗市场景',
+  note:'暗市交易为原创，不建立玩家与影宗现存组织的隶属或正式接触关系。',
+  desc:'影宗败后，残部化整为零，在暗市里兜售来路不明的魂道蛊材。买家不问出处，卖家不留姓名。有人把一张价目单塞进你手里，低声说可以先验货。',
+  options:[['验货，只谈这一单',40],['追查货源与旧案',35],['拒收，留下眼线',25]],
+  outcomes:['你只验了这一单，成色确实不差；至于货源，你没有多问，也没让对方记住你的脸。','你顺着价目单追查货源，摸到一处废弃库房；线索不算齐全，却足够交给愿意管这事的人。','你推回价目单，只记下递单人的模样；暗市照旧开着，你至少没被卷进第一笔买卖。']},
+ {era:10,n:'大爱盟·招揽',w:8,secondLife:true,actId:'growth',kind:'日常遭遇',
+  basis:'原著明确内容（大爱盟为方源所建势力、势力扩张与招揽）＋游戏原创基层招揽场景',
+  note:'登记与货单为原创；玩家只形成阶段性合作，不自动成为大爱盟正式成员或方源嫡系。',
+  desc:'大爱盟的告示贴到镇上：凡有蛊材门路者，皆可入盟换取庇护与订单。有人劝你趁早投靠，也有人提醒盟约易结难脱。登记的执事正挨家叩门。',
+  options:[['登记入盟，只接明面生意',40],['先做一单，不入名册',35],['婉拒，但保持往来',25]],
+  outcomes:['你登记入盟，只接明面上的货单；庇护是有了，规矩也多了几条。','你只做了一单，没有留下名字；钱货两清，谁也不必替谁担干系。','你婉拒了登记，只留一句日后可再谈；执事没有为难你，却把你的门牌记在了册角。']},
+ {era:10,n:'疯魔窟·外围异象',w:8,secondLife:true,actId:'turning',kind:'时代转折',
+  basis:'原著明确内容（疯魔窟现世、九层世界与周边异象）＋游戏原创外围营地场景',
+  note:'外围昼夜颠倒与井水异状为原创侧写；玩家不进入疯魔窟深层，也不参与尊者布局。',
+  desc:'疯魔窟现世后，外围百里昼夜颠倒，井水发苦，蛊虫也接连蜕错壳。各路人马在边缘扎营，却没人敢再往深处走。营地正为一处水源争执。',
+  options:[['勘井定源，先稳住营地',40],['撤到异象之外',35],['记录异状，上报势力',25]],
+  outcomes:['你带人勘出两口可用的旧井，重新分水；营地虽挤，至少不再为一口苦井动刀。','你主张撤到异象之外，众人骂你胆小；几天后异象扩大，反倒有人回来谢你。','你把昼夜、水味与蜕壳的异状逐日记下，交给愿意上报的人；这份记录比任何猜测都可靠。']},
+ {era:10,n:'三尊并立·说书人',w:7,secondLife:true,actId:'legacy',kind:'时代回响',
+  basis:'原著明确内容（宿命大战后星宿、巨阳与炼天魔尊三尊并立）＋游戏原创茶楼回响',
+  note:'说书内容与老者身份均为原创，只作民间传闻，不作为原著史实或人物评价。',
+  desc:'茶楼说书人讲起星宿、巨阳与炼天三尊并立，满堂喝彩。散场后，一个老者压低声音说：书里写的，和当年并不一样。他看见你，便不再往下说。',
+  options:[['请他讲完那段旧事',40],['只听说书，不追问',35],['替他添一杯茶',25]],
+  outcomes:['老者讲了些不上台面的旧事，真伪难辨；你没有全信，却记住了他反复提到的那几个名字。','你没有追问，付了茶钱便走；说书人的醒木一响，满堂又笑作一团。','你替他添了茶。老者看了你很久，只说一句：能听人把话说完的年月，来之不易。']}
+ ],i,x,pool,rv;
+ for(i=0;i<add.length;i++){
+  x=add[i];
+  ERA_MORTAL_EXTRA.push(x);
+  pool=ERA_MORTAL_EVENTS[x.era]||(ERA_MORTAL_EVENTS[x.era]=[]);
+  pool.push({n:x.n,w:x.w||7,g:(function(n){return function(){return S.fyLife===2&&!hasMark('已见·'+n);};})(x.n)});
+  if(x.secondLife&&LIFE_GATE.indexOf(x.n)<0)LIFE_GATE.push(x.n);
+  EVENT_ERA[x.n]={minEra:x.era,maxEra:x.era};
+  DEX_ERA_EVENTS.push(x.n);
+  rv=ERA_EVENT_REVIEW[x.era]||(ERA_EVENT_REVIEW[x.era]={});
+  rv[x.n]={actId:x.actId||'growth',kind:x.kind||'日常遭遇',status:'已核对',basis:x.basis,note:x.note||x.desc};
+  ERA_EVENT_CATALOG.push({id:'era10_炼天剧情v206_'+i,eraIdx:x.era,eraName:ERA_TIMELINE[x.era].name,
+   period:ERA_TIMELINE[x.era].chroniclePeriod||ERA_TIMELINE[x.era].period||'',name:x.n,weight:x.w||7,
+   hasGate:true,actId:rv[x.n].actId,actName:'时代剧情',status:'已核对',basis:x.basis,
+   kind:rv[x.n].kind,reviewNote:rv[x.n].note,source:'ERA_MORTAL_EXTRA'});
+ }
+})();
+
 try{Object.freeze(EVENT_ERA);}catch(e){__timelineFrozen=false;__timelineErr+='EVENT_ERA: '+String(e)+'; '}
 if(window.__TIMELINE){window.__TIMELINE._frozen=__timelineFrozen;window.__TIMELINE._err=__timelineErr;}
 (function(){
@@ -14617,6 +14869,1531 @@ function dexHint(k,id){
  }
  return '';
 }
+/* ══ v2.01 典籍数据与渲染（原著设定资料库） ══ */
+/* ═══════════════════════════════════════════════════════════════════
+   典籍 · 原著设定资料库（v2.01）
+   结构：CANON_CODEX.cats 分类，CANON_CODEX.entries[分类id] 条目数组
+   条目字段：id 唯一键 / n 名称 / s 别称或一句话 / g 位阶标签 / d 正文
+            / b 要点数组 / rel 关联名数组 / src 依据说明
+   原则：只做原著事实、设定与关系的结构化转述，不整段复制原文。
+   ═══════════════════════════════════════════════════════════════════ */
+var CANON_CODEX={
+ version:'1.0',
+ cats:[
+  ['world','五域九天'],
+  ['realm','修行境界'],
+  ['era','尊者纪年'],
+  ['school','流派'],
+  ['gu','蛊虫'],
+  ['move','杀招'],
+  ['house','仙蛊屋'],
+  ['place','秘境地名'],
+  ['person','人物'],
+  ['faction','势力'],
+  ['event','大事战役'],
+  ['legend','人祖传'],
+  ['quote','语录']
+ ],
+ entries:{}
+};
+var CODEX_CAT='world',CODEX_Q='',CODEX_DETAIL=null;
+
+function codexCatName(id){
+ for(var i=0;i<CANON_CODEX.cats.length;i++)if(CANON_CODEX.cats[i][0]===id)return CANON_CODEX.cats[i][1];
+ return '其他';
+}
+function codexAll(){
+ var out=[],c=CANON_CODEX.cats;
+ for(var i=0;i<c.length;i++){
+  var arr=CANON_CODEX.entries[c[i][0]]||[];
+  for(var j=0;j<arr.length;j++)out.push(arr[j]);
+ }
+ return out;
+}
+function codexFind(id){
+ var a=codexAll();
+ for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i];
+ return null;
+}
+function codexHit(e,q){
+ if(!q)return true;
+ var s=[e.n,e.s,e.g,e.d,(e.b||[]).join(' '),(e.rel||[]).join(' ')].join(' ').toLowerCase();
+ return s.indexOf(q)>=0;
+}
+function codexItemHtml(e){
+ var tag=e.g?'<em>'+escHtml(e.g)+'</em>':'';
+ return '<div class="codexItem" data-codex-id="'+escHtml(e.id)+'">'+
+  '<div class="ci-top"><b>'+escHtml(e.n)+'</b>'+tag+'</div>'+
+  (e.s?'<div class="ci-sub">'+escHtml(e.s)+'</div>':'')+'</div>';
+}
+function codexDetailHtml(e){
+ var h='<button class="codexBack" id="codexBack">← 返回列表</button>';
+ h+='<div class="codexDetailName">'+escHtml(e.n)+'</div>';
+ if(e.s)h+='<div class="codexDetailSub">'+escHtml(e.s)+'</div>';
+ if(e.g)h+='<div class="codexMeta"><span>'+escHtml(e.g)+'</span></div>';
+ h+='<p class="codexText">'+escHtml(e.d)+'</p>';
+ if(e.b&&e.b.length){
+  h+='<ul class="codexBullets">';
+  for(var i=0;i<e.b.length;i++)h+='<li>'+escHtml(e.b[i])+'</li>';
+  h+='</ul>';
+ }
+ if(e.rel&&e.rel.length)h+='<div class="codexRel"><b>相关：</b>'+e.rel.map(function(x){return escHtml(x);}).join(' · ')+'</div>';
+ if(e.src)h+='<div class="codexSrc">依据：'+escHtml(e.src)+'</div>';
+ return h;
+}
+function codexRender(){
+ if(!$('codexList'))return;
+ if(CODEX_DETAIL){
+  var e=codexFind(CODEX_DETAIL);
+  if(e){$('codexList').innerHTML=codexDetailHtml(e);$('codexCnt').textContent=codexCatName(e._cat||'')||'';}
+  $('codexTabs').innerHTML='';
+  var sw=$('codexSearchWrap');if(sw)sw.style.display='none';
+  return;
+ }
+ var sw2=$('codexSearchWrap');if(sw2)sw2.style.display='';
+ var q=CODEX_Q.trim().toLowerCase();
+ var tabs='';
+ for(var i=0;i<CANON_CODEX.cats.length;i++){
+  var c=CANON_CODEX.cats[i];
+  if(q)tabs+='<button data-codexcat="'+c[0]+'">'+c[1]+'</button>';
+  else tabs+='<button data-codexcat="'+c[0]+'"'+(c[0]===CODEX_CAT?' class="on"':'')+'>'+c[1]+'</button>';
+ }
+ $('codexTabs').innerHTML=tabs;
+ var html='',n=0;
+ if(q){
+  var groups=[];
+  for(var k=0;k<CANON_CODEX.cats.length;k++){
+   var cid=CANON_CODEX.cats[k][0],arr=CANON_CODEX.entries[cid]||[],hit=[];
+   for(var j=0;j<arr.length;j++){
+    var ee=arr[j];ee._cat=cid;
+    if(codexHit(ee,q))hit.push(ee);
+   }
+   if(hit.length)groups.push([cid,hit]);
+  }
+  for(var g=0;g<groups.length;g++){
+   var cid2=groups[g][0],hits=groups[g][1];
+   html+='<div class="codexGroupHead">'+codexCatName(cid2)+'</div>';
+   for(var m=0;m<hits.length;m++){hits[m]._cat=cid2;html+=codexItemHtml(hits[m]);n++;}
+  }
+  if(!n)html='<div class="codexEmpty">未找到匹配条目。</div>';
+  $('codexCnt').textContent='命中 '+n+' 条';
+ }else{
+  var arr2=CANON_CODEX.entries[CODEX_CAT]||[];
+  for(var t=0;t<arr2.length;t++){arr2[t]._cat=CODEX_CAT;html+=codexItemHtml(arr2[t]);n++;}
+  $('codexCnt').textContent='共 '+arr2.length+' 条';
+ }
+ $('codexList').innerHTML=html;
+}
+function codexOpen(){
+ CODEX_CAT='world';CODEX_Q='';CODEX_DETAIL=null;
+ var s=$('codexSearch');if(s)s.value='';
+ codexRender();
+ $('codexOverlay').classList.remove('hidden');
+}
+/* ── 一、五域九天 ─────────────────────────────────────────────── */
+CANON_CODEX.entries.world=[
+ {id:'w_overview',n:'五域九天',s:'地分五域，天分九重',g:'世界总纲',
+  d:'蛊界由大地五域与太古九天构成。天地之间充盈大道道痕，万物皆由道痕凝聚显化。凡人蛊师与蛊仙依地域而立，五域各有界壁阻隔，九天则多已在远古变乱中崩碎。',
+  b:['五域：中洲、南疆、北原、西漠、东海。','太古九天：白、赤、橙、黄、绿、青、蓝、紫、黑。','天地秘境是道痕极端浓郁、规则自发具象化的奇迹之地，位格可比准九转仙蛊。'],
+  rel:['五域界壁','太古九天','天地秘境'],src:'原著世界观设定'},
+ {id:'w_zhongzhou',n:'中洲',s:'门派公天下，天庭所在',g:'五域',
+  d:'地处五域核心，平原广袤、灵山福地众多，物产与地脉最厚，人道最盛。社会以宗门制为主，上升通道靠招揽弟子与立功晋升，擅长整合众力、布置大规模仙阵。',
+  b:['领袖势力为天庭，另设中洲十大古派。','代表流派：智道、律道、气道、炼道。','界壁称圣贤界壁，浩然之气凝重，异域蛊仙越境受压制。'],
+  rel:['天庭','中洲十大古派','圣贤界壁'],src:'原著明确'},
+ {id:'w_nanjiang',n:'南疆',s:'十万大山，家族寨子制',g:'五域',
+  d:'十万大山重峦叠嶂，瘴气弥漫，交通闭塞。各山立寨，蛊师以血脉宗族维系权力，凡人依附家族而生。青茅山古月山寨便是方源重生之地。',
+  b:['代表势力：武家、商家、铁家、池家、乔家、翼家等。','常见流派：土道、木道、毒道、骨道、变化道、音道。','界壁称瘴气界壁，毒瘴侵蚀真元与道痕。'],
+  rel:['武家','商家','铁家','青茅山'],src:'原著明确'},
+ {id:'w_beiyuan',n:'北原',s:'苍茫草原，黄金血脉部落制',g:'五域',
+  d:'极度辽阔的草原，四季分明，周期性爆发十年大雪灾。巨阳仙尊立下黄金血脉特权，各部族以王庭争霸争夺王庭福地名额，民风彪悍尚武。',
+  b:['圣地长生天为巨阳仙尊所创九转洞天。','黄金家族：黑家、刘家、耶律家、马家、东方家、努尔家等。','常见流派：运道、风道、力道、炎道。','界壁称苍炎界壁，烈焰焚身。'],
+  rel:['长生天','黄金血脉','八十八角真阳楼','王庭福地'],src:'原著明确'},
+ {id:'w_ximuo',n:'西漠',s:'沙海绿洲，家族联合',g:'五域',
+  d:'浩瀚沙海与绿洲相间，地底富藏黑油地脉，沙暴与酷日严酷。各大绿洲家族以水源与黑油立族，房家最擅炼制与运用仙蛊屋。',
+  b:['代表势力：房家、萧家、石家、万家、董家。','常见流派：炎道、土道、偷道、宇道、兵道。','界壁称黄沙界壁，狂沙消磨气血与神魂。'],
+  rel:['房家','问津坞','沉泥宫'],src:'原著明确'},
+ {id:'w_donghai',n:'东海',s:'群岛棋布，物产最丰',g:'五域',
+  d:'汪洋浩渺，群岛星罗棋布，海底海沟藏有上古海兽与珍稀资源，是五域资源总量最丰之地。世家富庶守成，偏好通商，争斗烈度相对较低。',
+  b:['代表势力：宋家、华家、沈家、汤家、谢家等。','常见流派：水道、云道、气道、食道。','界壁称蔚蓝界壁，水压缠滞、阻力千重。','后期气海老祖整合东海散修与异人势力。'],
+  rel:['气海老祖','龙宫','气海'],src:'原著明确'},
+ {id:'w_nineheavens',n:'太古九天',s:'白、赤、橙、黄、绿、青、蓝、紫、黑',g:'天穹',
+  d:'太古时苍穹九重相叠。历经人祖子女行迹、狂蛮魔尊毁天、红莲逆转时空等变故，赤橙黄绿青蓝紫七天相继崩碎，残片坠入凡间化为福地与绝地，最终只余白天与黑天完整轮转。',
+  b:['白天与黑天昼夜交替，覆盖五域长空。','黄天核心碎片后被打造成宝黄天。','九天残片可化为天之残片福地，是诸多传承与秘境的来源。'],
+  rel:['宝黄天','狂蛮魔尊','红莲魔尊'],src:'原著明确'},
+ {id:'w_baohuangtian',n:'宝黄天',s:'天下蛊仙的跨域交易场',g:'天穹',
+  d:'太古黄天碎裂后，黄天道君将黄天核心与自身仙窍相融，炼成超然世外的宝黄天。它拥有极强自卫天灵，不插手凡尘争霸，是五域蛊仙最安全、最庞大的跨域交易市场。',
+  b:['宝光机制：寄托之物越珍贵，宝光越盛。','支持神念、意志与宝光鉴宝，可跨空投送。','方源早年在此倒卖胆识蛊、兑换仙材，是其起家命脉之一。'],
+  rel:['黄天道君','胆识蛊'],src:'原著明确'},
+ {id:'w_wall',n:'五域界壁',s:'隔绝五域的天堑',g:'地理规则',
+  d:'五域之间原有厚重粘稠的界壁。穿越时蛊师与蛊仙会承受排斥、真元回流与神魂反噬；异域蛊仙在非本域作战，道痕亦受压制。',
+  b:['中洲圣贤界壁、北原苍炎界壁、南疆瘴气界壁、西漠黄沙界壁、东海蔚蓝界壁。','界壁强弱与地脉相连，是五域割据的地理根基。'],
+  rel:['五域合一'],src:'原著明确'},
+ {id:'w_merge',n:'五域合一',s:'界壁消融之后',g:'历史变迁',
+  d:'宿命蛊被毁前后，天下地脉复苏、地气翻涌，五域界壁因之逐渐变薄，最终彻底消融，五域连为一体。此后天下蛊仙可自由往来，格局由割据转向全面竞逐。',
+  b:['界壁消失是宿命大战之后的重大历史转折。','五域合一后，尊者级博弈再无地域缓冲。','游戏中第一世不得提前触发这一阶段。'],
+  rel:['宿命大战','五域界壁'],src:'原著明确＋游戏门控说明'}
+];
+
+/* ── 二、修行境界 ─────────────────────────────────────────────── */
+CANON_CODEX.entries.realm=[
+ {id:'r_kongqiao',n:'空窍',s:'蛊师修行之根',g:'凡境基础',
+  d:'蛊师腹中开辟的空窍，用于蓄积真元、温养与催动蛊虫。空窍中元海占容积的比例，决定资质高低与修行上限。',
+  b:['开窍是凡人踏上蛊师之路的第一步。','空窍容量、元海比例与窍壁强度共同决定资质与风险。'],
+  rel:['资质','十绝体'],src:'原著明确'},
+ {id:'r_zhuan',n:'一转至五转',s:'凡蛊师五境',g:'凡境',
+  d:'凡人蛊师分五转，每转又分初阶、中阶、高阶、巅峰。真元随转数变色：一转青铜、二转赤铁、三转白银、四转黄金、五转紫晶。五转为凡尘天花板。',
+  b:['一转：山寨见习、斥候。','二转：家族骨干、猎队队长。','三转：家老、寨中支柱。','四转：一族之长、一方豪强。','五转：凡俗王侯、一域霸主。'],
+  rel:['真元','升仙'],src:'原著明确'},
+ {id:'r_zizhi',n:'资质',s:'丁、丙、乙、甲四等',g:'凡境',
+  d:'以空窍内元海占比划分资质。丁等最低，终生难越二转；丙等中下；乙等可望三转；甲等天赋异禀，真元恢复极快，是族长与升仙种子。',
+  b:['甲等并非绝对圆满，仍有九成九等细微差别。','资质可通过血道等手段强行拔升，但代价极重。','方源重生时为丙等，后借血颅蛊淬炼至甲等。'],
+  rel:['血颅蛊','古月方源'],src:'原著明确'},
+ {id:'r_shijue',n:'十绝体',s:'人祖十子血脉的现世回响',g:'逆天体质',
+  d:'十绝体空窍元海充盈十成乃至溢出，修炼速度与真元储量远超常人，但窍壁承受不住持续膨胀的道痕，若不能在二十岁左右登仙，便会爆窍身死。',
+  b:['太日阳莽体、古月阴荒体、北冥冰魄体、森海轮回体、炎煌雷泽体、万金妙华体、大力真武体、逍遥智心体、厚土元央体、宇宙大衍体。','白凝冰为北冥冰魄体，黑楼兰为大力真武体。','后天另有纯梦求真体，为梦道而设。','十绝体仙窍是炼制至尊仙胎蛊的关键材料。'],
+  rel:['人祖十子','白凝冰','黑楼兰','至尊仙胎蛊'],src:'原著明确'},
+ {id:'r_shengxian',n:'升仙三气',s:'破茧、纳气、开窍',g:'仙凡之隔',
+  d:'五转蛊师碎窍破茧，纳吸天、地、人三气并使三者绝对平衡，再以本命蛊开辟仙窍福地，方能踏入六转。三气稍有偏颇便会道风散尽、化石沉沦或自爆陨落。',
+  b:['天之气：高天大道玄机。','地之气：厚土大道承载。','人之气：毕生经历、心性、才情与魂魄底蕴。'],
+  rel:['六转蛊仙','仙窍'],src:'原著明确'},
+ {id:'r_liuzhuan',n:'六转蛊仙',s:'青提仙元，福地初成',g:'仙境',
+  d:'初入仙道，开辟下等至中等福地，掌握仙元与仙道杀招的雏形。每十年一次地灾，共二十七次。多数散修终其一生止步于此。',
+  b:['仙元为青提仙元。','福地等级决定资源产出与灾劫强度。','仙蛊口粮是六转蛊仙最现实的经济压力。'],
+  rel:['福地','地灾'],src:'原著明确'},
+ {id:'r_qizhuan',n:'七转蛊仙',s:'红枣仙元，一方巨擘',g:'仙境',
+  d:'福地升为上等或特异福地，每五十年一次天劫，共三次。七转已是各大超级势力的长老与实权人物，能独镇一方。',
+  b:['仙元为红枣仙元。','开始有能力供养多只仙蛊与完整仙道杀招。','逆流河之战时方源以七转之身硬撼八转，震动五域。'],
+  rel:['天劫','逆流护身印'],src:'原著明确'},
+ {id:'r_bazhuan',n:'八转蛊仙',s:'白荔仙元，洞天之主',g:'仙境',
+  d:'福地升为洞天，需渡大劫、浩劫、万劫。八转是尊者未出时代的绝对主宰，威震一域，凤九歌、武庸、龙公等皆在此列。',
+  b:['仙元为白荔仙元。','洞天可容纳完整生态与仙蛊屋体系。','浩劫万载一见，渡劫者凤毛麟角。'],
+  rel:['洞天','凤九歌','武庸','龙公'],src:'原著明确'},
+ {id:'r_daohhen',n:'道痕互斥',s:'一派专修的天规',g:'仙道法则',
+  d:'蛊仙仙躯与仙窍长期浸润本派道痕，施展本派杀招威力倍增；若强行催动异派杀招，则被自身道痕剧烈削弱甚至反噬自伤。寻常蛊仙终其一生只能专修一派。',
+  b:['炎道蛊仙若催水道杀招，会引发道痕互噬。','极少数特殊仙蛊可绕开互斥，兼修两派。','至尊仙胎蛊的无冲突体质彻底打破此律。'],
+  rel:['至尊仙胎蛊','炼天魔尊'],src:'原著明确'},
+ {id:'r_xianjiang',n:'仙僵',s:'活死人之躯',g:'仙道异途',
+  d:'蛊仙寿尽或为避祸，将肉身与仙窍逆转为僵尸之躯。仙窍化为死窍，不再产出仙元，念头迟钝，需智道蛊虫维持思考；好处是不再受天劫地灾，但道痕会日渐剥落。',
+  b:['方源曾在真阳楼崩毁后服下借道死蛊化为仙僵。','仙僵时期借智慧蛊光晕推演，是方源积累底蕴的关键阶段。','后借至尊仙胎蛊破而后立。'],
+  rel:['借道死蛊','智慧蛊','至尊仙胎蛊'],src:'原著明确'},
+ {id:'r_jiuzhuan',n:'九转尊者',s:'一世无敌',g:'至高',
+  d:'正道称仙尊，魔道称魔尊。需渡过三次混沌大劫、主修流派达无上大宗师、并炼化五域两天本派自然道痕，方可登临。尊者在世时举世无敌，寿元有限却可横压一个时代。',
+  b:['成尊三关：混沌大劫、无上大宗师、炼化本派道痕。','尊者可留下真传、意志与后手，影响后世数十万年。','原著共出现十一位九转尊者。'],
+  rel:['十一尊者','混沌大劫'],src:'原著明确'},
+ {id:'r_xianqiao',n:'仙窍·福地·洞天',s:'蛊仙的体内世界',g:'仙道根基',
+  d:'蛊仙以本命蛊开辟仙窍，内蕴山川地脉，可安置秘境、族群与仙蛊屋。福地、洞天是仙窍外显的等级形态，等级越高，生态越完整、资源产出越丰。',
+  b:['福地分下等、中等、上等与特异。','洞天为八转层次，可自成一方天地。','至尊仙窍内含小五域与小九天，规模远超寻常洞天。'],
+  rel:['至尊仙窍','福地','洞天'],src:'原著明确'},
+ {id:'r_zaiJie',n:'灾劫',s:'地灾、天劫、浩劫、万劫',g:'仙道规则',
+  d:'仙窍运转会引来天地灾劫。六转每十年一地灾，七转每五十年一天劫，八转则有大劫、浩劫、万劫。灾劫既是生死关，也是道痕淬炼与仙元积累的契机。',
+  b:['灾劫强度与仙窍等级、道痕积累相关。','仙蛊屋与仙阵可辅助渡劫。','吞并他人福地洞天可转移或免除自身灾劫。'],
+  rel:['仙窍·福地·洞天','仙蛊屋'],src:'原著明确'},
+ {id:'r_wushang',n:'无上大宗师',s:'流派境界的尽头',g:'道境',
+  d:'每一流派的境界自入门至无上大宗师。到达无上大宗师，意味着对该派理解超越天道既定，是成尊的硬性前提，也是推演仙蛊方与自创杀招的根基。',
+  b:['境界层次可用流派造诣衡量。','原初境真意可直接拔升流派境界。','方源以炼道无上大宗师成尊，兼修万道。'],
+  rel:['原初境','炼天魔尊'],src:'原著明确'}
+];
+
+/* ── 三、尊者纪年 ─────────────────────────────────────────────── */
+CANON_CODEX.entries.era=[
+ {id:'e_yuanshi',n:'原始仙尊',s:'气道·天庭创立者',g:'太古·第一尊',
+  d:'人族第一位九转尊者，率人族挣脱异人奴役，开创天庭三百万年基业。传下开窍法与仙凡体系，以气道底蕴为天庭积攒海量仙元。',
+  b:['阵营：中洲天庭。','主修：气道。','遗泽：天庭体制、气道传承、仙墓与元气储备。','作风宽厚朴素，为天下人族谋生路。'],
+  rel:['天庭','气道','三气归来'],src:'原著明确'},
+ {id:'e_xingxiu',n:'星宿仙尊',s:'智道·星道·以身合天道',g:'太古·第二尊',
+  d:'天庭第二任领袖。晚年察觉天意制衡人族，遂献祭己身融入天道，在漫长岁月中扭曲天意，使天意长期偏向人族与天庭。生前布下多手暗棋，牵制后世魔尊。',
+  b:['主修：智道、星道。','代表造物：飞星棋盘、智慧蛊相关布局。','疯魔窟之战中率先复生，心机城府冠绝诸尊。'],
+  rel:['天庭','飞星棋盘','智慧蛊','疯魔窟'],src:'原著明确'},
+ {id:'e_wuji',n:'无极魔尊',s:'律道·疯魔窟推演永生',g:'远古·第一尊',
+  d:'律道开派鼻祖，性格冷酷严谨，视世俗道德如浮云，毕生只求永生。曾强闯天庭与合道后的星宿博弈，后于北原开辟疯魔窟，以混乱道痕推演跳出天道的永生之法。',
+  b:['主修：律道。','核心遗产：疯魔窟九层、规矩与排斥之道。','终局：永生之局失败，道消于疯魔窟。'],
+  rel:['疯魔窟','律道'],src:'原著明确'},
+ {id:'e_kuangman',n:'狂蛮魔尊',s:'变化道·力道·毁天霸主',g:'远古·第二尊',
+  d:'变化道与力道两派始祖，性情粗豪桀骜，崇尚纯粹肉身与热血搏杀。曾轰碎太古赤、橙、黄三天，留下万兽图腾与力道传承。',
+  b:['主修：变化道、力道。','风格：一派拟万派，化身万兽即掌万道。','遗泽：狂蛮真传、万兽图腾、北原力道火种。'],
+  rel:['变化道','力道','自由残缺变'],src:'原著明确'},
+ {id:'e_honglian',n:'红莲魔尊',s:'宙道·春秋蝉·宿命逆徒',g:'远古·第三尊',
+  d:'原为天庭预定继承人，因挚爱、双亲与师尊被宿命所夺，决绝反叛。炼成春秋蝉，借宙河一次次回溯，在无尽轮回中看破宿命，最终击碎宿命蛊一角。',
+  b:['主修：宙道。','核心造物：春秋蝉、石莲岛真传。','遗泽：前有古人、后有来者、未来身等宙道杀招。','为百万年后方源彻底毁蛊埋下火种。'],
+  rel:['春秋蝉','宙河','石莲岛','宿命蛊'],src:'原著明确'},
+ {id:'e_yuanlian',n:'元莲仙尊',s:'木道·画道·天庭第三任',g:'中古·第一尊',
+  d:'木道开派者，兼修隐秘的画道，创立天莲派，后掌天庭。以生生不息之木道治愈天下，暗留画道作为复活英灵的底牌。',
+  b:['主修：木道、画道。','代表造物：帝君神木、豆神宫、画卷《众生图》。','豆神宫与帝君城后合并为神帝城。','疯魔窟之战中展开画卷，复活中洲历代英灵。'],
+  rel:['天莲派','豆神宫','神帝城','众生图'],src:'原著明确'},
+ {id:'e_daotian',n:'盗天魔尊',s:'偷道·宇道·天外之魔',g:'中古·第二尊',
+  d:'来自天外的穿越者本杰孙，视蛊界为牢笼，一心打破世界屏障回家。开创偷道，与长毛老祖合炼遁空蛊，留下十道真传。',
+  b:['主修：偷道、宇道。','代表手段：神不知、鬼不觉、空绝传承、盗天机甲。','遁空蛊虽炼成，仍未能使盗天真正进入空门。','遗泽深刻影响方源的隐匿与偷盗手段。'],
+  rel:['偷道','遁空蛊','神不知','鬼不觉'],src:'原著明确'},
+ {id:'e_juyang',n:'巨阳仙尊',s:'运道·长生天·黄金血脉',g:'中古·第三尊',
+  d:'运道开派者，创立北原长生天，筑八十八角真阳楼，确立黄金血脉统治。将运道分为自身运、众生运、天地运，以气运布局北原数万年。',
+  b:['主修：运道。','核心造物：八十八角真阳楼、镇运天宫。','制度遗产：黄金家族、王庭争霸、十年大雪灾与王庭福地。','疯魔窟复生后与星宿、方源三尊鼎立。'],
+  rel:['长生天','运道','八十八角真阳楼','镇运天宫'],src:'原著明确'},
+ {id:'e_youhun',n:'幽魂魔尊',s:'魂道·影宗·至尊仙胎',g:'近古·第一尊',
+  d:'魂道开派者，杀性极盛，以杀戮祭炼神魂。年轻时为炼魂道灭青家满门，留下青鬼沙漠与青仇。死后本体残魂沉于生死门布局，七名分魂越过逆流河创建影宗。',
+  b:['主修：魂道。','核心布局：十万年炼制九转至尊仙胎蛊，最终被方源截胡。','影宗为死后分魂所建，不可与幽魂本人在世混同。','关联秘境：生死门、荡魂山、落魄谷。'],
+  rel:['影宗','至尊仙胎蛊','生死门','青仇'],src:'原著明确'},
+ {id:'e_letu',n:'乐土仙尊',s:'土道·人道·天道',g:'近古·第二尊',
+  d:'幽魂之后以仁善与和平理念修复五域，抑制魂道杀戮，庇护弱小异人。留下五域真传、蓝龙鲸洞天与镇魔悔哭海。晚年欲转修天道复生，在疯魔窟被方源背刺。',
+  b:['主修：土道，兼修人道、天道。','遗产：五域真传、蓝龙鲸洞天、镇魔悔哭海。','疯魔窟中遭方源背刺，道痕与积累被吞噬。','陆畏因是后世南疆真传的承接者，非乐土同时代人。'],
+  rel:['乐土','蓝龙鲸洞天','镇魔悔哭海','陆畏因'],src:'原著明确'},
+ {id:'e_fangyuan',n:'炼天魔尊·古月方源',s:'炼道·兼修万道',g:'当代·第十一尊',
+  d:'天外之魔魂魄，五百年魔道经历后以春秋蝉重生回青茅山。夺取至尊仙胎蛊，得无冲突之体，攻破天庭、捏碎宿命蛊，于疯魔窟背刺乐土后登临九转。',
+  b:['主修：炼道，兼修万道。','核心底蕴：至尊仙胎蛊、春秋蝉、逆流护身印、万我、荡魂山、落魄谷、炼海。','对外自号大爱仙尊，实以炼蛊与交易收割天下仙材。','终局与星宿、巨阳三尊并立。'],
+  rel:['古月方源','至尊仙胎蛊','宿命蛊','大爱盟'],src:'原著明确'},
+ {id:'e_zunzhe',n:'十一尊者总览',s:'三百万年的十一次登顶',g:'纪年总表',
+  d:'原著时间跨度极长，先后出现十一位九转尊者。尊者之间往往隔着数十万年，彼此以真传、意志与后手隔世博弈。',
+  b:['太古：原始、星宿。','远古：无极、狂蛮、红莲。','中古：元莲、盗天、巨阳。','近古：幽魂、乐土。','当代：炼天（方源）。'],
+  rel:['九转尊者'],src:'原著明确'}
+];
+/* ── 四、流派 ─────────────────────────────────────────────────── */
+CANON_CODEX.entries.school=[
+ {id:'s_liandao',n:'炼道',s:'养、用、炼之首',g:'根基大派',
+  d:'一切蛊虫的诞生与升炼皆依赖炼道，是蛊界最底层的生产流派。分隔离炼法与精细人炼两大路数，前者借天地伟力，后者靠神念微操。',
+  b:['代表：长毛老祖、琅琊福地、古月方源。','八转以上仙蛊升炼失败率极高，反噬可致道消。','炼海是炼道道痕凝聚的终极秘境。'],
+  rel:['炼海','长毛老祖','琅琊福地'],src:'原著明确'},
+ {id:'s_zhoudao',n:'宙道',s:'光阴岁月之流',g:'根基大派',
+  d:'掌控时间流速、定格与回溯。仙窍内的时间加速可提高产出，也会加快灾劫到来。宙河是宙道的本源显化。',
+  b:['开派代表：红莲魔尊。','核心造物：春秋蝉、石莲岛、万年斗飞车。','方源以春秋蝉回溯，是其重生与博弈的根本。'],
+  rel:['春秋蝉','宙河','红莲魔尊'],src:'原著明确'},
+ {id:'s_yudao',n:'宇道',s:'空间折叠之流',g:'根基大派',
+  d:'掌控空间折叠、瞬移、仙窍扩张与虚空穿梭。定仙游是宇道最具代表性的仙蛊，心念所至即可跨越五域。',
+  b:['代表：盗天魔尊。','西漠房家亦以宇道与仙蛊屋见长。','空裂等杀招可撕裂空间、抹除攻击。'],
+  rel:['定仙游','盗天魔尊','空裂'],src:'原著明确'},
+ {id:'s_zhidao',n:'智道',s:'念、意、情三要素',g:'根基大派',
+  d:'以念头即时运算、意志长期存续、情绪干扰心境。可推演仙蛊方与杀招、洞察天机、遮蔽命格，是谋略型蛊仙的核心。',
+  b:['开派鼻祖：星宿仙尊。','代表：东方长凡、紫山真君。','智慧蛊可极速放大智道推演。'],
+  rel:['星宿仙尊','智慧蛊','东方长凡'],src:'原著明确'},
+ {id:'s_hundao',n:'魂道',s:'屠戮与神魂之路',g:'根基大派',
+  d:'修炼魂魄底蕴，路径从百人魂、万人魂直至太古荒魂与纯净魂。可分化神魂、搜魂夺忆、奴役神魂。荡魂山壮魂、落魄谷炼魂，合为魂道圣境。',
+  b:['开派始祖：幽魂魔尊。','方源借胆识蛊与荡魂山积累出惊人魂道底蕴。','影宗诸分魂即魂道分化的极致运用。'],
+  rel:['幽魂魔尊','荡魂山','落魄谷','影宗'],src:'原著明确'},
+ {id:'s_bianhuadao',n:'变化道',s:'一派拟万派',g:'根基大派',
+  d:'化身万兽万形，变为何物便掌何派道痕。极尽灵活，肉搏与生存能力绝顶，但需要深厚的体魄与道痕基础。',
+  b:['开派始祖：狂蛮魔尊。','自由残缺变是其代表杀招之一。','对理解多流派道痕有独特价值。'],
+  rel:['狂蛮魔尊','自由残缺变'],src:'原著明确'},
+ {id:'s_yundao',n:'运道',s:'自身运、众生运、天地运',g:'根基大派',
+  d:'以气运为道。自身运决定个人机缘，众生运可将气运相连，天地运关乎大势走向。运道蛊仙擅长借势与布局。',
+  b:['开派始祖：巨阳仙尊。','代表蛊虫：狗屎运蛊、连运蛊。','长生天与八十八角真阳楼是运道制度的具象。'],
+  rel:['巨阳仙尊','狗屎运蛊','连运蛊'],src:'原著明确'},
+ {id:'s_lidao',n:'力道',s:'纯粹肉身之力',g:'主流大派',
+  d:'以肉身与力量为道，直来直去、刚猛无俦。历史上曾极盛，后渐衰，但在近身搏杀与军团冲阵中依旧恐怖。',
+  b:['代表：狂蛮魔尊、黑楼兰。','招牌杀招：力道大手印、万我系列中的力道虚影。','与奴道兼修曾被视为禁忌。'],
+  rel:['狂蛮魔尊','黑楼兰','力道大手印'],src:'原著明确'},
+ {id:'s_qidao',n:'气道',s:'元气浩荡',g:'主流大派',
+  d:'以天地元气为根基，攻守兼备、范围广阔。天庭原始仙尊与龙公皆是气道绝顶，气海更是气道极致秘境。',
+  b:['代表：原始仙尊、龙公、气海老祖。','杀招：无量气海、气盖山河、气流剪、气呼山。','东海气海为气道修行圣地。'],
+  rel:['原始仙尊','龙公','气海'],src:'原著明确'},
+ {id:'s_shuidao',n:'水道',s:'柔韧与冲刷',g:'主流大派',
+  d:'以水之柔韧、冲刷与渗透为道，擅长持久战、困敌与疗愈，与宙道、宇道配合可发挥奇效。',
+  b:['常见于东海与南疆水系地带。','逆流河兼具律道与水道特性。','代表杀招：激流勇进、血漂流（血道与水行结合）。'],
+  rel:['逆流河','东海'],src:'原著明确'},
+ {id:'s_yandao',n:'炎道',s:'焚灭攻伐',g:'主流大派',
+  d:'以火焰与高温为道，攻伐猛烈、范围杀伤强，是北原与西漠常见流派之一。',
+  b:['炎煌雷泽体兼修炎道与雷道。','仙蛊屋万年长明灯涉及光道与炎道。'],
+  rel:['炎煌雷泽体'],src:'原著明确'},
+ {id:'s_tudao',n:'土道',s:'厚载与防御',g:'主流大派',
+  d:'以大地承载、厚重防御与地脉操控为道，擅长守御、筑城与稳固仙窍。乐土仙尊以土道成尊。',
+  b:['代表：乐土仙尊。','仙蛊屋沉泥宫、安土重山堡皆为土道防御体系。','厚土元央体与土道亲和。'],
+  rel:['乐土仙尊','沉泥宫'],src:'原著明确'},
+ {id:'s_mudao',n:'木道',s:'生生不息',g:'主流大派',
+  d:'以生机、生长、治愈与草木为道。元莲仙尊以木道成尊，豆神宫与天莲派皆承其脉。',
+  b:['代表：元莲仙尊、天莲派。','杀招：豆神兵卒、桃花迷林。','天元宝莲凡蛊产元石，天元宝皇莲产仙元。'],
+  rel:['元莲仙尊','天莲派','天元宝莲'],src:'原著明确'},
+ {id:'s_fengdao',n:'风道',s:'迅疾与切割',g:'主流大派',
+  d:'以风之迅疾、无形与切割为道，擅长机动、突袭与范围绞杀。武庸的清风剪、风声鹤唳是风道巅峰杀招。',
+  b:['代表：武庸、武家。','仙蛊屋玉清滴风小竹楼为八转风道。'],
+  rel:['武庸','玉清滴风小竹楼','清风剪'],src:'原著明确'},
+ {id:'s_leidao',n:'雷道',s:'迅烈破邪',g:'主流大派',
+  d:'以雷霆之迅烈与破邪为道，爆发力极强，常与炎道兼修形成炎雷复合。',
+  b:['炎煌雷泽体为炎雷复合十绝体。','雷道杀招多见于攻伐型蛊仙。'],
+  rel:['炎煌雷泽体'],src:'原著明确'},
+ {id:'s_jindao',n:'金道',s:'锋锐与坚固',g:'主流大派',
+  d:'以金属的锋锐、坚固与延展为道，攻防一体，常用于兵器、甲胄与仙蛊屋构造。',
+  b:['万金妙华体与金道亲和。','铁家以金道、律道见长。'],
+  rel:['万金妙华体','铁家'],src:'原著明确'},
+ {id:'s_jiandao',n:'剑道',s:'攻伐第一',g:'主流大派',
+  d:'极度专注杀伤，剑意、剑势、剑魂、剑心层层递进。攻伐之力冠绝诸派，但防御薄弱，渡劫风险高。',
+  b:['代表：薄青，号称五域剑道第一仙。','杀招：五指拳心剑、剑痕索命。','薄青真传位于中洲薄家一脉。'],
+  rel:['薄青','五指拳心剑','剑痕索命'],src:'原著明确'},
+ {id:'s_xuedao',n:'血道',s:'以血为引，速成而凶险',g:'禁忌流派',
+  d:'以活人鲜血为引，修炼极快、越级杀敌能力强，但极易反噬，被正魔两道共同围剿。',
+  b:['代表：血海老祖（巨阳仙尊死后所化分身）。','血神子为血道代表杀招。','方源早年以血颅蛊血祭提升资质。'],
+  rel:['血海老祖','血神子','血颅蛊'],src:'原著明确'},
+ {id:'s_toudao',n:'偷道',s:'神不知，鬼不觉',g:'特殊流派',
+  d:'凭空盗取仙蛊、仙元、寿元乃至道痕。正面硬抗不足，但机巧诡异、防不胜防。',
+  b:['开派始祖：盗天魔尊。','代表杀招：无相手、大盗鬼手、鬼不觉、见面曾相识。','天外之魔身份使其不受本土宿命约束。'],
+  rel:['盗天魔尊','无相手','大盗鬼手'],src:'原著明确'},
+ {id:'s_mengdao',n:'梦道',s:'入梦取真意',g:'特殊流派',
+  d:'以大梦为道，可入他人梦境、汲取梦境中的道痕真意，绕过常规修行积累。沉沦梦境则会魂飞魄散。',
+  b:['纯梦求真体为梦道后天绝体。','杀招：引魂入梦、白日梦、寻梦剑、碎梦。','梦求真为方源的梦道分身。'],
+  rel:['梦求真','引魂入梦','纯梦求真体'],src:'原著明确'},
+ {id:'s_rendao',n:'人道',s:'万物之灵，人定胜天',g:'特殊流派',
+  d:'以人性、愿力与众生念力为道，对天道劫难与宿命有独特克制。天庭的人道底蕴是其抗衡天意的王牌。',
+  b:['爱蛊、态度蛊皆属人道奇蛊。','方源以人道手段立大爱仙尊之名。','人海是人道念力汇聚之地。'],
+  rel:['爱蛊','态度蛊','人海'],src:'原著明确'},
+ {id:'s_tiandao',n:'天道',s:'损有余而补不足',g:'至高流派',
+  d:'天道并非人格神，而是维护天地平衡的冷酷机制。它借灾劫、巧合与意志暗示扶持弱者、削平强者。宿命蛊是天道的核心具象。',
+  b:['宿命蛊定众生轨线，天外之魔与爱蛊是其克星。','乐土晚年欲转修天道。','天道道痕极难被寻常蛊仙感悟。'],
+  rel:['宿命蛊','天意','乐土仙尊'],src:'原著明确'},
+ {id:'s_lvdao',n:'律道',s:'规则与法度',g:'特殊流派',
+  d:'以规则、排斥、约束为道。无极魔尊以此推演天地规则，逆流河也是律道与水道交织的秘境。',
+  b:['开派代表：无极魔尊。','逆流护身印以律道、水道为基。','规矩蛊、排斥蛊为律道核心蛊虫。'],
+  rel:['无极魔尊','逆流河','规矩蛊'],src:'原著明确'},
+ {id:'s_shidao',n:'食道',s:'吞噬与消化',g:'特殊流派',
+  d:'研究蛊虫口粮与吞噬消化之道，可吞外物永久增强体内道痕，也是解决仙蛊饲养难题的关键。',
+  b:['东海为食道常见之地。','仙蛊口粮是食道最现实的应用场景。'],
+  rel:['仙蛊口粮'],src:'原著明确'},
+ {id:'s_zhendao',n:'阵道',s:'以微力撬动天地',g:'特殊流派',
+  d:'布置仙阵、勾连地脉，以阵旗阵盘撬动天地伟力。阵成则坚不可摧，但布阵耗时、依赖地利。',
+  b:['代表：南疆池家。','仙蛊屋本质上是固化的大型仙阵。'],
+  rel:['池家','仙蛊屋'],src:'原著明确'},
+ {id:'s_huadao',n:'画道',s:'画里乾坤',g:'隐秘流派',
+  d:'以丹青画卷封存天地、人物与道痕，可将英灵、杀招藏于画中。元莲仙尊暗创此道，作为天庭复生英灵的底牌。',
+  b:['代表：元莲仙尊、《众生图》。','疯魔窟之战中画卷展开，复活中洲历代英灵。'],
+  rel:['元莲仙尊','众生图'],src:'原著明确'},
+ {id:'s_yindao',n:'音道',s:'九曲天籁，杀人无形',g:'特殊流派',
+  d:'以音波振荡攻伐神魂与肉身，兼具群攻、辅助与解禁之能。凤九歌为音道绝顶。',
+  b:['代表：凤九歌。','杀招：碧玉歌、天地歌、伏首歌、向天歌、离歌、大风歌、命运歌。','呼啸溪为音道相关秘境。'],
+  rel:['凤九歌','命运歌'],src:'原著明确'},
+ {id:'s_nudao',n:'奴道',s:'以一人敌一国',g:'特殊流派',
+  d:'驭使荒兽、异人与军团，形成兽潮或大军。军团战几乎无敌，但极耗神魂念头，本体易被斩首。',
+  b:['代表：常山阴（方源马甲）、百兽王。','万我系列融合奴道与力道。','吴帅以奴道与梦道统御异人。'],
+  rel:['万我','常山阴','吴帅'],src:'原著明确'},
+ {id:'s_dudao',n:'毒道',s:'瘴疠侵蚀',g:'地域流派',
+  d:'以毒瘴、腐蚀与持续伤害为道，南疆十万大山是其天然温床，常与木道、水道配合。',
+  b:['南疆瘴气界壁与毒道相合。','多见于南疆山寨与密林作战。'],
+  rel:['南疆'],src:'原著明确'},
+ {id:'s_gudao',n:'骨道',s:'白骨为兵',g:'地域流派',
+  d:'以骨骼、尸骸与死亡残余为道，可炼白骨蛊、操控骨兵。南疆白骨山一带流传白骨传承。',
+  b:['方源曾在白骨山夺取灰骨才子传承，炼成白骨肉生蛊。'],
+  rel:['白骨山','白骨肉生蛊'],src:'原著明确'},
+ {id:'s_yundao2',n:'云道',s:'聚散无常',g:'地域流派',
+  d:'以云气聚散、遮蔽与浮空为道，东海群岛常见，擅长隐匿、飞行与范围遮蔽。',
+  b:['东海常见流派之一。'],
+  rel:['东海'],src:'原著明确'}
+];
+
+/* ── 五、蛊虫 ─────────────────────────────────────────────────── */
+CANON_CODEX.entries.gu=[
+ {id:'g_chunqiu',n:'春秋蝉',s:'逆流光阴的六转仙蛊',g:'六转·宙道',
+  d:'红莲魔尊所创。催动者可自爆肉身修为，将神魂记忆压缩入蛊，逆着宙河回到过去某个时间节点，实现重生。成功受气运与宙河风浪影响，寄居空窍时会持续损耗宿主生机与气运。',
+  b:['位阶：六转，后可达七转。','食物：宙河之水，离开宙河需定期补水。','是方源重生与多次回溯的根本。','红莲真传藏于宙河石莲岛。'],
+  rel:['红莲魔尊','宙河','石莲岛'],src:'原著明确'},
+ {id:'g_xiantai',n:'至尊仙胎蛊',s:'九转·无冲突之体',g:'九转',
+  d:'幽魂魔尊以影宗十万年积累与十绝仙僵炼制，最终被方源夺舍。成蛊后肉身可容纳全流派道痕而不互斥，仙窍广阔如域，内含小五域与小九天。',
+  b:['打破道痕互斥的天规。','需定期吞噬十绝体仙窍为食，否则仙躯崩解。','可吞并同派福地洞天以转移灾劫。','是方源登临九转的根基。'],
+  rel:['幽魂魔尊','十绝体','至尊仙窍'],src:'原著明确'},
+ {id:'g_suming',n:'宿命蛊',s:'九转·天道核心',g:'九转',
+  d:'天庭监天塔所奉的九转天道仙蛊，设定众生出生、荣辱、相遇、死亡与成败的轨线。红莲击碎其一角，方源最终将其彻底捏碎。',
+  b:['克星：天外之魔、爱蛊。','宿命蛊在，则尊者亦难违天命。','被毁后五域界壁渐消，尊者时代再临。'],
+  rel:['监天塔','宿命大战','爱蛊'],src:'原著明确'},
+ {id:'g_zhihui',n:'智慧蛊',s:'九转·智慧光晕',g:'九转',
+  d:'散发幽蓝智慧光晕，使沐浴者的念头以惊人速度碰撞推演，可悟出失传仙蛊方与杀招架构。代价是普通活人寿命飞速流逝。',
+  b:['方源在仙僵时期寿命为零，得以无代价沉浸光晕。','是方源积累仙蛊方与杀招的重要底蕴。'],
+  rel:['仙僵','智道'],src:'原著明确'},
+ {id:'g_dingxianyou',n:'定仙游',s:'六转·心念即至',g:'六转·宇道',
+  d:'只要心中有清晰景象，哪怕只是亲眼见过一眼，便可瞬间跨越千里万里，无视五域界壁抵达该地。是行军、突袭与跑路的绝顶战略仙蛊。',
+  b:['方源在三叉山群强环伺下当场炼成。','食物：碧玉天竹嫩芽。','炼成后跨域直达中洲天梯山，夺取狐仙福地。'],
+  rel:['三叉山','狐仙福地','宇道'],src:'原著明确'},
+ {id:'g_taidu',n:'态度蛊',s:'八转·人道假面',g:'八转·人道',
+  d:'源自人祖戴面具的典故。可完美伪装表情、真元气息、气血道痕乃至灵魂波动，连八转智道大能近距离探查亦难识破。',
+  b:['位阶：八转。','是方源多马甲行走天下的关键依仗之一。'],
+  rel:['人祖传','古月方源'],src:'原著明确'},
+ {id:'g_ai',n:'爱蛊',s:'九转·宿命的裂痕',g:'九转·人道',
+  d:'只凭自愿寄宿于心怀挚爱之人，无法被常理炼化奴役。催动不耗仙元，却会随机抽取宿主的容貌、寿命、器官或亲情为代价，是少数能伤及宿命蛊的存在。',
+  b:['人祖之子太日阳莽因爱蛊而亡的典故。','曾啄伤宿命蛊一角。'],
+  rel:['宿命蛊','人祖传'],src:'原著明确'},
+ {id:'g_jianchi',n:'坚持蛊',s:'逆流河的意志之骨',g:'传奇',
+  d:'人祖传中贯穿逆流河的核心意象，象征万折不挠的道心。方源正是凭此道心肉身趟过逆流河，炼成逆流护身印。',
+  b:['并非寻常可炼制的蛊虫，更接近道心具象。','与逆流河、逆流护身印强相关。'],
+  rel:['逆流河','逆流护身印'],src:'原著明确'},
+ {id:'g_xiwang',n:'希望蛊',s:'开窍之源',g:'人祖传',
+  d:'人祖在绝望深渊中得到的一点微光。凡人开窍时将希望蛊捏碎于丹田，象征踏上修行之路的第一缕希望。',
+  b:['人祖传“规矩与希望”篇的核心。','是蛊师开窍仪式的象征。'],
+  rel:['人祖传','开窍'],src:'原著明确'},
+ {id:'g_guiju',n:'规矩蛊',s:'不以规矩，不能成方圆',g:'人祖传',
+  d:'人祖在荒野中遇到的规蛊与矩蛊，教他以规矩立身。象征秩序、法度与可依循的道路，与律道渊源极深。',
+  b:['规蛊与矩蛊常并称。','无极魔尊的律道可视作对这一意象的极致推演。'],
+  rel:['人祖传','律道'],src:'原著明确'},
+ {id:'g_liliang',n:'力量蛊',s:'以青春为食',g:'人祖传',
+  d:'赐予人祖撕碎万物的神力，代价是吞噬其青春与健美肉体。象征超凡力量背后暗藏的价码。',
+  b:['人祖因此衰老佝偻。','与智慧蛊构成“力量与智慧”双篇。'],
+  rel:['人祖传','力道'],src:'原著明确'},
+ {id:'g_danshi',n:'胆识蛊',s:'荡魂山所产壮魂奇珍',g:'魂道奇蛊',
+  d:'将活物魂魄砸碎于荡魂山石上，便会凝结出胆识蛊。它无视资质瓶颈，纯净地暴增魂魄底蕴，是方源起家与积累魂道根基的关键。',
+  b:['产地：荡魂山。','方源曾靠贩卖胆识蛊在宝黄天积累巨额财富。','无副作用，远胜寻常壮魂手段。'],
+  rel:['荡魂山','宝黄天','魂道'],src:'原著明确'},
+ {id:'g_xuelu',n:'血颅蛊',s:'血亲祭炼，拔升资质',g:'血道',
+  d:'以血亲之血祭炼，可强行拔升蛊师资质。方源在青茅山趁古月一代尸变之乱，以血颅蛊血祭全寨，将丙等资质淬至甲等。',
+  b:['代价极重，需大量血亲性命。','是方源彻底斩断凡俗伦常的起点。'],
+  rel:['青茅山','古月方源','血道'],src:'原著明确'},
+ {id:'g_yinyang',n:'阴阳转生蛊',s:'逆转阴阳',g:'特殊',
+  d:'可逆转生灵阴阳之体。方源曾以此将白凝冰转为女儿身，成为二人长期纠葛的起点之一。',
+  b:['白凝冰原为男身，后被转为女身。','涉及生死与身份的深层变化。'],
+  rel:['白凝冰'],src:'原著明确'},
+ {id:'g_jiedao',n:'借道死蛊',s:'化身为僵',g:'禁术',
+  d:'服下后可舍弃肉身生机，转化为死窍仙僵。方源在真阳楼崩毁、巨阳意志追杀的绝境中以此逃生。',
+  b:['化为仙僵后不受天劫地灾，但仙窍死寂。','后借至尊仙胎蛊破而后立。'],
+  rel:['仙僵','八十八角真阳楼'],src:'原著明确'},
+ {id:'g_shou',n:'寿蛊',s:'增寿而无方',g:'天道奇蛊',
+  d:'服用可直接增长阳寿，无法人工炼制，只能自然生成。历代尊者与蛊仙争抢不休，是蛊界最硬的通货之一。',
+  b:['原著术语为寿蛊，不称寿元蛊。','气海老祖曾以寿蛊为筹码与天庭交易。'],
+  rel:['气海老祖','天庭'],src:'原著明确'},
+ {id:'g_xingnian',n:'星念蛊',s:'星宿一脉的智道根基',g:'智道',
+  d:'与星宿仙尊、飞星棋盘一脉相承的智道蛊虫，用于凝聚星念、推演天机与布置星象棋局。',
+  b:['与智慧蛊分属不同路数：一为星念推演，一为光晕启悟。'],
+  rel:['星宿仙尊','飞星棋盘'],src:'原著明确'},
+ {id:'g_goushiyun',n:'狗屎运蛊',s:'运道奇蛊',g:'六转·运道',
+  d:'名字粗鄙，却能带来极强的意外好运。属巨阳仙尊运道体系，是北原运道真传的代表蛊虫之一。',
+  b:['与连运蛊同属运道。','方源曾借运道手段布局北原。'],
+  rel:['巨阳仙尊','运道'],src:'原著明确'},
+ {id:'g_lianyun',n:'连运蛊',s:'气运相连',g:'六转·运道',
+  d:'可将彼此气运相连，祸福与共。既是结盟的手段，也是暗中转移厄运的杀器。',
+  b:['运道“众生运”的具象。','巨阳仙尊以此构建北原气运网络。'],
+  rel:['巨阳仙尊','运道'],src:'原著明确'},
+ {id:'g_bianyi',n:'变异蛊',s:'变化道的核心',g:'六转·变化道',
+  d:'可模拟万物形态与道痕结构，是变化道蛊仙化身万兽的关键。狂蛮魔尊一脉对此道推演极深。',
+  b:['狂蛮魔尊为变化道开派者。'],
+  rel:['狂蛮魔尊','变化道'],src:'原著明确'},
+ {id:'g_tianyuan',n:'天元宝莲',s:'元石与仙元之源',g:'木道·资源',
+  d:'元莲仙尊一脉的宝莲。凡蛊阶段产元石，升炼至六转天元宝皇莲后产仙元，是极为重要的资源型蛊虫。',
+  b:['凡蛊产元石，六转宝皇莲产仙元。','不可混写为凡蛊直接产仙元。'],
+  rel:['元莲仙尊','元石'],src:'原著明确'},
+ {id:'g_hunxiao',n:'魂啸蛊',s:'魂道攻伐',g:'魂道',
+  d:'魂道杀招魂啸的核心蛊虫，以魂力震荡冲击敌方神魂，穿透肉身防御。',
+  b:['魂道常见攻伐手段。','影宗蛊仙多有使用。'],
+  rel:['魂啸','魂道'],src:'原著明确'},
+ {id:'g_baigu',n:'白骨肉生蛊',s:'白骨山的传承',g:'骨道',
+  d:'方源在白骨山夺取灰骨才子传承后炼成，可借白骨生机重塑血肉，是早期重要的保命与恢复手段。',
+  b:['关联地点：白骨山。','体现骨道“由死转生”的一面。'],
+  rel:['白骨山','骨道'],src:'原著明确'},
+ {id:'g_yueguang',n:'月光蛊',s:'凡蛊口粮示例',g:'凡蛊',
+  d:'常见凡蛊，以月兰花瓣为食。可用于演示凡蛊饲养的基本逻辑：口粮虽平易，但需稳定供给。',
+  b:['凡蛊口粮多取自自然植物、矿石或兽肉。'],
+  rel:['养蛊'],src:'原著明确'},
+ {id:'g_jiuchong',n:'酒虫',s:'方源早期根基',g:'凡蛊',
+  d:'以陈年美酒浸泡喂养的凡蛊。方源重生初期即设法谋取酒虫，作为积累资源与修行的起点。',
+  b:['需以酒饲养。','是方源青茅山时期的重要依仗。'],
+  rel:['青茅山','古月方源'],src:'原著明确'},
+ {id:'g_dukong',n:'遁空蛊',s:'盗天的归乡之望',g:'宇道奇蛊',
+  d:'盗天魔尊与长毛老祖合作炼制的空间奇蛊，意在打破世界屏障、返回故乡。蛊虽炼成，却仍未能使盗天真正进入空门。',
+  b:['炼成不等于成功穿越。','是盗天一生执念的具象。'],
+  rel:['盗天魔尊','长毛老祖','空门'],src:'原著明确'},
+ {id:'g_huijian',n:'慧剑仙蛊',s:'剑道与智道的结合',g:'剑道',
+  d:'剑道仙蛊，讲究以慧御剑、以剑证心。与五指拳心剑、剑痕索命等剑道杀招相呼应。',
+  b:['薄青一脉的剑道传承核心。'],
+  rel:['薄青','五指拳心剑'],src:'原著明确'},
+ {id:'g_huigu',n:'悔蛊',s:'人道奇蛊',g:'人道',
+  d:'龙鲸洞天相关的人道奇蛊，与救死扶伤、夜歌等人道杀招同源。方源持悔蛊可触发红莲真传的天外之魔版本。',
+  b:['与龙鲸、乐土一脉的人道传承相关。'],
+  rel:['龙鲸洞天','救死扶伤','夜歌'],src:'原著明确'},
+ {id:'g_gongde',n:'功德蛊',s:'乐土一脉',g:'人道/土道',
+  d:'乐土仙尊一脉的功德之蛊，以济世利生积累功德，转化为护持与愿力。',
+  b:['乐土五域真传的重要组成部分。'],
+  rel:['乐土仙尊','五域真传'],src:'原著明确'},
+ {id:'g_shihun',n:'噬魂蛊',s:'幽魂一脉',g:'魂道',
+  d:'吞噬魂魄以壮大自身的魂道蛊虫，是幽魂魔尊屠戮万灵、祭炼神魂的路数之一。',
+  b:['与荡魂山、落魄谷的魂道体系互补。'],
+  rel:['幽魂魔尊','魂道'],src:'原著明确'},
+ {id:'g_dingxian',n:'定仙游·补充',s:'炼制与限制',g:'仙蛊规则',
+  d:'定仙游虽为六转，却因无视界壁的战略价值被无数势力觊觎。其炼制需要极高空间造诣与天时地利，方源是在三叉山绝境中借势成蛊。',
+  b:['仙蛊唯一：同一时间只能存在一只同名仙蛊。','掌握定仙游即可掌握跨域机动权。'],
+  rel:['定仙游'],src:'原著明确'}
+];
+/* ── 六、杀招 ─────────────────────────────────────────────────── */
+CANON_CODEX.entries.move=[
+ {id:'m_niliu',n:'逆流护身印',s:'反弹万法的流水长袍',g:'律道/水道·方源',
+  d:'将逆流河的规则炼成护身杀招，化作半透明流水长袍披于体表。任何攻击触及长袍，都会被判定为逆流阻碍，原路反弹回施术者。',
+  b:['方源在逆流河历练后炼成。','曾以七转之身硬撼多位八转蛊仙。','核心基石：逆流河、牵丝蛊、坚持意志。'],
+  rel:['逆流河','坚持蛊','古月方源'],src:'原著明确'},
+ {id:'m_wanwo',n:'万我',s:'虚影狂潮，万我归一',g:'奴道/力道·方源',
+  d:'方源为打破奴道与力道不可兼修的禁锢所创。以力道虚影为基，融合奴道驭使之精粹，可化出成千上万个具备本体部分力量的虚影。',
+  b:['方源第一世创制，第二世继续改良。','衍生万我大手印、万我剑雨、大爱分身等变式。','是方源以少敌众的招牌。'],
+  rel:['古月方源','奴道','力道'],src:'原著明确'},
+ {id:'m_yinhun',n:'引魂入梦',s:'跳过防御，直拽神魂',g:'魂道/梦道·方源',
+  d:'以梦蝶类仙蛊配合魂道，将敌方神魂强行拖入梦境。在梦道尚未普及的时代，几乎无人能防，一中招便陷入沉睡任人宰割。',
+  b:['绕过肉身与道痕防御。','方源凭此连斩多位八转强敌。'],
+  rel:['梦道','梦求真'],src:'原著明确'},
+ {id:'m_guiguan',n:'鬼官遮天·阎罗殿',s:'魂道杀伐体系',g:'魂道·幽魂一脉',
+  d:'幽魂一脉的魂道杀招体系，以鬼官、阎罗意象统御魂魄与死亡。方源后来将其改造并改称“阎帝”。',
+  b:['核心思路：以魂道压制、吞噬与审判。','与鬼官衣等防御手段配套。'],
+  rel:['幽魂魔尊','魂道'],src:'原著明确'},
+ {id:'m_wuzhi',n:'五指拳心剑',s:'五重连判的剑道绝学',g:'剑道·薄青',
+  d:'薄青一脉的剑道杀招，依次考验剑形、剑意、剑势、剑魂、剑心五重。每过一重威力递增，五重全成则威能惊人。',
+  b:['完整版为五指全心剑。','剑心无我者第五重成功率更高。','方源可由薄青真传或古梦杀招库习得。'],
+  rel:['薄青','剑道','慧剑仙蛊'],src:'原著明确'},
+ {id:'m_jianhen',n:'剑痕索命',s:'以剑道道痕换永久锋锐',g:'剑道·薄青',
+  d:'每次使用都会永久消耗剑道道痕境界，同时使此招基础威力永久提升。是以自身道途为薪柴的拼命剑术。',
+  b:['薄青真传奖励之一。','越用越强，但剑道境界会持续滑落。'],
+  rel:['薄青','剑道'],src:'原著明确'},
+ {id:'m_qianyou',n:'前有古人',s:'红莲真传·宙道',g:'宙道·红莲',
+  d:'以宙道牵引历史中的强者余响，借“前有古人”之势增强自身。与“后有来者”互为两半，通常二选一。',
+  b:['来源：红莲真传。','与光阴、传承意象相关。'],
+  rel:['红莲魔尊','后有来者'],src:'原著明确'},
+ {id:'m_houyou',n:'后有来者',s:'红莲真传·宙道',g:'宙道·红莲',
+  d:'与“前有古人”相对的宙道杀招，借后来者之势延续道统。二者互斥，取其一。',
+  b:['来源：红莲真传。'],
+  rel:['红莲魔尊','前有古人'],src:'原著明确'},
+ {id:'m_weilai',n:'未来身',s:'天外之魔版红莲真传',g:'宙道·红莲',
+  d:'持悔蛊的天外之魔可触发的红莲真传变体。抽中后本场后续杀招按更高一档计算，象征“未来之我”提前到来。',
+  b:['亚仙尊后自动替换为未来已至。','每场仅触发一次。'],
+  rel:['红莲魔尊','悔蛊','未来已至'],src:'原著明确'},
+ {id:'m_weilaiyizhi',n:'未来已至',s:'随机总权重的宙道杀招',g:'宙道',
+  d:'未来身的进阶形态。每次使出时在较高区间随机取一数作为本式总权重，可吃增益，威能浮动但上限极高。',
+  b:['亚仙尊后替换未来身。'],
+  rel:['未来身','红莲魔尊'],src:'原著衍生＋游戏适配'},
+ {id:'m_guangyin',n:'光阴飞刃',s:'中洲薄家一脉的宙道杀招',g:'宙道',
+  d:'以光阴凝刃斩敌的宙道杀招，与中洲薄家、薄青一脉的梦境传承相关，并非红莲魔尊所创。',
+  b:['不得误归红莲魔尊。','终身使用次数有限。'],
+  rel:['薄青','宙道'],src:'原著明确'},
+ {id:'m_mingyun',n:'命运歌',s:'凤九歌的八转音道绝唱',g:'音道·凤九歌',
+  d:'凤九歌在宿命大战关键时刻唱响的音道杀招，以歌声撼动天庭道心，助方源击碎宿命枷锁。',
+  b:['八转音道杀招。','与九曲天籁同属凤九歌音道体系。','宿命大战的关键转折之一。'],
+  rel:['凤九歌','宿命大战','音道'],src:'原著明确'},
+ {id:'m_jiuqu',n:'九曲天籁',s:'凤九歌音道总纲',g:'音道·凤九歌',
+  d:'凤九歌的音道体系总称，包含碧玉歌、天地歌、伏首歌、向天歌、离歌、大风歌、命运歌等多式，攻伐、控制、辅助兼备。',
+  b:['一式一意，随境界与心境递进。','八转之后方得命运歌。'],
+  rel:['凤九歌','命运歌'],src:'原著明确'},
+ {id:'m_qingfeng',n:'清风剪',s:'武庸的风道杀招',g:'风道·武庸',
+  d:'武家八转风道杀招，以无形风刃绞杀，锋锐迅疾。武庸坐镇玉清滴风小竹楼时威力更盛。',
+  b:['与风声鹤唳并称武庸双绝。','曾连斩多位同阶八转。'],
+  rel:['武庸','玉清滴风小竹楼','风道'],src:'原著明确'},
+ {id:'m_fengsheng',n:'风声鹤唳',s:'武庸的风道杀招',g:'风道·武庸',
+  d:'以风声与鹤唳扰乱心神、压制敌势的风道杀招，配合清风剪可形成攻心与斩杀的完整链条。',
+  b:['武庸隐忍数百年后一举展露的锋芒。'],
+  rel:['武庸','清风剪'],src:'原著明确'},
+ {id:'m_sanqi',n:'三气归来',s:'天庭元始一脉的底牌',g:'气道·天庭',
+  d:'元始仙尊一脉留下的特殊杀招，战败后可不进败局、直接再战一次。龙公在宿命大战中以此支撑天庭最后的尊严。',
+  b:['全局仅能触发一次。','体现天庭三百万年的底蕴。'],
+  rel:['原始仙尊','龙公','天庭'],src:'原著明确'},
+ {id:'m_hunbao',n:'魂爆',s:'幽魂一脉的搏命手段',g:'魂道',
+  d:'以神魂自爆换取重创与保命机会，是魂道蛊仙在绝境中的最后手段。',
+  b:['双方同时受创。','方源可由幽魂残念传承习得。'],
+  rel:['幽魂魔尊','魂道'],src:'原著明确'},
+ {id:'m_guibujue',n:'鬼不觉',s:'盗天双绝之一',g:'偷道·盗天',
+  d:'盗天魔尊的隐匿绝技，行动时极难被察觉，被发现的概率大幅降低，配合“神不知”可来去无踪。',
+  b:['来源：盗天真传。','主动催动可额外获得一次出手机会。'],
+  rel:['盗天魔尊','神不知'],src:'原著明确'},
+ {id:'m_shenbuzhi',n:'神不知',s:'盗天双绝之一',g:'偷道·盗天',
+  d:'与鬼不觉并称的隐匿杀招，可遮蔽天机与感知，使敌人无法判断施术者的位置与意图。',
+  b:['盗天真传核心。','常用于潜入、夺宝与脱身。'],
+  rel:['盗天魔尊','鬼不觉'],src:'原著明确'},
+ {id:'m_wuxiang',n:'无相手',s:'截取敌方攻势',g:'偷道·盗天',
+  d:'凭空截取对方一部分攻势或权柄，化为己用。是大盗鬼手的上位手段，二者可叠加但存在上限。',
+  b:['来源：盗天魔尊残念传承。','与鬼手叠加有封顶。'],
+  rel:['盗天魔尊','大盗鬼手'],src:'原著明确'},
+ {id:'m_dadao',n:'大盗鬼手',s:'盗窃之手的具象',g:'偷道·盗天',
+  d:'以鬼手窃取敌方力量、仙元或杀招要素，配合无相手可大幅削弱对手。',
+  b:['来源：盗天魔尊残念传承。'],
+  rel:['盗天魔尊','无相手'],src:'原著明确'},
+ {id:'m_jianmian',n:'见面曾相识',s:'盗天的错位杀招',g:'偷道·盗天',
+  d:'以错位与迷惑制造“似曾相识”的破绽，令敌方判断失准、攻势减半。',
+  b:['来源：盗天魔尊残念传承。'],
+  rel:['盗天魔尊'],src:'原著明确'},
+ {id:'m_wujin',n:'五禁玄光气',s:'超级蛊阵杀招',g:'气道·蛊阵',
+  d:'以超级蛊阵催动的气道杀招，释放当回合压制敌方攻势。属游戏内适配的蛊阵体系。',
+  b:['陶铸真传·毁山相关。','每场限一次。'],
+  rel:['气道','蛊阵'],src:'游戏内设定（原著风格改编）'},
+ {id:'m_xueshenzi',n:'血神子',s:'血海老祖的血道杀招',g:'血道',
+  d:'血海老祖一脉的血道杀招，以血神子分身与血道道痕作战。方源可经血海真传习得。',
+  b:['血神子源于血海老祖，非方源原创。','血道蛊仙使用时会占据杀招位。'],
+  rel:['血海老祖','血道'],src:'原著明确'},
+ {id:'m_konglie',n:'空裂',s:'宇道·撕裂空间',g:'宇道',
+  d:'撕裂空间的一击，可抹除敌方一次最强攻势。属宇道蛊仙在蛊虫完善度推演中领悟的杀招。',
+  b:['每局仅可使用一次，用后遗忘。'],
+  rel:['宇道','定仙游'],src:'游戏内设定（原著风格改编）'},
+ {id:'m_mengli',n:'梦里轻烟',s:'龙宫的入梦绝技',g:'梦道·龙宫',
+  d:'龙宫门开，轻烟散出，中招者瞬间陷入昏睡梦境，任凭外界轰击亦难自拔。是八转梦道仙蛊屋的核心杀招。',
+  b:['归属：龙宫。','对八转蛊仙亦有奇效。'],
+  rel:['龙宫','吴帅','梦道'],src:'原著明确'},
+ {id:'m_tiandi',n:'天地一家亲',s:'方源的统御之名',g:'奴道/炼道',
+  d:'方源以“天地一家亲”为名整合异人与仙窍生态，将统御、炼化与共生包装成一套宏大叙事。',
+  b:['既是杀招名，也是其统御体系的旗号。'],
+  rel:['古月方源','大爱盟'],src:'原著明确'},
+ {id:'m_jiusi',n:'救死扶伤',s:'人道疗愈',g:'人道',
+  d:'龙鲸·悔蛊引出的人道传承之一，以人道底蕴疗愈自身与盟友，稳固战局。与夜歌二选一。',
+  b:['来源：龙鲸洞天相关人道传承。'],
+  rel:['悔蛊','龙鲸洞天','夜歌'],src:'原著明确'},
+ {id:'m_yegong',n:'夜歌',s:'人道慑魂',g:'人道',
+  d:'与救死扶伤相对的人道杀招，以低吟慑魂削弱敌方攻势。',
+  b:['与救死扶伤互斥。'],
+  rel:['悔蛊','救死扶伤'],src:'原著明确'},
+ {id:'m_bairimeng',n:'白日梦',s:'梦道彩蛋杀招',g:'梦道',
+  d:'梦道修行者在特定梦境中可得的杀招，以白日入梦扰乱敌方节奏。',
+  b:['仅梦道修行者有概率获得。'],
+  rel:['梦道','梦求真'],src:'游戏内设定（原著风格改编）'},
+ {id:'m_xunmeng',n:'寻梦剑',s:'梦道与剑道的合流',g:'梦道/剑道',
+  d:'以梦寻剑、以剑入梦的复合杀招，威力随梦道与剑道境界同时增长。',
+  b:['梦境古梦层可得。'],
+  rel:['梦道','剑道'],src:'游戏内设定（原著风格改编）'},
+ {id:'m_tianming',n:'天命破',s:'越用越强的力道杀招',g:'力道',
+  d:'每次被抽中，威力按倍率叠加，越战越强。象征以力破命、不服天命的意志。',
+  b:['初值较低，可无限叠加。'],
+  rel:['力道','天命'],src:'游戏内设定（原著风格改编）'},
+ {id:'m_ziyou',n:'自由残缺变',s:'狂蛮变化道',g:'变化道·狂蛮',
+  d:'狂蛮魔尊一脉的变化道杀招，化身残缺之形仍能保留核心战力，体现“变化由我”的霸道。',
+  b:['来源：狂蛮真传。','基础威力随本回合行动次数增长。'],
+  rel:['狂蛮魔尊','变化道'],src:'原著明确'},
+ {id:'m_wanhun',n:'万魂噬天',s:'幽魂的九转杀招',g:'魂道·九转',
+  d:'幽魂魔尊现世时的倾覆一击，万魂齐出，吞噬天地。数值与声势都近乎无解。',
+  b:['九转魂道杀招。','仅在幽魂本尊现身的特定局面出现。'],
+  rel:['幽魂魔尊','魂道'],src:'原著明确'},
+ {id:'m_wuliang',n:'无量气海',s:'气道八转招牌',g:'气道',
+  d:'气道八转杀招，可攻可守，以浩荡元气化海护体，抵消一次败局。',
+  b:['与气海秘境同名同源。','气海老祖的招牌之一。'],
+  rel:['气道','气海'],src:'原著明确'},
+ {id:'m_qigai',n:'气盖山河',s:'气道重压',g:'气道',
+  d:'以磅礴元气铺天盖地压下，压制敌方攻势与行动。龙公等气道大能常用。',
+  b:['天庭气道体系的一部分。'],
+  rel:['气道','龙公'],src:'原著明确'},
+ {id:'m_qiliu',n:'气流剪',s:'气道切割',g:'气道',
+  d:'将气流凝成利刃切割敌阵，轻快凌厉，常与风道手段配合。',
+  b:['武庸一脉气道与风道并用。'],
+  rel:['气道','武庸'],src:'原著明确'},
+ {id:'m_qihu',n:'气呼山',s:'气道化山',g:'气道',
+  d:'一口气化作山岳盖压，以势压人，是气道中正面的强攻手段。',
+  b:['气道中坚杀招。'],
+  rel:['气道'],src:'原著明确'},
+ {id:'m_lidao',n:'力道大手印',s:'方源力道招牌',g:'力道',
+  d:'势大力沉的巨掌，正面碾压。方源早期以力道起家时的招牌杀招之一。',
+  b:['力道流派的典型攻伐。'],
+  rel:['力道','古月方源'],src:'原著明确'},
+ {id:'m_xuepiao',n:'血漂流',s:'血道疾行',g:'血道',
+  d:'化血水疾行，速度与恢复兼备，是血道蛊仙的机动手段。',
+  b:['六转血本仙蛊相关。'],
+  rel:['血道'],src:'原著明确'},
+ {id:'m_xueran',n:'血染征袍',s:'血道护体',g:'血道',
+  d:'血光凝袍护身，以血道道痕抵消伤害，攻守一体。',
+  b:['血道防御手段。'],
+  rel:['血道'],src:'原著明确'},
+ {id:'m_xuejian',n:'血渐冷',s:'血道寒意',g:'血道',
+  d:'以血道寒意侵蚀敌方气血与战意，令其攻势渐弱。',
+  b:['血道控制手段。'],
+  rel:['血道'],src:'原著明确'},
+ {id:'m_doushen',n:'豆神兵卒',s:'豆神宫招牌',g:'木道',
+  d:'三色兵卒分别为冲杀、飞箭与自爆，是豆神宫一脉的木道战阵杀招。',
+  b:['元莲仙尊一脉的豆神宫。','后与帝君城合并为神帝城。'],
+  rel:['豆神宫','元莲仙尊','木道'],src:'原著明确'},
+ {id:'m_taolin',n:'桃花迷林',s:'木道战场杀招',g:'木道',
+  d:'方圆千里化作桃林，以花雾与枝蔓困敌，是木道的大范围战场杀招。',
+  b:['木道困敌手段。'],
+  rel:['木道'],src:'原著明确'},
+ {id:'m_chengshuang',n:'成双入对',s:'偷道分身秘技',g:'偷道',
+  d:'分化一个战力相同的分身，令本式威力倍增。是盗天魔尊一脉的机巧手段。',
+  b:['来源：盗天传承。'],
+  rel:['盗天魔尊','偷道'],src:'原著明确'},
+ {id:'m_suimeng',n:'碎梦',s:'梦道破碎',g:'梦道',
+  d:'将梦境击碎四散，以碎片扰乱敌方神魂与判断。',
+  b:['梦道攻伐手段。'],
+  rel:['梦道'],src:'原著明确'},
+ {id:'m_luanyi',n:'乱意散梦',s:'智道掺梦道',g:'智道/梦道',
+  d:'以智道为主、梦道为辅，扰乱敌方念头与梦境，使其判断失准。',
+  b:['智道与梦道的复合应用。'],
+  rel:['智道','梦道'],src:'原著明确'}
+];
+
+/* ── 七、仙蛊屋 ───────────────────────────────────────────────── */
+CANON_CODEX.entries.house=[
+ {id:'h_jiantian',n:'监天塔',s:'天庭的九转中枢',g:'九转·天庭',
+  d:'天庭第一牌面与指挥中枢，以九转宿命蛊为眼，辅以智道、天道、律道仙蛊。可监察五域九天道痕异动，引动宿命威能降下抹杀劫光。',
+  b:['宿命大战中被方源联军攻破外壳。','方源登塔捏碎宿命蛊，监天塔半毁。'],
+  rel:['天庭','宿命蛊','宿命大战'],src:'原著明确'},
+ {id:'h_zhenyang',n:'八十八角真阳楼',s:'北原黄金掠夺机',g:'准九转·长生天',
+  d:'巨阳仙尊铸于王庭福地，八十八层对应黄金家族血脉机缘。每逢十年大雪灾，便汲取灾能、抽取北原野外仙蛊与灵珍入楼，成为巨阳后裔私产。',
+  b:['长毛老祖参与炼制并提升至八转。','方源联合黑楼兰破坏楼心阵眼，真阳楼彻底倒塌。'],
+  rel:['巨阳仙尊','长生天','王庭福地'],src:'原著明确'},
+ {id:'h_zhenyun',n:'镇运天宫',s:'长生天的气运旗舰',g:'八转·运道',
+  d:'北原长生天的移动作战旗舰，凝聚黄金后裔气运，逢凶化吉。宿命大战中作为进攻天庭的先头重锤，硬扛监天塔轰击。',
+  b:['运道仙蛊屋。','巨阳仙尊所立。'],
+  rel:['巨阳仙尊','长生天'],src:'原著明确'},
+ {id:'h_longgong',n:'龙宫',s:'梦里轻烟，入梦无解',g:'八转·梦道/奴道',
+  d:'中古龙人始祖吴帅为对抗天庭清洗所筑。门开烟散，中招者陷入昏睡梦境。后经东海争夺被方源夺得，成为吴帅统御两天异人的旗舰。',
+  b:['核心杀招：梦里轻烟。','兼具梦道与奴道。'],
+  rel:['吴帅','梦里轻烟'],src:'原著明确'},
+ {id:'h_yuqing',n:'玉清滴风小竹楼',s:'南疆武家镇族至宝',g:'八转·风道',
+  d:'通体由玉清仙竹构筑的两层小楼，四周微风环绕。八转仙蛊屋中遁速极快，武庸坐镇其中可放大清风剪与风声鹤唳之威。',
+  b:['归属：南疆武家。','极致机动与风道攻防一体。'],
+  rel:['武庸','武家','清风剪'],src:'原著明确'},
+ {id:'h_wannian',n:'万年斗飞车',s:'宙河霸王战舰',g:'八转·宙道',
+  d:'方源为征伐宙河、夺取石莲岛真传而亲自设计炼制。由大量年蛊、月蛊、日蛊与八转宙道仙蛊构成，可在宙河风浪中平稳疾驰。',
+  b:['方源亲造。','用于宙河大战与追击战。'],
+  rel:['宙河','石莲岛','古月方源'],src:'原著明确'},
+ {id:'h_tiexue',n:'铁血楼',s:'移动空中监狱',g:'八转·律道/金道',
+  d:'南疆铁家的标志性仙蛊屋，兼具监牢、审判与镇压之能，可移动布防，威慑魔道。',
+  b:['归属：南疆铁家。','铁家以捕盗除魔闻名。'],
+  rel:['铁家'],src:'原著明确'},
+ {id:'h_wenjin',n:'问津坞',s:'房家沙海战堡',g:'七至八转·宇道/水道',
+  d:'西漠房家的仙蛊屋之一，擅长空间穿梭与沙海遁行，是房家战阵的重要节点。',
+  b:['归属：西漠房家。','房家以仙蛊屋群围猎强敌。'],
+  rel:['房家','西漠'],src:'原著明确'},
+ {id:'h_chenni',n:'沉泥宫',s:'地底潜伏的土道堡垒',g:'七至八转·土道',
+  d:'可潜入地底、吸纳大地道痕，坚壁清野、久守不破，是房家防御体系的核心之一。',
+  b:['归属：西漠房家。'],
+  rel:['房家','土道'],src:'原著明确'},
+ {id:'h_luoying',n:'落英馆',s:'木道治疗与困敌',g:'七转·木道',
+  d:'百花飞舞、治疗辅助、困敌致幻，是房家仙蛊屋群中的支援型堡垒。',
+  b:['归属：西漠房家。'],
+  rel:['房家','木道'],src:'原著明确'},
+ {id:'h_qingxin',n:'清心玉壶',s:'天庭审讯与净化',g:'八转·智道/律道',
+  d:'天庭仙蛊屋，可安定心神、净化魔念、审讯强敌，是监天塔体系的重要辅助。',
+  b:['归属：中洲天庭。'],
+  rel:['天庭','智道'],src:'原著明确'},
+ {id:'h_changming',n:'万年长明灯',s:'破暗与视野压制',g:'八转·光道/炎道',
+  d:'天庭的照明与破暗仙蛊屋，可驱散黑暗遮蔽、大范围压制视野，为大军作战提供优势。',
+  b:['归属：中洲天庭。'],
+  rel:['天庭','光道'],src:'原著明确'},
+ {id:'h_antu',n:'安土重山堡',s:'极致土道防御',g:'八转·土道',
+  d:'以厚重土道道痕构筑的堡垒，可化解尊者级余波，是方源一方的防御底牌之一。',
+  b:['归属：大爱盟一系。'],
+  rel:['土道','大爱盟'],src:'原著明确'},
+ {id:'h_renti',n:'仙蛊屋总述',s:'移动的战争堡垒',g:'仙道工造',
+  d:'仙蛊屋由多只仙蛊与数十万乃至上百万凡蛊以阵法永久固化拼装而成，集移动要塞、协同施法、道痕防御与仙元放大为一体。',
+  b:['凡仙皆可御：填入仙元即可爆发稳定威能。','庇护乘员，免受流派道痕反噬。','可集中多位蛊仙之力，围杀高阶强敌。'],
+  rel:['阵道','仙蛊'],src:'原著明确'}
+];
+
+/* ── 八、秘境与地名 ───────────────────────────────────────────── */
+CANON_CODEX.entries.place=[
+ {id:'p_niliu',n:'逆流河',s:'万法沉寂，唯意志可渡',g:'天地秘境·律道/水道',
+  d:'河水逆向奔涌，越往前阻力越强。河中万蛊沉寂、仙凡杀招失效，唯有纯粹肉身与坚定意志能够立足。无数八转大能入河皆被淘汰。',
+  b:['方源以五百年执念肉身趟过逆流河。','由此炼成逆流护身印。','人祖背子渡河、功亏一篑的典故亦出于此。'],
+  rel:['逆流护身印','坚持蛊','人祖传'],src:'原著明确'},
+ {id:'p_danghun',n:'荡魂山',s:'壮魂之地，胆识蛊之源',g:'天地秘境·魂道',
+  d:'通体由纯净魂质与晶石构成，泛幽绿之光。活物登临，魂魄受山风震荡；将魂魄砸碎于山石，可凝结出胆识蛊。',
+  b:['原属狐仙福地，后归方源。','与落魄谷合为魂道修行圣境。'],
+  rel:['胆识蛊','落魄谷','狐仙福地'],src:'原著明确'},
+ {id:'p_luopo',n:'落魄谷',s:'炼魂之地',g:'天地秘境·魂道',
+  d:'谷中长年呼啸落魄风与落魄雾，吹骨消肉、迷乱心智，可将虚浮神魂淬炼得凝实坚韧。',
+  b:['“荡魂山壮魂，落魄谷炼魂”。','原由影宗掌握，后归方源。'],
+  rel:['荡魂山','影宗'],src:'原著明确'},
+ {id:'p_shengsi',n:'生死门',s:'生与死的界限',g:'天地秘境·魂道/天道',
+  d:'门外为生，门内为死，天下亡魂归宿之地。幽魂魔尊曾以此为巢潜修，研拟生死转化与至尊仙胎。',
+  b:['《人祖传》有载。','幽魂死后本体残魂沉于门内死境布局。'],
+  rel:['幽魂魔尊','人祖传'],src:'原著明确'},
+ {id:'p_zhouhe',n:'宙河',s:'光阴之河',g:'天地秘境·宙道',
+  d:'穿梭过去、现在、未来的无形大河，五域九天的时间流速由其支流决定。年兽、月兽、日兽生息其间，春秋蝉由此溯流而上。',
+  b:['红莲石莲岛藏于宙河核心。','万年斗飞车可在此破浪疾驰。'],
+  rel:['春秋蝉','石莲岛','万年斗飞车'],src:'原著明确'},
+ {id:'p_shilian',n:'石莲岛',s:'红莲真传所在',g:'宙河秘境',
+  d:'红莲魔尊将七转、八转、九转真传深藏于宙河核心的石莲岛，唯有春秋蝉持有者方能踏足。',
+  b:['前有古人、后有来者、未来身等真传出于此。','方源以万年斗飞车征伐宙河夺取真传。'],
+  rel:['红莲魔尊','宙河','未来身'],src:'原著明确'},
+ {id:'p_shijing',n:'市井',s:'井中气泡，纳福地囚蛊仙',g:'天地秘境·宇道/人道',
+  d:'东海秘境。井壁悬挂无数气泡，每个气泡都是一方微缩天地，可安放福地、囚禁蛊仙并阻断内外感应。',
+  b:['《人祖传》有载。','方源曾借此安顿异人族群、诱杀强敌。'],
+  rel:['东海','人祖传'],src:'原著明确'},
+ {id:'p_qiankun',n:'乾坤晶壁',s:'记录天地一切过往',g:'天地秘境·律道/智道',
+  d:'映照自太古以来的一切真实历史、秘密与因果。盗天魔尊曾借其勘探世界壁垒，无极魔尊割裂部分晶壁布于疯魔窟推演天道。',
+  b:['可视为天地自身的记忆。'],
+  rel:['盗天魔尊','无极魔尊','疯魔窟'],src:'原著明确'},
+ {id:'p_fengmo',n:'疯魔窟',s:'无极的永生之局',g:'天地秘境·天道/律道',
+  d:'位于北原深处，无极魔尊耗百万年铸造，共九层。窟中充斥混乱道痕，靠近者神魂受冲击而丧失理智。第八层为棋局与天地熔炉，第九层为衍生世界中心。',
+  b:['无极在此推演永生，最终失败道消。','星宿、巨阳、乐土、幽魂、方源等尊者在此决战。','方源在此背刺乐土并登临九转。'],
+  rel:['无极魔尊','原初境','疯魔窟终局'],src:'原著明确'},
+ {id:'p_lianhai',n:'炼海',s:'万物可炼的炼道汪洋',g:'天地秘境·炼道',
+  d:'长毛老祖晚年试图补全的炼道秘境，仅成半成品，后由方源融合毛民手段与万千仙材彻底完善。全海由炼道道痕凝成，万物入海皆可融炼。',
+  b:['方源炼道成尊的终极底牌之一。','与长毛老祖、琅琊福地渊源极深。'],
+  rel:['长毛老祖','琅琊福地','炼道'],src:'原著明确'},
+ {id:'p_yuanchu',n:'原初境',s:'万道之源',g:'天地秘境·全流派',
+  d:'蕴含世界诞生之初最纯粹的天地真意。蛊仙吸纳对应流派真意，可直接拔升流派境界，是疯魔窟大战中诸尊争夺的核心。',
+  b:['可将流派境界推至无上大宗师门槛。','疯魔窟终局的关键筹码。'],
+  rel:['疯魔窟','无上大宗师'],src:'原著明确'},
+ {id:'p_renhai',n:'人海',s:'众生念力与复生',g:'天地秘境·人道',
+  d:'汇聚红尘众生念力与生命的人道秘境，可用于复活死者与积累愿力，是天庭与方源都极为重视的底牌。',
+  b:['人道体系的极致体现。'],
+  rel:['人道','天庭'],src:'原著明确'},
+ {id:'p_qihai',n:'气海',s:'东海气道极致',g:'天地秘境·气道',
+  d:'东海极天之气汇聚成的浩荡气海，气道仙法在此威能倍增。方源以气海老祖之名坐拥此地，整合东海势力。',
+  b:['气海老祖的名号由来。','气道修行的圣地。'],
+  rel:['气海老祖','气道','东海'],src:'原著明确'},
+ {id:'p_letu',n:'乐土',s:'乐土仙尊的净土',g:'福地洞天',
+  d:'乐土仙尊一脉经营的净土，以仁善与和平为理念，庇护弱小异人与人族底层。后世真传由陆畏因承接。',
+  b:['乐土仙尊主修土道，兼修人道、天道。','乐土真传分布五域。'],
+  rel:['乐土仙尊','陆畏因'],src:'原著明确'},
+ {id:'p_huxian',n:'狐仙福地',s:'方源第一块真正基业',g:'福地',
+  d:'位于中洲天梯山。方源在三叉山炼成定仙游后跨域而至，一举夺下狐仙福地与荡魂山，从此有了立足之地。',
+  b:['内含荡魂山。','方源在此贩卖胆识蛊起家。'],
+  rel:['定仙游','荡魂山','天梯山'],src:'原著明确'},
+ {id:'p_wangting',n:'王庭福地',s:'北原十年一度的避难所',g:'福地',
+  d:'巨阳仙尊所设，王庭争霸的胜者方可进入避难并继承真阳楼机缘。十年大雪灾来临时，它是北原各部族生死攸关的入口。',
+  b:['与八十八角真阳楼相连。','方源曾扶持黑楼兰夺取名额并混入其中。'],
+  rel:['八十八角真阳楼','黑楼兰','王庭争霸'],src:'原著明确'},
+ {id:'p_yitianshan',n:'义天山',s:'影宗与天庭的赌局',g:'南疆要地',
+  d:'南疆义天山，影宗十万年积累与天庭在此决战。幽魂本体跨出生死门，以十绝仙僵大阵炼制至尊仙胎蛊，最终被方源截胡。',
+  b:['全书最重要的转折之一。','天意借方源之手除幽魂，方源却反手夺舍仙胎。'],
+  rel:['至尊仙胎蛊','影宗','天庭'],src:'原著明确'},
+ {id:'p_qingmao',n:'青茅山',s:'方源重生之地',g:'南疆山寨',
+  d:'南疆青茅山，古月山寨所在，邻近白家寨与熊家寨。方源前世五百年后借春秋蝉重生回十五岁开窍大典，故事由此开始。',
+  b:['古月一代尸变、血祭全族的终局发生于此。','白凝冰自爆冰封群山。'],
+  rel:['古月方源','白凝冰','古月山寨'],src:'原著明确'},
+ {id:'p_sancha',n:'三叉山',s:'三王传承与仙前炼蛊',g:'南疆要地',
+  d:'三王传承出世之地，犬王、信王、霸王三道传承引来五域四五转强者云集。方源在此于群强环伺下当场炼成定仙游。',
+  b:['定仙游炼成后跨域直达天梯山。','三王传承外围争夺是游戏中的重要事件。'],
+  rel:['定仙游','三王传承'],src:'原著明确'},
+ {id:'p_baigu',n:'白骨山',s:'灰骨才子传承',g:'南疆要地',
+  d:'方源早期与白凝冰同行所至之地，夺取灰骨才子的白骨传承，炼成白骨肉生蛊。',
+  b:['骨道传承的代表地点。'],
+  rel:['白骨肉生蛊','骨道'],src:'原著明确'},
+ {id:'p_shangliang',n:'商量山',s:'南疆商贸圣地',g:'南疆要地',
+  d:'商家经营的商贸中心，规矩森严，凡人与蛊仙皆可自由买卖。方源曾在此演武场百战百胜，赢得身价与紫荆令牌。',
+  b:['商家的大本营。','商心慈与商队线的核心地点。'],
+  rel:['商家','商心慈'],src:'原著明确'},
+ {id:'p_tianti',n:'天梯山',s:'狐仙福地所在',g:'中洲要地',
+  d:'中洲天梯山，狐仙福地所在。方源以定仙游跨域而至，从此在中洲扎根。',
+  b:['与三叉山形成空间跳跃的关键节点。'],
+  rel:['狐仙福地','定仙游'],src:'原著明确'},
+ {id:'p_daxueshan',n:'大雪山福地',s:'雪胡老祖的根基',g:'北原福地',
+  d:'北原八转魔仙雪胡老祖的福地。逆流河重现人间与雪胡老祖炼蛊、马鸿运事件相关。',
+  b:['逆流河出世的重要背景地点。'],
+  rel:['雪胡老祖','逆流河'],src:'原著明确'},
+ {id:'p_langya',n:'琅琊福地',s:'毛民炼道底蕴',g:'福地',
+  d:'长毛老祖与琅琊地灵一脉的福地，蕴藏毛民炼道传承。方源吞并琅琊福地后，尽收其炼道底蕴。',
+  b:['长毛老祖与琅琊地灵须分开看待。','方源炼道大成的重要基础。'],
+  rel:['长毛老祖','琅琊地灵','炼道'],src:'原著明确'},
+ {id:'p_lanlong',n:'蓝龙鲸洞天',s:'乐土一脉洞天',g:'洞天',
+  d:'乐土仙尊一脉的洞天，内有镇魔悔哭海。相关封魔传闻与悔蛊、人道传承相系。',
+  b:['镇魔悔哭海位于洞天之内，不可泛化为凡人海域普遍异象。'],
+  rel:['乐土仙尊','镇魔悔哭海','悔蛊'],src:'原著明确'},
+ {id:'p_zhenmo',n:'镇魔悔哭海',s:'蓝龙鲸洞天内的封魔之海',g:'洞天秘境',
+  d:'位于蓝龙鲸洞天的封魔海域，与乐土一脉镇压魔道、悔蛊人道传承相关。',
+  b:['相关传说不可外溢为五域海域普遍现象。'],
+  rel:['蓝龙鲸洞天','乐土仙尊','悔蛊'],src:'原著明确'},
+ {id:'p_qinggui',n:'青鬼沙漠',s:'幽魂灭青家的余痕',g:'南疆绝地',
+  d:'幽魂魔尊年轻时灭青家满门，留下青鬼沙漠与青仇。青家已灭族，后世不得再写青家原族群延续。',
+  b:['青仇与青家遗藏、豆神宫存在原著线索关联。'],
+  rel:['幽魂魔尊','青仇'],src:'原著明确'},
+ {id:'p_kongmen',n:'空门',s:'盗天的归乡之门',g:'世界边界',
+  d:'盗天魔尊毕生追寻的世界屏障薄弱处，他相信穿过空门便可回到故乡。遁空蛊虽炼成，仍未真正打开归途。',
+  b:['盗天的执念所在。','与乾坤晶壁勘探世界壁垒相关。'],
+  rel:['盗天魔尊','遁空蛊','乾坤晶壁'],src:'原著明确'}
+];
+/* ── 九、人物 ─────────────────────────────────────────────────── */
+CANON_CODEX.entries.person=[
+ {id:'n_fangyuan',n:'古月方源',s:'天外之魔，炼天魔尊',g:'当代主角',
+  d:'前世为地球穿越者，在蛊界以魔道之身挣扎五百年，寿尽前炼成春秋蝉重生回青茅山十五岁。此后以极冷酷的理性与惊人耐心，一步步夺取至尊仙胎、掀翻天庭、捏碎宿命，最终登临九转。',
+  b:['道心：求道永生，不为善恶所动。','马甲：常山阴、气海老祖、吴帅、梦求真、大爱仙尊等。','第一世与第二世严格分段：第一世止于春秋蝉催动，第二世重回青茅山。'],
+  rel:['春秋蝉','至尊仙胎蛊','大爱盟'],src:'原著明确'},
+ {id:'n_bainingbing',n:'白凝冰',s:'北冥冰魄体，纯粹的精彩',g:'南疆',
+  d:'青茅山白家寨少主，十绝体之一的北冥冰魄体。生性骄傲、好战而纯粹，追求“精彩”的人生。与方源从敌对到长期纠缠，曾被阴阳转生蛊转为女身。',
+  b:['青茅山终局自爆冰封群山。','与方源的合作始终带着算计与默契。'],
+  rel:['青茅山','北冥冰魄体','阴阳转生蛊'],src:'原著明确'},
+ {id:'n_fengjiuge',n:'凤九歌',s:'八转音道，红尘情义',g:'中洲',
+  d:'中洲音道八转蛊仙，重情重义、风流洒脱。宿命大战中唱响命运歌，成为击碎宿命的关键力量之一。',
+  b:['音道体系：九曲天籁。','与方源亦敌亦友。'],
+  rel:['命运歌','九曲天籁'],src:'原著明确'},
+ {id:'n_shangxinci',n:'商心慈',s:'商家血脉，赤子之心',g:'南疆',
+  d:'商家嫡系，天性善良、重视情义。方源早年以凡人身份与之相识，留下复杂因果。',
+  b:['商量山与商队线的重要人物。','其善意与方源的冷酷形成鲜明对照。'],
+  rel:['商家','商量山'],src:'原著明确'},
+ {id:'n_shangya',n:'商睚',s:'商家掌权者',g:'南疆',
+  d:'商家高层，精于商贸与权谋，执掌商量山秩序，是南疆商业势力的代表。',
+  b:['商家以规矩与商贸立族。'],
+  rel:['商家','商量山'],src:'原著明确'},
+ {id:'n_wuyong',n:'武庸',s:'南疆枭雄，隐忍数百年',g:'南疆·八转',
+  d:'南疆武家家主，八转风道蛊仙。外表平庸、实则城府极深，隐忍数百年后一举展露锋芒，以清风剪与风声鹤唳威震五域。',
+  b:['镇族之宝：玉清滴风小竹楼。','与方源既有合作也有博弈。'],
+  rel:['武家','清风剪','玉清滴风小竹楼'],src:'原著明确'},
+ {id:'n_longgong',n:'龙公',s:'天庭脊梁，气道柱石',g:'中洲·八转',
+  d:'天庭八转气道蛊仙，忠于天庭三百万年道统。宿命大战中明知不可为而为之，以三气归来撑起天庭最后的尊严。',
+  b:['气道绝顶，气盖山河。','其忠勇与方源的冷酷形成对照。'],
+  rel:['天庭','气道','三气归来'],src:'原著明确'},
+ {id:'n_zishan',n:'紫山真君',s:'影宗真传，绝唱托孤',g:'影宗·八转',
+  d:'影宗八转智道蛊仙，一生为影宗传承奔走。临终前将影宗真传托付方源，成就全书最悲壮的传承绝唱之一。',
+  b:['智道造诣极高。','“恭送紫山真君”为名场面。'],
+  rel:['影宗','智道'],src:'原著明确'},
+ {id:'n_heiloulan',n:'黑楼兰',s:'大力真武体，北原女杰',g:'北原',
+  d:'北原黑家出身，十绝体之一的大力真武体。性格豪爽刚烈，与方源多次合作，参与破坏八十八角真阳楼。',
+  b:['力道天赋绝顶。','王庭争霸的重要参与者。'],
+  rel:['大力真武体','八十八角真阳楼','王庭福地'],src:'原著明确'},
+ {id:'n_dongfang',n:'东方长凡',s:'智道大能，长凡不凡',g:'北原·八转',
+  d:'北原东方家出身，智道八转蛊仙。心思深沉、算无遗策，是北原运道与智道交织格局中的关键人物。',
+  b:['“武庸不庸，长凡不凡”为读者名评。'],
+  rel:['智道','东方家'],src:'原著明确'},
+ {id:'n_tieruonan',n:'铁若男',s:'铁家执法者',g:'南疆',
+  d:'南疆铁家的重要人物，性情刚正、嫉恶如仇，以捕盗除魔为志，与方源的魔道行径天然对立。',
+  b:['铁家以铁血楼与律道手段闻名。'],
+  rel:['铁家','铁血楼'],src:'原著明确'},
+ {id:'n_guyuefangzheng',n:'古月方正',s:'方源的族弟',g:'南疆',
+  d:'古月山寨同辈，资质与心性皆属上乘，是方源在凡俗亲缘中少数仍存纠葛的人物。',
+  b:['青茅山血祭终局中的关键见证者。'],
+  rel:['青茅山','古月山寨'],src:'原著明确'},
+ {id:'n_guyueqingshu',n:'古月青书',s:'古月一族长辈',g:'南疆',
+  d:'古月山寨家老，掌管族务，是方源早期在族中周旋的重要对象。',
+  b:['其生死与青茅山终局相关。'],
+  rel:['青茅山','古月山寨'],src:'原著明确'},
+ {id:'n_jiajinsheng',n:'贾金生',s:'青茅山商队掌柜',g:'南疆',
+  d:'往来青茅山的商队掌柜，精于算计。方源重生初期与其打交道，谋取酒虫与元石。',
+  b:['方源早期资源积累的对手与踏板。'],
+  rel:['青茅山','酒虫'],src:'原著明确'},
+ {id:'n_mahongyun',n:'马鸿运',s:'北原气运之子',g:'北原',
+  d:'北原马家少年，身负惊人鸿运。其气运引来雪胡老祖等强者的觊觎，成为逆流河事件的重要引线。',
+  b:['巨阳仙尊运道布局的余波。'],
+  rel:['大雪山福地','运道','雪胡老祖'],src:'原著明确'},
+ {id:'n_xuehu',n:'雪胡老祖',s:'北原八转魔仙',g:'北原·八转',
+  d:'北原八转冰道蛊仙，大雪山福地之主。为夺马鸿运气运与逆流河机缘出手，是逆流河之战的主要强敌之一。',
+  b:['逆流河一战的对手。'],
+  rel:['大雪山福地','逆流河'],src:'原著明确'},
+ {id:'n_changmao',n:'长毛老祖',s:'毛民炼道之祖',g:'炼道·八转',
+  d:'毛民出身的炼道八转蛊仙，炼道造诣冠绝古今，曾参与炼制八十八角真阳楼，晚年试图补全炼海秘境。',
+  b:['与琅琊地灵是不同存在，不可混同。','其炼道手段与《人祖传》隔绝炼法相承。'],
+  rel:['炼道','炼海','八十八角真阳楼'],src:'原著明确'},
+ {id:'n_langya',n:'琅琊地灵',s:'琅琊福地的地灵',g:'地灵',
+  d:'琅琊福地的地灵，承继毛民炼道传承。地灵不是长毛老祖本人，须与老祖分开登记。',
+  b:['方源吞并琅琊福地后得其炼道底蕴。'],
+  rel:['琅琊福地','长毛老祖'],src:'原著明确'},
+ {id:'n_wushuai',n:'吴帅',s:'龙人始祖，龙宫之主',g:'中古',
+  d:'中古龙人始祖，为对抗天庭清洗而筑龙宫。后与方源达成合作，统御两天异人，成为方源的重要助力。',
+  b:['掌梦里轻烟与龙宫。','异人统御体系的代表人物。'],
+  rel:['龙宫','梦里轻烟','异人'],src:'原著明确'},
+ {id:'n_qihai',n:'气海老祖',s:'东海的方源马甲',g:'东海·八转',
+  d:'方源以气海为根基经营的马甲身份，坐拥东海气海，整合散修与异人势力，在五域格局中举足轻重。',
+  b:['气道八转级战力。','与天庭、长生天均有交易往来。'],
+  rel:['气海','东海','寿蛊'],src:'原著明确'},
+ {id:'n_changshanyin',n:'常山阴',s:'狼王马甲',g:'马甲',
+  d:'方源早期使用的狼王身份，以奴道驭使狼群，在北原与南疆边地活动。',
+  b:['方源多马甲体系的开端之一。'],
+  rel:['奴道','古月方源'],src:'原著明确'},
+ {id:'n_mengqiuzhen',n:'梦求真',s:'方源的梦道分身',g:'马甲·梦道',
+  d:'方源以梦道手段塑造的分身身份，修习梦道、经营梦境传承，是方源窥探梦道与后世布局的重要棋子。',
+  b:['纯梦求真体相关。','掌引魂入梦等梦道手段。'],
+  rel:['梦道','引魂入梦','纯梦求真体'],src:'原著明确'},
+ {id:'n_xuehai',n:'血海老祖',s:'巨阳死后的血道分身',g:'近古·八转',
+  d:'巨阳仙尊死后若干年才发展起来的血道分身，以血道横行一时。时间上不得早于巨阳在世。',
+  b:['血神子源于血海老祖。','血道被正魔两道共同忌惮。'],
+  rel:['血道','血神子','巨阳仙尊'],src:'原著明确'},
+ {id:'n_boqing',n:'薄青',s:'五域剑道第一仙',g:'近古后段·八转',
+  d:'中洲薄家一脉的剑道八转蛊仙，号称五域剑道第一仙。留下五指拳心剑、剑痕索命等剑道真传。',
+  b:['光阴飞刃与薄家梦境传承相关，非红莲所创。','时间属近古后段，不可提前到红莲时期。'],
+  rel:['剑道','五指拳心剑','剑痕索命'],src:'原著明确'},
+ {id:'n_moyao',n:'墨瑶',s:'薄青一脉相关人物',g:'近古后段',
+  d:'与薄青、薄家剑道传承相关的重要人物，属近古后段时间线。',
+  b:['不可提前至红莲时期。'],
+  rel:['薄青','剑道'],src:'原著明确'},
+ {id:'n_baiqing',n:'白晴',s:'白家相关人物',g:'南疆',
+  d:'青茅山白家一脉人物，与白凝冰的家族线相关。',
+  b:['其命运服从青茅山终局。'],
+  rel:['白凝冰','青茅山'],src:'原著明确'},
+ {id:'n_fengjinhuang',n:'凤金煌',s:'凤九歌相关后辈',g:'中洲',
+  d:'与凤九歌一脉相关的中洲后辈人物，承继音道与中洲人脉。',
+  b:['音道传承的延续者之一。'],
+  rel:['凤九歌','音道'],src:'原著明确'},
+ {id:'n_qingchou',n:'青仇',s:'青家遗孤',g:'南疆',
+  d:'幽魂魔尊灭青家后留下的遗孤，与青家遗藏、豆神宫存在原著线索关联，是幽魂线的重要因果。',
+  b:['青家已被灭族，不可写其原族群延续。'],
+  rel:['幽魂魔尊','青鬼沙漠','豆神宫'],src:'原著明确'},
+ {id:'n_luweiyn',n:'陆畏因',s:'乐土真传承接者',g:'后世·南疆',
+  d:'后世南疆承接乐土真传的人物，并非乐土仙尊同时代人。',
+  b:['不可写成乐土时期已与玩家同行。'],
+  rel:['乐土仙尊','五域真传'],src:'原著明确'},
+ {id:'n_huangtian',n:'黄天道君',s:'宝黄天之主',g:'天穹',
+  d:'太古黄天道君，将黄天核心与自身仙窍相融，炼成超然世外的宝黄天，立下宝光交易规则。',
+  b:['宝黄天不插手五域争霸。'],
+  rel:['宝黄天'],src:'原著明确'},
+ {id:'n_guyueyidai',n:'古月一代',s:'青茅山尸变之祖',g:'南疆',
+  d:'古月山寨的初代强者，死后化为尸变之祸。方源借其尸变之乱发动血祭，彻底改写青茅山格局。',
+  b:['青茅山血色终局的核心。'],
+  rel:['青茅山','血颅蛊'],src:'原著明确'}
+];
+
+/* ── 十、势力 ─────────────────────────────────────────────────── */
+CANON_CODEX.entries.faction=[
+ {id:'f_tianting',n:'天庭',s:'中洲霸主，三百万年道统',g:'超级势力',
+  d:'原始仙尊创立、星宿仙尊合道守护的人族最高道统。以监天塔与宿命蛊为核心，统御中洲十大古派，长期以天意制衡天下魔尊。',
+  b:['核心：监天塔、宿命蛊、气道底蕴、人道底牌。','宿命大战后被方源攻破，宿命蛊被毁。','代表：龙公、紫山真君（影宗出身）等。'],
+  rel:['监天塔','宿命蛊','中洲十大古派'],src:'原著明确'},
+ {id:'f_shidapai',n:'中洲十大古派',s:'天庭羽翼',g:'超级势力',
+  d:'中洲最顶尖的十个宗门，受天庭节制又各有传承，是人族正统秩序的执行者。',
+  b:['涵盖智道、律道、剑道、音道等多派。','与天庭互为表里。'],
+  rel:['天庭','中洲'],src:'原著明确'},
+ {id:'f_changshengtian',n:'长生天',s:'北原黄金圣地',g:'超级势力',
+  d:'巨阳仙尊所创九转洞天，北原黄金血脉的圣地与权力中枢。以运道与真阳楼体系统御北原诸部。',
+  b:['核心：八十八角真阳楼、镇运天宫。','黄金家族共治。'],
+  rel:['巨阳仙尊','八十八角真阳楼','镇运天宫'],src:'原著明确'},
+ {id:'f_huangjin',n:'黄金家族',s:'北原王庭血脉',g:'统治集团',
+  d:'黑、刘、耶律、马、东方、努尔等家族共掌北原，凭黄金血脉享有真阳楼机缘与王庭特权。',
+  b:['十年大雪灾与王庭争霸是其制度核心。','血脉不等于血道。'],
+  rel:['长生天','王庭福地','黑楼兰'],src:'原著明确'},
+ {id:'f_wujia',n:'武家',s:'南疆第一家族',g:'超级势力',
+  d:'南疆最强家族之一，以风道与雷道见长，家主武庸隐忍深沉。镇族之宝为玉清滴风小竹楼。',
+  b:['武庸、清风剪、风声鹤唳。'],
+  rel:['武庸','玉清滴风小竹楼'],src:'原著明确'},
+ {id:'f_shangjia',n:'商家',s:'南疆商贸巨族',g:'超级势力',
+  d:'以商贸与规矩立族，经营商量山，是南疆经济命脉的掌控者之一，与各方势力保持交易往来。',
+  b:['商心慈、商睚。','商量山为商贸圣地。'],
+  rel:['商心慈','商量山'],src:'原著明确'},
+ {id:'f_tiejia',n:'铁家',s:'南疆执法世家',g:'超级势力',
+  d:'南疆以捕盗除魔、律道与金道见长的家族，铁血楼是其标志性仙蛊屋。',
+  b:['铁若男。'],
+  rel:['铁若男','铁血楼'],src:'原著明确'},
+ {id:'f_chijia',n:'池家',s:'南疆阵道世家',g:'大族',
+  d:'南疆擅长阵道的家族，以仙阵勾连地脉、以微力撬动天地，是守御与布阵的行家。',
+  b:['阵道代表势力。'],
+  rel:['阵道'],src:'原著明确'},
+ {id:'f_fangjia',n:'房家',s:'西漠仙蛊屋世家',g:'超级势力',
+  d:'西漠最强家族之一，精于仙蛊屋炼制与围猎战法，拥有问津坞、沉泥宫、落英馆等成套战争堡垒。',
+  b:['仙蛊屋群作战的代表。'],
+  rel:['问津坞','沉泥宫','落英馆'],src:'原著明确'},
+ {id:'f_yingzong',n:'影宗',s:'幽魂死后分魂所建',g:'隐秘势力',
+  d:'幽魂魔尊死后，七名分魂越过逆流河创建的隐秘组织，继承魂道与至尊仙胎的十万年布局。紫山真君为其重要人物。',
+  b:['影宗是幽魂死后势力，非其生前所建。','义天山之战后元气大伤。','“影宗余烬”只能作为历史回响。'],
+  rel:['幽魂魔尊','紫山真君','义天山'],src:'原著明确'},
+ {id:'f_jiangmeng',n:'僵盟',s:'仙僵互助组织',g:'隐秘势力',
+  d:'由仙僵组成的松散联盟，互通情报、互相庇护，在正道的夹缝中生存。',
+  b:['方源化僵时期曾与僵盟打交道。'],
+  rel:['仙僵','借道死蛊'],src:'原著明确'},
+ {id:'f_langya',n:'琅琊派',s:'毛民炼道传承',g:'福地势力',
+  d:'以琅琊福地为核心的毛民炼道势力，掌握天地炼法与大量炼道传承。',
+  b:['长毛老祖与琅琊地灵分属不同存在。','后被方源吞并。'],
+  rel:['琅琊福地','长毛老祖','炼道'],src:'原著明确'},
+ {id:'f_daai',n:'大爱盟',s:'方源当代的天下联盟',g:'超级势力',
+  d:'方源以“大爱仙尊”之名建立的联盟体系，整合东海、异人、散修与部分中洲势力，表面倡导互利共生，实则服务于其炼道与永生布局。',
+  b:['对外名号：大爱仙尊。','统御异人、经营炼海与人海。'],
+  rel:['古月方源','气海老祖','吴帅'],src:'原著明确'},
+ {id:'f_yiren',n:'异人势力',s:'毛民、石人、雪人、鲛人等',g:'族群势力',
+  d:'五域两天中的非人族群，长期受人族压制。毛民擅炼道，石人擅筑造，雪人擅冰道，鲛人擅水道，各自拥有独特传承。',
+  b:['吴帅统御两天异人。','方源以异人构建仙窍内循环与军团。'],
+  rel:['吴帅','毛民','至尊仙窍'],src:'原著明确'},
+ {id:'f_letu',n:'乐土真传',s:'五域仁善道统',g:'传承势力',
+  d:'乐土仙尊留下的五域真传体系，以仁善、和平与济世为核，后世由陆畏因等承接。',
+  b:['与乐土仙尊本人须区分时代。'],
+  rel:['乐土仙尊','陆畏因'],src:'原著明确'}
+];
+/* ── 十一、大事战役 ───────────────────────────────────────────── */
+CANON_CODEX.entries.event=[
+ {id:'v_yuangu',n:'人族崛起与天庭创立',s:'从异人奴役到人族正统',g:'太古',
+  d:'原始仙尊率人族挣脱异人奴役，开创开窍法与仙凡体系，建立天庭。自此人族成为五域主体，天庭成为三百万年的人族道统象征。',
+  b:['原始仙尊为第一尊。','星宿仙尊继位后以身合天道，长期扭曲天意护佑人族。'],
+  rel:['原始仙尊','星宿仙尊','天庭'],src:'原著明确'},
+ {id:'v_sanbaiwan',n:'三百万年尊者史',s:'十一尊隔世博弈',g:'通史',
+  d:'十一位九转尊者前后相继，以真传、意志与后手跨越数十万年相互角力。每一尊的陨落都不是终点，而是下一场棋局的开始。',
+  b:['太古：原始、星宿。','远古：无极、狂蛮、红莲。','中古：元莲、盗天、巨阳。','近古：幽魂、乐土。','当代：炼天（方源）。'],
+  rel:['十一尊者'],src:'原著明确'},
+ {id:'v_kuangman',n:'狂蛮毁天',s:'轰碎赤橙黄三天',g:'远古',
+  d:'狂蛮魔尊以变化道与力道轰碎太古赤、橙、黄三天，天穹自此残缺，残片坠入凡间化为福地与绝地。',
+  b:['黄天核心后被炼成宝黄天。','九天只余白天与黑天完整轮转。'],
+  rel:['狂蛮魔尊','太古九天','宝黄天'],src:'原著明确'},
+ {id:'v_honglian',n:'红莲击碎宿命一角',s:'以宙道逆天',g:'远古',
+  d:'红莲魔尊在无数次回溯中看破宿命，以春秋蝉与宙道之力击碎宿命蛊一角，为后世彻底毁蛊埋下伏笔。',
+  b:['红莲真传藏于宙河石莲岛。','其反抗源于挚爱、双亲与师尊被宿命所夺。'],
+  rel:['红莲魔尊','春秋蝉','宿命蛊'],src:'原著明确'},
+ {id:'v_yingzong',n:'影宗十万年布局',s:'幽魂死后的仙胎之谋',g:'近古',
+  d:'幽魂魔尊死后，本体残魂沉于生死门，七名分魂越过逆流河建立影宗，以十万年时间收集十绝仙僵，欲炼制九转至尊仙胎蛊使其复活。',
+  b:['影宗是幽魂死后势力。','义天山之战为布局终章。'],
+  rel:['幽魂魔尊','影宗','至尊仙胎蛊'],src:'原著明确'},
+ {id:'v_qingmao',n:'青茅山血色终局',s:'血祭全族，春秋蝉重生',g:'南疆',
+  d:'方源借古月一代尸变之乱，以血颅蛊血祭全寨，将丙等资质淬至甲等。随后在绝境中催动春秋蝉，自爆肉身重生回十五岁开窍大典。',
+  b:['第一世的终点与第二世的起点。','白凝冰自爆冰封群山。','玩家不是方源，不自动获得其身份与记忆。'],
+  rel:['青茅山','血颅蛊','春秋蝉'],src:'原著明确'},
+ {id:'v_sancha',n:'三叉山仙前炼蛊',s:'群强环伺，当场成蛊',g:'南疆',
+  d:'三王传承出世，五域四五转强者云集。方源在群强环伺下当场炼成六转定仙游，随即跨域遁走，震动天下。',
+  b:['定仙游炼成是方源战略机动的起点。','随后夺取狐仙福地与荡魂山。'],
+  rel:['三叉山','定仙游','狐仙福地'],src:'原著明确'},
+ {id:'v_niliu',n:'逆流河之战',s:'七转硬撼八转',g:'北原',
+  d:'逆流河重现人间，雪胡老祖等八转强者为夺机缘云集。方源以七转之身肉身渡河，凭逆流护身印硬抗群强轰击，威震五域。',
+  b:['马鸿运气运为事件引线。','方源自此奠定“逆流”之名。'],
+  rel:['逆流河','逆流护身印','雪胡老祖'],src:'原著明确'},
+ {id:'v_zhenyang',n:'真阳楼倾覆',s:'北原黄金掠夺机崩塌',g:'中古遗产·当代',
+  d:'方源联合黑楼兰潜入王庭福地，破坏八十八角真阳楼的楼心阵眼，令这座屹立数万年的黄金掠夺机彻底倒塌。',
+  b:['巨阳意志与真阳楼后手被触发。','方源在绝境中服下借道死蛊化为仙僵逃生。'],
+  rel:['八十八角真阳楼','黑楼兰','借道死蛊'],src:'原著明确'},
+ {id:'v_yitianshan',n:'义天山截胡仙胎',s:'天意与魔尊的互算',g:'南疆',
+  d:'影宗以十万年积累与十绝仙僵在义天山炼制至尊仙胎蛊，天庭来攻，幽魂本体跨出生死门。最终天意借方源之手重创幽魂，方源却反手夺舍仙胎。',
+  b:['全书最重要转折之一。','方源从此拥有无冲突之体。'],
+  rel:['义天山','至尊仙胎蛊','幽魂魔尊'],src:'原著明确'},
+ {id:'v_suming',n:'宿命大战',s:'捏碎宿命，五域改天',g:'当代',
+  d:'方源联合北原、东海、异人与部分中洲势力进攻天庭。凤九歌唱响命运歌，龙公以三气归来做最后一搏，最终方源登临监天塔，捏碎九转宿命蛊。',
+  b:['宿命蛊被毁，五域界壁随之渐消。','天庭三百万年道统遭受根本动摇。','界壁消融发生在宿命蛊被毁之后。'],
+  rel:['监天塔','宿命蛊','凤九歌','龙公'],src:'原著明确'},
+ {id:'v_fengmo',n:'疯魔窟终局',s:'三尊鼎立，乐土陨落',g:'当代',
+  d:'星宿、巨阳借疯魔窟后手复生，与方源在第九层争夺原初境与永生之机。乐土欲转修天道，被方源背刺，道痕与积累尽数被吞。方源登临九转，与星宿、巨阳三尊并立。',
+  b:['无极魔尊的永生局早已失败道消。','原初境为流派境界的关键筹码。','三尊鼎立是大时代的新格局。'],
+  rel:['疯魔窟','原初境','乐土仙尊','星宿仙尊','巨阳仙尊'],src:'原著明确'},
+ {id:'v_wangting',n:'王庭争霸',s:'十年一度的北原生死局',g:'北原',
+  d:'每逢十年大雪灾，北原各部族争夺进入王庭福地的名额。胜者可得真阳楼机缘与避难权，败者部族覆灭。',
+  b:['黄金血脉享有特权。','方源曾扶持黑楼兰参与其中。'],
+  rel:['王庭福地','八十八角真阳楼','黑楼兰'],src:'原著明确'},
+ {id:'v_langya',n:'吞并琅琊',s:'炼道底蕴尽归方源',g:'当代',
+  d:'方源以谋划与武力吞并琅琊福地，尽收毛民炼道传承，为其日后炼道成尊与完善炼海打下根基。',
+  b:['长毛老祖与琅琊地灵分属不同存在。'],
+  rel:['琅琊福地','长毛老祖','炼道'],src:'原著明确'}
+];
+
+/* ── 十二、人祖传 ─────────────────────────────────────────────── */
+CANON_CODEX.entries.legend=[
+ {id:'l_zonggang',n:'《人祖传》总纲',s:'蛊界最早的道与寓言',g:'典籍',
+  d:'《人祖传》是蛊界流传最广的古老典籍，以人祖的旅程讲述力量、智慧、规矩、希望、爱、自我等命题，几乎每一篇都对应一种大道真意。',
+  b:['是全书的哲学总纲。','诸多秘境与蛊虫的典故源出于此。','不同势力对其解读各异。'],
+  rel:['人祖','希望蛊','态度蛊','逆流河'],src:'原著明确'},
+ {id:'l_renzu',n:'人祖',s:'人族之始',g:'神话',
+  d:'人祖是传说中人族的起点，孤身行走于蛮荒，与天地万灵周旋。他的每一次选择都化作后世的一条大道。',
+  b:['其子女对应十绝体与十种大道倾向。','人祖并非全知全能，常在欲望与代价间挣扎。'],
+  rel:['人祖十子','十绝体'],src:'原著明确'},
+ {id:'l_shizi',n:'人祖十子',s:'十绝体的神话原型',g:'神话',
+  d:'人祖育有十名子女，各自象征一种极端禀赋，对应现世的十绝体：太日阳莽、古月阴荒、北冥冰魄、森海轮回、炎煌雷泽、万金妙华、大力真武、逍遥智心、厚土元央、宇宙大衍。',
+  b:['十绝体修行极快，却有爆窍之厄。','十绝体仙窍是炼制至尊仙胎蛊的材料。'],
+  rel:['十绝体','人祖'],src:'原著明确'},
+ {id:'l_guiju',n:'规矩与希望',s:'先立规矩，再存希望',g:'寓言',
+  d:'人祖在绝境中先得规、矩，学会立身行事的分寸；又在最深的黑暗中得到一点希望。没有规矩则混乱，没有希望则灭亡。',
+  b:['规矩蛊与希望蛊的典故出处。','律道与开窍仪式皆可追溯于此。'],
+  rel:['规矩蛊','希望蛊','律道'],src:'原著明确'},
+ {id:'l_liliang',n:'力量与智慧',s:'超凡的代价',g:'寓言',
+  d:'人祖吞下力量蛊，获得撕碎万物的神力，却失去青春；又借智慧蛊获得无穷智计，却要付出寿元。力量与智慧都不是免费的。',
+  b:['力量蛊吞噬青春，智慧蛊消耗寿命。','方源在仙僵时期才得以无代价使用智慧蛊。'],
+  rel:['力量蛊','智慧蛊'],src:'原著明确'},
+ {id:'l_taidu',n:'态度的面具',s:'人前之相，人后之心',g:'寓言',
+  d:'人祖戴上面具，以不同态度示人，逐渐分不清哪一张才是真正的自己。态度蛊由此而来，可伪装表情、气息与神魂。',
+  b:['态度蛊为八转人道奇蛊。','隐喻身份与伪装的主题。'],
+  rel:['态度蛊','人道'],src:'原著明确'},
+ {id:'l_niliu',n:'逆流河',s:'背子渡河，功亏一篑',g:'寓言',
+  d:'人祖背负子女逆流而上，河水越近源头阻力越强。他在最后关头力竭，功亏一篑。逆流河因此成为意志与坚持的试炼。',
+  b:['唯有纯粹肉身与意志可渡。','方源以五百年执念走完了人祖未竟之路。'],
+  rel:['逆流河','坚持蛊'],src:'原著明确'},
+ {id:'l_ai',n:'爱与宿命',s:'宿命被爱情所伤',g:'寓言',
+  d:'人祖传记载，宿命坚不可摧，却会被爱所伤。爱蛊因此成为少数能伤及宿命蛊的存在，代价则由所爱之人承担。',
+  b:['爱蛊只寄宿于自愿者。','催动代价随机抽取容貌、寿命、器官或亲情。'],
+  rel:['爱蛊','宿命蛊'],src:'原著明确'},
+ {id:'l_ziwo',n:'自我蛊',s:'我是谁',g:'寓言',
+  d:'人祖最终面对“自我”之问。自我蛊象征对本心的确认：唯有认清自己，才能不被力量、智慧与态度所吞噬。',
+  b:['与态度面具篇互为表里。','是全书道心主题的收束。'],
+  rel:['人祖','态度蛊'],src:'原著明确'},
+ {id:'l_shijing',n:'市井',s:'井中自有天地',g:'寓言',
+  d:'人祖在市井中见到无数气泡，每一枚气泡都是一方天地，有人安居其中，有人被囚其中。',
+  b:['东海市井秘境的典故来源。'],
+  rel:['市井'],src:'原著明确'},
+ {id:'l_shengsi',n:'生死门',s:'生门与死门',g:'寓言',
+  d:'人祖行至生死门，门外为生，门内为死。生死门因此成为天下亡魂的归宿，也是幽魂魔尊布局之地。',
+  b:['与幽魂残魂、至尊仙胎布局相关。'],
+  rel:['生死门','幽魂魔尊'],src:'原著明确'}
+];
+
+/* ── 十三、语录 ───────────────────────────────────────────────── */
+CANON_CODEX.entries.quote=[
+ {id:'q_gushi',n:'蛊是天地之精，人是万物之灵',s:'蛊界根本之语',g:'总纲',
+  d:'概括蛊界世界观：蛊虫是天地道痕的凝结，人则是能够养蛊、用蛊、炼蛊的万物之灵。',
+  b:['常被用作全书开篇与总纲。'],rel:['养蛊','用蛊','炼蛊'],src:'原著核心语句'},
+ {id:'q_zaosui',n:'早岁已知世事艰',s:'方源一生写照',g:'道心',
+  d:'写尽方源少年即历尽世情、却始终不改求道之志的一生。后半句常被读者续作“大坂长青步步攀”。',
+  b:['体现方源的道心与韧性。'],rel:['古月方源'],src:'原著相关名句'},
+ {id:'q_fengshuang',n:'不过是些许风霜罢了',s:'逆流河上的独白',g:'道心',
+  d:'方源在逆流河中承受万般阻难时的态度：再大的苦厄，也只是求道路上的一点风霜。',
+  b:['与逆流河、坚持蛊主题呼应。'],rel:['逆流河','坚持蛊'],src:'原著相关名句'},
+ {id:'q_zhaowen',n:'朝闻道，夕死可矣',s:'求道者的决绝',g:'道心',
+  d:'蛊界无数蛊仙的真实写照：只要能在有生之年窥见大道，纵死无悔。',
+  b:['典出《论语》，在书中被反复化用。'],rel:['道心'],src:'典籍化用'},
+ {id:'q_tiandi',n:'天地不仁，以万物为刍狗',s:'蛊界的冷酷底色',g:'天道',
+  d:'天道没有善恶，只维护平衡。众生的悲欢在天地眼中并无差别，这正是蛊界残酷的根源。',
+  b:['典出《道德经》，与书中天道观相合。'],rel:['天道','宿命蛊'],src:'典籍化用'},
+ {id:'q_ershichi',n:'二十七步天注定，逆流河上任我行',s:'逆流而上的气魄',g:'道心',
+  d:'流传于读者间的概括之语，写方源在既定宿命前仍选择逆流而行的姿态。',
+  b:['属读者整理流传，非原著逐字原文。'],rel:['逆流河','古月方源'],src:'读者流传（非原文）'},
+ {id:'q_yuyu',n:'郁郁久居人下',s:'不甘与野心',g:'群雄',
+  d:'写尽蛊界群雄不甘屈居人下的野心。乱世之中，无人愿做他人棋子上的一枚棋子。',
+  b:['常被用于形容武庸、东方长凡等枭雄。'],rel:['武庸','东方长凡'],src:'原著相关名句'},
+ {id:'q_yiqu',n:'便一去不回',s:'赴死者的决然',g:'群雄',
+  d:'明知前路九死一生，仍慨然赴之。蛊界从不缺这样的人，也正因如此才有那么多悲壮绝唱。',
+  b:['与紫山真君托孤、龙公死战等场面呼应。'],rel:['紫山真君','龙公'],src:'原著相关名句'}
+];
+
+/* ══ v2.02 典籍扩容：卷目、尊者真传、十绝体、蛊虫、仙蛊屋、势力 ══ */
+
+/* 六卷卷目 */
+CANON_CODEX.entries.event.push(
+ {id:'v_juan1',n:'卷一·青茅山',s:'重生、开窍与血色终局',g:'卷目',
+  d:'方源前世寿尽，催动春秋蝉重生回青茅山十五岁开窍大典。他以凡人身份周旋于古月、白家、熊家之间，借尸变之乱血祭全族，将丙等资质淬至甲等。',
+  b:['核心地点：青茅山、古月山寨、白家寨、熊家寨。','核心人物：白凝冰、古月方正、古月青书、贾金生。','终局：白凝冰自爆冰封群山，方源催动春秋蝉再启轮回。'],
+  rel:['青茅山','白凝冰','春秋蝉'],src:'原著明确'},
+ {id:'v_juan2',n:'卷二·三叉山',s:'三王传承与当场炼蛊',g:'卷目',
+  d:'三王传承出世，五域蛊师云集。方源在群强环伺下当场炼成六转定仙游，跨域遁走，夺取中洲天梯山的狐仙福地与荡魂山。',
+  b:['定仙游是全书战略机动的起点。','狐仙福地内藏荡魂山。','方源开始以胆识蛊在宝黄天积累财富。'],
+  rel:['三叉山','定仙游','狐仙福地','荡魂山'],src:'原著明确'},
+ {id:'v_juan3',n:'卷三·王庭福地',s:'北原真阳楼与黄金血脉',g:'卷目',
+  d:'方源布局北原，扶持黑楼兰参与王庭争霸，潜入王庭福地破坏八十八角真阳楼的楼心阵眼，令这座黄金掠夺机倒塌。',
+  b:['巨阳仙尊的意志与后手被触发。','方源在绝境中服下借道死蛊化为仙僵。','运道、黄金血脉与十年雪灾构成北原格局。'],
+  rel:['八十八角真阳楼','黑楼兰','借道死蛊'],src:'原著明确'},
+ {id:'v_juan4',n:'卷四·义天山',s:'影宗仙胎与截胡',g:'卷目',
+  d:'影宗十万年布局在义天山收网，以十绝仙僵炼制九转至尊仙胎蛊。天庭来攻，幽魂本体跨出生死门，最终方源反手夺舍仙胎。',
+  b:['天意借方源之手重创幽魂，方源却不受摆布。','方源从此拥有无冲突之体。','这是全书最重要的转折。'],
+  rel:['义天山','至尊仙胎蛊','幽魂魔尊'],src:'原著明确'},
+ {id:'v_juan5',n:'卷五·宿命大战',s:'攻破天庭，捏碎宿命',g:'卷目',
+  d:'方源联合北原、东海、异人与部分中洲势力进攻天庭。凤九歌唱响命运歌，龙公以三气归来做最后死战，方源登临监天塔捏碎宿命蛊。',
+  b:['天庭三百万年道统遭受根本动摇。','宿命蛊被毁后五域界壁渐消。'],
+  rel:['宿命大战','监天塔','凤九歌','龙公'],src:'原著明确'},
+ {id:'v_juan6',n:'卷六·疯魔窟',s:'三尊鼎立与永生之局',g:'卷目',
+  d:'星宿、巨阳借后手复生，与方源在疯魔窟第九层争夺原初境与永生之机。乐土欲转修天道，被方源背刺。方源登临九转，三尊并立。',
+  b:['无极魔尊的永生局早已失败道消。','原初境是流派境界的关键筹码。'],
+  rel:['疯魔窟','原初境','乐土仙尊'],src:'原著明确'}
+);
+
+/* 尊者真传 · 后手 */
+CANON_CODEX.entries.event.push(
+ {id:'v_zc_yuanshi',n:'原始真传',s:'气道与天庭制度',g:'尊者真传',
+  d:'原始仙尊留下的气道传承、开窍体系与天庭制度根基，是天庭三百万年气运与仙元储备的来源。',
+  b:['核心：气道本源、仙墓底蕴、天庭旧制。','后世龙公等气道蛊仙承其脉。'],rel:['原始仙尊','天庭','气道'],src:'原著明确'},
+ {id:'v_zc_xingxiu',n:'星宿真传',s:'智道、星道与合道后手',g:'尊者真传',
+  d:'星宿仙尊以智道与星道布局，生前留下飞星棋盘与多手暗棋；死后以身合天道，在漫长岁月中持续影响天意。',
+  b:['飞星棋盘是其标志性造物。','疯魔窟复生后继续操盘。'],rel:['星宿仙尊','飞星棋盘','智道'],src:'原著明确'},
+ {id:'v_zc_wuji',n:'无极真传',s:'律道与疯魔窟九层',g:'尊者真传',
+  d:'无极魔尊将律道推演与永生之局封存于疯魔窟九层，留下规矩、排斥等律道根基，也留下失败的教训。',
+  b:['疯魔窟第八层为棋局与天地熔炉。','第九层为衍生世界中心。'],rel:['无极魔尊','疯魔窟','律道'],src:'原著明确'},
+ {id:'v_zc_kuangman',n:'狂蛮真传',s:'变化道、力道与万兽图腾',g:'尊者真传',
+  d:'狂蛮魔尊留下万兽图腾、变化道与力道传承，强调以肉身与变化硬撼天地，是北原尚武之风的源头之一。',
+  b:['代表杀招：自由残缺变。','图腾火种散落北原。'],rel:['狂蛮魔尊','变化道','力道'],src:'原著明确'},
+ {id:'v_zc_honglian',n:'红莲真传',s:'宙道与石莲岛',g:'尊者真传',
+  d:'红莲魔尊将七转、八转、九转真传藏于宙河石莲岛，唯有春秋蝉持有者可入。前有古人、后有来者、未来身等皆出于此。',
+  b:['天外之魔持悔蛊可触发未来身变体。','红莲真传的核心是反抗宿命。'],rel:['红莲魔尊','石莲岛','未来身'],src:'原著明确'},
+ {id:'v_zc_yuanlian',n:'元莲真传',s:'木道、画道与众生图',g:'尊者真传',
+  d:'元莲仙尊留下天莲派、豆神宫与画道底牌《众生图》。画卷可藏英灵与杀招，在疯魔窟之战中复活中洲历代英灵。',
+  b:['豆神宫与帝君城后合并为神帝城。','木道与画道互为表里。'],rel:['元莲仙尊','豆神宫','众生图'],src:'原著明确'},
+ {id:'v_zc_daotian',n:'盗天真传',s:'偷道十道与归乡执念',g:'尊者真传',
+  d:'盗天魔尊留下十道真传，核心是隐匿、窃取与空间穿梭。他一生所求并非无敌，而是打破世界屏障回家。',
+  b:['代表手段：神不知、鬼不觉。','遁空蛊炼成却未能打开空门。'],rel:['盗天魔尊','遁空蛊','偷道'],src:'原著明确'},
+ {id:'v_zc_juyang',n:'巨阳真传',s:'运道三脉与真阳楼',g:'尊者真传',
+  d:'巨阳仙尊将运道分为自身运、众生运、天地运三脉，以八十八角真阳楼与王庭福地制度统御北原。',
+  b:['代表蛊虫：狗屎运蛊、连运蛊。','黄金血脉不等于血道。'],rel:['巨阳仙尊','八十八角真阳楼','运道'],src:'原著明确'},
+ {id:'v_zc_youhun',n:'幽魂真传',s:'魂道与至尊仙胎布局',g:'尊者真传',
+  d:'幽魂魔尊留下魂道杀伐体系与十万年仙胎之谋。其死后残魂沉于生死门，七名分魂建影宗继续布局。',
+  b:['影宗是死后势力，不可与幽魂在世混同。','义天山一战仙胎被方源截胡。'],rel:['幽魂魔尊','影宗','至尊仙胎蛊'],src:'原著明确'},
+ {id:'v_zc_letu',n:'乐土真传',s:'土道、人道与五域真传',g:'尊者真传',
+  d:'乐土仙尊留下五域真传、蓝龙鲸洞天与镇魔悔哭海，以仁善与和平理念修复幽魂之后的五域。',
+  b:['后世承接者为陆畏因，非同时代人。','疯魔窟中被方源背刺。'],rel:['乐土仙尊','五域真传','蓝龙鲸洞天'],src:'原著明确'},
+ {id:'v_zc_liantian',n:'炼天真传',s:'炼道、炼海与万道兼修',g:'尊者真传',
+  d:'方源以炼道成尊，兼修万道。其传承核心是炼海、至尊仙窍与以交易和炼蛊统御天下的体系。',
+  b:['对外自号大爱仙尊。','炼海为炼道道痕凝聚的终极秘境。'],rel:['炼天魔尊','炼海','大爱盟'],src:'原著明确'}
+);
+
+/* 十绝体 */
+CANON_CODEX.entries.realm.push(
+ {id:'r_tairi',n:'太日阳莽体',s:'人祖长子血脉',g:'十绝体',
+  d:'人祖长子太日阳莽所对应的绝体，兼修宇道与光道，气魄张扬、战力惊人。影宗曾以仙僵之身承载此体。',
+  b:['代表人物：太日阳莽。','与影宗仙僵、义天山布局相关。'],rel:['人祖十子','影宗'],src:'原著明确'},
+ {id:'r_guyue',n:'古月阴荒体',s:'人祖次女血脉',g:'十绝体',
+  d:'人祖次女古月阴荒所对应的绝体，兼修宙道与月道，是古月一族血脉的源头之一。',
+  b:['与古月一族祖血相关。','影无邪初代肉身曾涉及此体。'],rel:['古月一族','人祖十子'],src:'原著明确'},
+ {id:'r_beiming',n:'北冥冰魄体',s:'冰道绝体',g:'十绝体',
+  d:'极寒之体，修炼冰道与水道事半功倍。白凝冰即此体，青茅山终局自爆冰封群山。',
+  b:['代表人物：白凝冰。','若不能在时限内登仙，有爆窍之厄。'],rel:['白凝冰','青茅山'],src:'原著明确'},
+ {id:'r_senhai',n:'森海轮回体',s:'木道绝体',g:'十绝体',
+  d:'生机极盛的木道绝体，体内道痕如森海轮回，恢复与生长之力惊人。',
+  b:['与木道、生机类传承亲和。'],rel:['木道','人祖十子'],src:'原著明确'},
+ {id:'r_yanhuang',n:'炎煌雷泽体',s:'炎雷双绝',g:'十绝体',
+  d:'同时亲和炎道与雷道的绝体，爆发力冠绝十绝，攻伐猛烈但难以久持。',
+  b:['炎雷复合，破坏力极强。'],rel:['炎道','雷道'],src:'原著明确'},
+ {id:'r_wanjin',n:'万金妙华体',s:'金道绝体',g:'十绝体',
+  d:'金道绝体，肉身坚逾金石，锋锐与防御兼备，适合近身硬撼。',
+  b:['与金道、兵道亲和。'],rel:['金道','铁家'],src:'原著明确'},
+ {id:'r_dalizhenwu',n:'大力真武体',s:'力道绝体',g:'十绝体',
+  d:'力道绝体，肉身力量远超同阶。黑楼兰即此体，性格豪烈，力压北原同辈。',
+  b:['代表人物：黑楼兰。','与力道、变化道亲和。'],rel:['黑楼兰','力道'],src:'原著明确'},
+ {id:'r_xiaoyao',n:'逍遥智心体',s:'智道绝体',g:'十绝体',
+  d:'智道绝体，念头运转极快，推演与洞察远超常人，但肉身相对脆弱。',
+  b:['与智道、星道亲和。'],rel:['智道','星宿仙尊'],src:'原著明确'},
+ {id:'r_houtu',n:'厚土元央体',s:'土道绝体',g:'十绝体',
+  d:'土道绝体，根基厚重、防御无双，最擅长久守与稳固仙窍。',
+  b:['与土道、乐土一脉亲和。'],rel:['土道','乐土仙尊'],src:'原著明确'},
+ {id:'r_yuzhou',n:'宇宙大衍体',s:'宇道与宙道双绝',g:'十绝体',
+  d:'同时通晓宇道与宙道的绝体，空间与时间两道兼修，是最接近“宇宙”本义的体质。',
+  b:['与定仙游、春秋蝉等时空仙蛊亲和。'],rel:['宇道','宙道','定仙游'],src:'原著明确'}
+);
+
+/* 蛊虫补充 */
+CANON_CODEX.entries.gu.push(
+ {id:'g_nian',n:'年蛊',s:'宙道计时之蛊',g:'宙道',
+  d:'记载与流转“年”之单位的宙道蛊虫，是万年斗飞车等宙道仙蛊屋的核心组件之一。',
+  b:['与月蛊、日蛊共同构成时间尺度。'],rel:['万年斗飞车','宙道'],src:'原著明确'},
+ {id:'g_yue',n:'月蛊',s:'宙道计时之蛊',g:'宙道',
+  d:'以月为尺的宙道蛊虫，配合年蛊、日蛊可稳定仙蛊屋内外的时间流速。',
+  b:['万年斗飞车的组件。'],rel:['万年斗飞车','宙道'],src:'原著明确'},
+ {id:'g_ri',n:'日蛊',s:'宙道计时之蛊',g:'宙道',
+  d:'以日为尺的宙道蛊虫，三者相合可让仙蛊屋在宙河风浪中保持航向与节律。',
+  b:['万年斗飞车的组件。'],rel:['万年斗飞车','宙道'],src:'原著明确'},
+ {id:'g_qiansi',n:'牵丝蛊',s:'逆流护身印的辅助',g:'律道',
+  d:'将逆流河的规则牵引、编织成护身长袍的辅助蛊虫，是逆流护身印得以成形的关键一环。',
+  b:['与逆流河、坚持意志共同构成护身印。'],rel:['逆流护身印','逆流河'],src:'原著明确'},
+ {id:'g_mengdie',n:'梦蝶蛊',s:'入梦的引路者',g:'梦道',
+  d:'引魂入梦的核心蛊虫，以梦蝶牵引敌方神魂坠入梦境，绕过肉身与道痕防御。',
+  b:['梦道与魂道复合运用的代表。'],rel:['引魂入梦','梦道'],src:'原著明确'},
+ {id:'g_qiyun',n:'气运蛊',s:'运道基础蛊',g:'运道',
+  d:'观测与搬运气运的基础蛊虫，巨阳仙尊运道体系的底层构件，可用于看运、借运与转运。',
+  b:['与连运蛊、狗屎运蛊同属运道。'],rel:['巨阳仙尊','运道'],src:'原著明确'},
+ {id:'g_hundeng',n:'魂灯蛊',s:'照魂之灯',g:'魂道',
+  d:'以魂力点燃的灯蛊，可照见残魂、稳定神魂，也常被用于诱捕或安抚游魂。',
+  b:['幽魂一脉常见手段。'],rel:['幽魂魔尊','魂道'],src:'原著明确'},
+ {id:'g_baohuanglian',n:'天元宝皇莲',s:'六转·仙元之源',g:'木道·资源',
+  d:'天元宝莲升炼至六转后的形态，可产出仙元。凡蛊阶段的天元宝莲只产元石，二者不可混写。',
+  b:['六转宝皇莲产仙元。','元莲仙尊一脉的资源根基。'],rel:['天元宝莲','元莲仙尊'],src:'原著明确'}
+);
+
+/* 仙蛊屋补充 */
+CANON_CODEX.entries.house.push(
+ {id:'h_shendi',n:'神帝城',s:'豆神宫与帝君城合体',g:'八转·木道/画道',
+  d:'豆神宫与帝君城后来合并而成的巨城，兼具木道生机与画道底蕴，是元莲一脉留下的重要遗产。',
+  b:['豆神宫为元莲所创，神帝城是其后来的完成形态。','不可把神帝城提前当作元莲在世时已存在。'],rel:['元莲仙尊','豆神宫','画道'],src:'原著明确'},
+ {id:'h_feixing',n:'飞星棋盘',s:'星宿的智道棋局',g:'八转·智道/星道',
+  d:'星宿仙尊的标志性造物，以星念为子、以天机为盘，可推演大势、布置暗棋。',
+  b:['星宿真传的核心之一。'],rel:['星宿仙尊','星念蛊'],src:'原著明确'},
+ {id:'h_daotianjijia',n:'盗天机甲',s:'天外之魔的战甲',g:'八转·偷道/宇道',
+  d:'盗天魔尊留下的战甲类仙蛊屋，兼具隐匿、空间穿梭与强攻能力，体现其天外工艺思路。',
+  b:['与空绝神甲同属盗天遗产。'],rel:['盗天魔尊','偷道'],src:'原著明确'},
+ {id:'h_doushen',n:'豆神宫',s:'元莲的木道宫殿',g:'八转·木道',
+  d:'元莲仙尊所创的木道仙蛊屋，以三色豆神兵卒结阵，后与帝君城合并为神帝城。',
+  b:['招牌杀招：豆神兵卒。'],rel:['元莲仙尊','神帝城','豆神兵卒'],src:'原著明确'}
+);
+
+/* 势力补充 */
+CANON_CODEX.entries.faction.push(
+ {id:'f_tianlian',n:'天莲派',s:'元莲仙尊所创',g:'超级势力',
+  d:'元莲仙尊创立的木道宗门，后与天庭关系密切，是元莲真传在人间的道统。',
+  b:['以木道、画道为底蕴。','豆神宫为其重要遗产。'],rel:['元莲仙尊','豆神宫'],src:'原著明确'},
+ {id:'f_heijia',n:'黑家',s:'北原黄金家族',g:'大族',
+  d:'北原黄金家族之一，黑楼兰出身于此。家族内部对血脉与战功的取舍长期存在分歧。',
+  b:['黑楼兰参与破坏真阳楼。'],rel:['黑楼兰','长生天'],src:'原著明确'},
+ {id:'f_dongfangjia',n:'东方家',s:'北原黄金家族',g:'大族',
+  d:'北原黄金家族之一，东方长凡出身于此，以智道与运道布局见长。',
+  b:['东方长凡为智道八转。'],rel:['东方长凡','长生天'],src:'原著明确'}
+);
+
+/* ══ v2.03 剧情详解：前世、六卷主线、马甲与终局 ══ */
+CANON_CODEX.entries.event.push(
+ {id:'v_plot_life1',n:'前世五百年',s:'第一世：从青茅山到春秋蝉自爆',g:'剧情详解',
+  d:'古月方源本是来自地球的灵魂，降临蛊界后落于南疆青茅山古月一族，资质低劣，在族中备受冷眼。第一世的他在底层挣扎求生，辗转五域，屡遭背叛与追杀，最终转入血道，以杀伐与算计一步步登临六转。寿元将尽之际，他被五域正道强者围剿，走投无路之下催动六转春秋蝉，以自身为代价逆转光阴，带着五百年记忆回到十五岁开窍大典之前。',
+  b:['本质：天外之魔，灵魂不属于蛊界，不在宿命蛊的命数图谱之内。','起点：南疆青茅山古月山寨，丙等资质，凡人开局。','道路：五百年间由凡人蛊师走到六转，主修血道，行事冷酷务实。','终局：被正道围剿濒死，催动春秋蝉自爆重生，全书由此展开。','注意：玩家不是方源，选择青茅山出生也不会自动获得其记忆、蛊虫与机缘。'],
+  rel:['古月方源','春秋蝉','青茅山','血道'],src:'原著明确'},
+ {id:'v_plot_juan1',n:'卷一详解·青茅山',s:'重生开局与血祭全族',g:'剧情详解',
+  d:'重生后的方源以十五岁少年之身重回开窍大典，凭借前世记忆在古月山寨布局：算计族老、夺取酒虫、暗中收取青茅山野外传承。他与白家白凝冰相识，亦敌亦友；古月一代老祖尸变复苏，企图血祭全族后裔以求升仙。方源将计就计，以血颅蛊抢先血屠山寨，将自身丙等资质强行淬炼至甲等，再借白凝冰北冥冰魄体自爆冰封群山之势，带着奄奄一息的白凝冰破冰而出，彻底斩断俗缘。',
+  b:['开窍大典：方源以记忆优势抢占先机，避开前世走过的死路。','酒虫与野外传承：早期最重要的两笔本钱。','血颅蛊：方源血屠亲族、拔升资质的凶器，也是魔心的起点。','白凝冰自爆：冰封青茅山数里，为方源撕开生路。','结局：方源携白凝冰离开南疆大山，凡人篇收束。'],
+  rel:['青茅山','白凝冰','血颅蛊','古月一代','春秋蝉'],src:'原著明确'},
+ {id:'v_plot_juan2',n:'卷二详解·白骨与三叉山',s:'白骨传承、商量山与定仙游',g:'剧情详解',
+  d:'方源与化为女身的白凝冰结伴南下，在白骨山夺取灰骨才子的白骨传承，炼成白骨肉生蛊；护送商心慈的商队抵达成南疆商贸重镇商量山，在演武场百战百胜，赢得紫荆令牌与身价。三叉山三王传承出世，五域四五转强者云集，方源在群强环伺、仙鹤门蛊仙高空窥伺之下，当场架炉炼成六转定仙游，吞蛊遁走，跨域直达中洲天梯山，夺得狐仙福地与荡魂山。',
+  b:['白骨山：白骨传承与白骨肉生蛊，补上方源早期保命与伪装手段。','商量山：商心慈与商队线，方源在此积累人脉、名声与资源。','三叉山：三王传承引得正魔强者齐聚，是全书第一次大规模夺宝。','定仙游：六转仙蛊，成蛊瞬间吞服遁走，完成跨域翻盘。','战果：狐仙福地加荡魂山，方源从此拥有仙级根基。'],
+  rel:['白骨山','商量山','三叉山','定仙游','狐仙福地','商心慈'],src:'原著明确'},
+ {id:'v_plot_juan3',n:'卷三详解·北原与真阳楼',s:'王庭争霸、真阳楼倾覆与仙僵之身',g:'剧情详解',
+  d:'方源以狐仙福地为根基，借荡魂山与胆识蛊在宝黄天积累财富，化解仙鹤门等十大古派的围攻。随后北上，化名狼王常山阴，统御百万群狼介入王庭争霸，扶持黑楼兰入主王庭福地。他潜入巨阳仙尊留下的八十八角真阳楼，触动巨阳意志，天庭蛊仙随之降临，天下皆敌。方源联合黑楼兰、白凝冰引爆真阳楼与王庭福地，在虚空乱流中服下借道死蛊，舍弃肉身化为死窍仙僵，才得以逃生。',
+  b:['胆识蛊生意：方源在宝黄天完成原始积累，也结下众多仇家。','狼王常山阴：北原马甲，统御群狼介入部落争霸。','八十八角真阳楼：巨阳仙尊留给黄金血脉的万年底牌。','真阳楼倾覆：北原黄金家族的象征被彻底掀翻。','借道死蛊：方源主动转为死窍仙僵，以无寿元之身换取活路。'],
+  rel:['王庭福地','八十八角真阳楼','黑楼兰','借道死蛊','常山阴'],src:'原著明确'},
+ {id:'v_plot_juan4',n:'卷四详解·仙僵与义天山',s:'智慧蛊推演与截胡至尊仙胎',g:'剧情详解',
+  d:'方源以六转仙僵之躯行走五域。仙僵寿元为零，反而让他能长期沉浸在九转智慧蛊的光晕中推演蛊方与杀招；他在宝黄天翻云覆雨，探索各福地，获得东方长凡的智道真传与繁星洞天资源。南疆义天山成为影宗与天庭的决战之地：幽魂魔尊本体跨出生死门，以十绝仙僵大阵耗费十万年积累炼制九转至尊仙胎蛊。方源察觉自己只是天意用来除掉幽魂的棋子，在仙胎出炉的一瞬元神出窍，抢先入驻仙胎，重塑无冲突神体，从棋子变成掀桌者。',
+  b:['仙僵之利：寿元为零意味着可以长时间承受智慧蛊光晕。','东方长凡真传：智道积累让方源的推演能力再上一层。','义天山：天庭监天塔与影宗十绝仙僵大阵的正面对撞。','至尊仙胎蛊：幽魂十万年布局的结晶，被方源截胡。','天意：方源识破自己被当作除魔工具，转而为自己夺舍。'],
+  rel:['义天山','智慧蛊','至尊仙胎蛊','幽魂魔尊','东方长凡','天意'],src:'原著明确'},
+ {id:'v_plot_juan5',n:'卷五详解·逆流河与宿命大战',s:'影宗新主、吞并琅琊与捏碎宿命',g:'剧情详解',
+  d:'方源凭至尊仙胎极速成长，在北原雪灾中肉身走通逆流河，创出逆流护身印；他继承紫山真君遗产，成为影宗新宗主，又吞并琅琊福地，尽收毛民炼道底蕴。中洲炼蛊大会上，天庭企图彻底修复九转宿命蛊，重掌众生定数。方源联合长生天、四域散仙与异人联军攻入天庭，凤九歌在关头唱出《命运歌》动摇天庭道心，方源一路杀至监天塔之巅，当着五域蛊仙的面捏碎宿命蛊，宿命时代就此终结。',
+  b:['逆流河：方源以肉身逆流而上，悟出逆流护身印。','紫山托孤：影宗十万年执念与遗产交到方源手中。','琅琊福地：毛民炼道底蕴被方源整体吞并。','炼蛊大会：天庭修复宿命蛊的最后机会。','捏碎宿命：天外之魔不受宿命束缚，方能真正毁蛊。'],
+  rel:['逆流河','影宗','紫山真君','琅琊福地','宿命蛊','凤九歌'],src:'原著明确'},
+ {id:'v_plot_juan6',n:'卷六详解·疯魔窟与成尊',s:'诸尊复生、背刺乐土与三尊并立',g:'剧情详解',
+  d:'宿命蛊碎裂、五域界壁消散后，天下融为一体。方源化身气海老祖一统东海，收割资源；疯魔窟第九层则成为诸尊最后的赌局：无极魔尊推演永生失败身死，星宿仙尊与巨阳仙尊先后复生，乐土仙尊欲转修天道复生成尊。方源在关键时刻背弃盟约，与星宿、巨阳合力击杀乐土，并吞噬其天道道痕与遗产，借天地熔炉突破混沌大劫，正式登临九转，号炼天魔尊。',
+  b:['五域合一：界壁消失后，资源与势力重新洗牌。','气海老祖：方源在东海的新马甲，用于整合海域。','诸尊复生：星宿、巨阳、乐土各自携带后手归来。','背刺乐土：方源以最冷酷的方式吞下天道积累。','成尊：炼天魔尊之名确立，三尊并立成为全书定格。'],
+  rel:['疯魔窟','乐土仙尊','星宿仙尊','巨阳仙尊','气海老祖'],src:'原著明确'},
+ {id:'v_plot_end',n:'终局·三尊并立',s:'疯魔窟之后，全书定格',g:'剧情详解',
+  d:'疯魔窟一战，乐土陨落，方源成尊，星宿仙尊、巨阳仙尊与炼天魔尊三方并立，天下进入没有宿命枷锁的新纪元。原著在此处停更，三尊之间的最终胜负、永生之谜与天外之魔的归乡之路都没有给出答案。游戏把这一段处理为历史回响，不虚构原著未写出的终局。',
+  b:['星宿：智道与星道，合道三百万年的天庭后手。','巨阳：运道与黄金血脉，北原万载基业的化身。','方源：炼道成尊，兼修万道，手握至尊仙胎与春秋蝉。','留白：原著停更处不替作者补写结局。','游戏处理：只做时代余烬与历史回响，不设为可改写的主线。'],
+  rel:['疯魔窟','星宿仙尊','巨阳仙尊','炼天魔尊'],src:'原著明确＋合理推断'}
+);
+CANON_CODEX.entries.person.push(
+ {id:'n_fangyuan_majia',n:'方源马甲志',s:'狼王、气海、梦求真与大爱仙尊',g:'身份',
+  d:'方源在五域行走时惯以多重身份布局：北原化名狼王常山阴统御群狼；东海以气海老祖之名整合势力；以梦道分身梦求真行走梦境；成尊后对外自封大爱仙尊，五域正道则称其为炼天魔尊。每一个马甲都是他搜集资源、掩饰意图与切割因果的工具。',
+  b:['常山阴：北原狼王身份，用于介入王庭争霸。','气海老祖：东海马甲，用于吞并海域势力。','梦求真：梦道分身，独立行走梦境与真意。','大爱仙尊：成尊后的自封尊号，带有强烈讽刺意味。','炼天魔尊：五域正道对其炼道成尊的公认称呼。'],
+  rel:['常山阴','气海老祖','梦求真','大爱仙尊','炼天魔尊'],src:'原著明确'}
+);
+CANON_CODEX.entries.era.push(
+ {id:'e_epoch',n:'纪元历法',s:'三大时间坐标',g:'时间体系',
+  d:'蛊界历史可分三层来看：其一是三百万年的远古通史，从人祖出世、人族挣脱异人奴役，到太古、远古、中古、近古十一位九转尊者相继执掌天地；其二是方源第一世的五百年魔道生涯；其三是方源重生后的今生六卷。游戏用 eraIdx 组织可玩时代，人祖纪元与太古时代作为前置历史层，不单独占用可玩时代编号。',
+  b:['远古通史：人祖纪元与太古时代属于前置历史层。','十尊纪元：太古至近古，共十一位九转尊者。','第一世：方源五百年，终于春秋蝉自爆。','今生：重生回青茅山，展开正文六卷。','游戏映射：eraIdx 0–9 为古代诸时期，10 为方源当代。'],
+  rel:['三百万年尊者史','十一尊者总览','春秋蝉'],src:'原著明确'}
+);
+/* ══ v2.04 名场面：人物对话与场景演出（原著回放，不参与玩法结算） ══ */
+CANON_CODEX.cats.push(['scene','名场面']);
+CANON_CODEX.entries.scene=[
+ {id:'sc_qingmao_kaiqiao',n:'青茅山·开窍睁眼',s:'重生后的第一眼',g:'原著回放',scene:true,
+  d:'方源催动春秋蝉后重回十五岁开窍大典前夜，在山寨旧屋中睁眼。',
+  b:['原著节点：卷一开局。','演出形式：旁白与方源内心独白。'],
+  rel:['古月方源','青茅山','春秋蝉'],src:'原著明确',
+  lines:[['旁白','青茅山，夜雨敲窗。十五岁的少年在旧木床上睁开眼，眼底没有少年的懵懂，只有五百年的风霜。'],['方源','回来了。'],['方源','这一世，我不会再输。'],['旁白','窗外，开窍大典的钟声还未响起。']]},
+ {id:'sc_qingmao_bingfeng',n:'青茅山·血祭冰封',s:'白凝冰的最后一场精彩',g:'原著回放',scene:true,
+  d:'古月一代尸变、血祭全族之夜，方源以血颅蛊反屠山寨，白凝冰引爆北冥冰魄冰封群山。',
+  b:['原著节点：卷一终局。','名场面：冰封数里，方源携白凝冰破冰而出。'],
+  rel:['白凝冰','血颅蛊','北冥冰魄体','古月一代'],src:'原著明确',
+  lines:[['旁白','血月之下，古月山寨已成炼狱。古月一代的尸身立在祭坛上，贪婪地吞吸族人的血气。'],['古月一代','都是我的血食……都是我的！'],['方源','你算错了一件事。'],['方源','我从来就没打算让这山寨留下活口。'],['旁白','血颅蛊出，刀光落下。方源亲手斩断最后一丝俗缘，将丙等资质硬生生淬至甲等。'],['白凝冰','方源，你说人这一生活着，到底图什么？'],['方源','图一个一直往前走。'],['白凝冰','那我就给你看一场最精彩的。'],['白凝冰','北冥冰魄——爆！'],['旁白','冰潮吞没群山。方源抱起奄奄一息的她，破冰而出，头也不回地走进南疆大山。']]},
+ {id:'sc_sancha_liangu',n:'三叉山·仙前炼蛊',s:'群强环伺，当场成蛊',g:'原著回放',scene:true,
+  d:'三叉山三王传承破灭之际，方源在正魔强者与仙鹤门蛊仙窥伺下当场炼成六转定仙游。',
+  b:['原著节点：卷二高潮。','六转定仙游成蛊即吞，跨域遁走。'],
+  rel:['三叉山','定仙游','仙鹤门'],src:'原著明确',
+  lines:[['旁白','三叉山巅，火光与血光交织。四转、五转的强者围成一圈，天上还有仙鹤门的蛊仙俯瞰。'],['易冲天','方源，交出传承，留你全尸！'],['方源','急什么。'],['旁白','他盘膝坐下，当着所有人的面架起蛊炉。炉火一起，四周的贪婪与杀意都变成了惊愕。'],['况狂生','他疯了？在这里炼蛊？'],['旁白','火光冲天而起，六转的气息撕裂云层。定仙游，成。'],['方源','诸位，后会有期。'],['旁白','仙蛊入口，人影凭空消失。群强扑空，只余满地炉灰。']]},
+ {id:'sc_zhenyang',n:'真阳楼·借道死蛊',s:'掀翻巨阳万年底牌',g:'原著回放',scene:true,
+  d:'方源潜入八十八角真阳楼，巨阳意志苏醒，王庭福地崩塌，方源服下借道死蛊化为死窍仙僵逃生。',
+  b:['原著节点：卷三终局。','代价：舍弃肉身，寿元归零。'],
+  rel:['八十八角真阳楼','巨阳仙尊','借道死蛊','王庭福地'],src:'原著明确',
+  lines:[['巨阳意志','区区六转，也敢动我巨阳的楼？'],['方源','楼是死的，人是活的。'],['旁白','真阳楼层层崩解，虚空乱流撕碎一切。天庭蛊仙的气息正在逼近，退路已经断绝。'],['方源','肉身而已。'],['旁白','他吞下借道死蛊。生机的灯火熄灭，死窍仙僵之躯在乱流中站起，一步一步走出崩塌的王庭。']]},
+ {id:'sc_yitian',n:'义天山·夺舍仙胎',s:'从棋子到掀桌者',g:'原著回放',scene:true,
+  d:'义天山之战，幽魂魔尊以十绝仙僵大阵炼成九转至尊仙胎蛊，方源元神出窍抢先入驻。',
+  b:['原著节点：卷四高潮。','天意本欲借方源之手除掉幽魂。'],
+  rel:['义天山','至尊仙胎蛊','幽魂魔尊','天意'],src:'原著明确',
+  lines:[['旁白','义天山，十绝仙僵大阵缓缓转动，十万年的积累凝成一枚仙胎。'],['幽魂魔尊','仙胎是我的。'],['方源','不。'],['方源','现在它是我的。'],['旁白','在仙胎出炉的一瞬，方源元神出窍，抢在幽魂之前没入光晕。天意的棋局，被棋子亲手掀翻。']]},
+ {id:'sc_suming',n:'天庭·捏碎宿命',s:'万载枷锁，今朝尽碎',g:'原著回放',scene:true,
+  d:'宿命大战，方源率联军攻入天庭，在监天塔之巅当着五域蛊仙捏碎九转宿命蛊。',
+  b:['原著节点：卷五终局。','只有完全的天外之魔才能真正毁掉宿命蛊。'],
+  rel:['天庭','宿命蛊','龙公','凤九歌'],src:'原著明确',
+  lines:[['龙公','宿命在，天庭在！'],['方源','那就让宿命先不在。'],['旁白','监天塔上，九转宿命蛊悬于光柱之中，映照着五域众生的命数。'],['旁白','方源一步踏出，五指收拢。'],['方源','万载枷锁，今朝尽碎。'],['旁白','清脆的碎裂声传遍五域。宿命断了，天下万灵第一次真正握住了自己的命。']]},
+ {id:'sc_niliuhe',n:'逆流河·道心独白',s:'一个小人物坚持到现在的理由',g:'原著回放',scene:true,
+  d:'方源在北原雪灾中肉身逆流而上，走通逆流河，留下全书最著名的道心独白。',
+  b:['原著节点：卷五前期。','逆流河：背子渡河，功亏一篑的寓言。'],
+  rel:['逆流河','道心','北原'],src:'原著明确',
+  lines:[['旁白','逆流河的水从脚下倒灌而来，冲刷肉身，也冲刷记忆。'],['方源','我曾经呐喊过，渐渐地我不再发出声音。'],['方源','我曾经哭泣过，渐渐地我不再流泪。'],['方源','我曾经悲伤过，渐渐地我能承受一切。'],['方源','我曾经欢喜过，渐渐地我看淡了世间。'],['方源','而如今，我只剩下面无表情。我的目光如同磐石一样坚硬，我的心中只剩下坚持。'],['方源','这就是我，一个小人物，方源，坚持到现在的全部理由。']]},
+ {id:'sc_zishan',n:'紫山托孤',s:'我可以死，你不能死',g:'原著回放',scene:true,
+  d:'影宗败于天意，紫山真君在泥泞中把影宗十万年的执念与遗产托付给平生大敌方源。',
+  b:['原著节点：卷五前期。','紫山真君是幽魂第一分魂。'],
+  rel:['紫山真君','影宗','方源','宿命'],src:'原著明确',
+  lines:[['旁白','泥泞里，紫山真君的身影正在消散。他望着面前这个平生最大的敌人。'],['紫山真君','方源……我们影宗败了，败给了天意，败给了宿命。'],['紫山真君','但我可以死，你不能死！'],['紫山真君','带上我们所有分魂十万年的执念，活下去！去打破这该死的宿命！'],['旁白','方源接过遗产，没有回答。他只是转身，继续往前走。']]},
+ {id:'sc_fengjiuge',n:'凤九歌·一去不回',s:'正魔由我，不由天',g:'原著回放',scene:true,
+  d:'宿命大战前，凤九歌明知此行九死一生，仍然动身。',
+  b:['原著节点：卷五宿命大战。','名台词：便一去不回。'],
+  rel:['凤九歌','宿命大战','命运歌'],src:'原著明确',
+  lines:[['旁人','此去若是一去不回？'],['凤九歌','便一去不回！'],['凤九歌','我本是魔，亦可是正。正魔由我，不由天！'],['旁白','他大笑出门，衣袂被风吹起，像一面不肯落下的旗。']]},
+ {id:'sc_wuyong',n:'武庸出渊',s:'岂是郁郁久居人下之辈',g:'原著回放',scene:true,
+  d:'母亲陨落、南疆群雄围攻武家之际，隐忍数百年的武庸踏出风雨。',
+  b:['原著节点：南疆武家线。','武庸是南疆枭雄。'],
+  rel:['武庸','武家','南疆'],src:'原著明确',
+  lines:[['旁白','风雨压城，武家山门前的血迹还未干透。'],['武庸','我武庸岂是郁郁久居人下之辈！'],['旁白','他一步踏出，剑光荡开四面觊觎。隐忍数百年，只为这一刻。']]},
+ {id:'sc_daotian',n:'盗天·归乡',s:'我只想回家',g:'原著回放',scene:true,
+  d:'盗天魔尊本杰孙登临九转，却始终找不到回到故乡的路。',
+  b:['原著节点：盗天真传背景。','盗天为天外之魔，一生追寻空门。'],
+  rel:['盗天魔尊','空门','天外之魔'],src:'原著明确',
+  lines:[['旁白','星空浩渺，空门之前，盗天魔尊站了很久。'],['盗天魔尊','我不想成尊，我不想无敌，我只想……回家。'],['旁白','他偷遍天下，炼成遁空蛊，却终究没能推开那扇门。']]},
+ {id:'sc_kuangman',n:'狂蛮·男人的浪漫',s:'变化道才是天地间真正的浪漫',g:'原著回放',scene:true,
+  d:'狂蛮魔尊以肉身称雄，留下了最粗豪直白的一段话。',
+  b:['原著节点：狂蛮真传背景。','狂蛮主修变化道与力道。'],
+  rel:['狂蛮魔尊','变化道','力道'],src:'原著明确',
+  lines:[['狂蛮魔尊','男人就该干男人该干的事！'],['狂蛮魔尊','什么长袍广袖，那是娘们穿的！真男人只披兽皮，露胸膛！'],['狂蛮魔尊','千般变化，万种玄奇，变化道才是天地间真正的浪漫！'],['旁白','他赤着上身站在风雪里，身后是万兽的图腾。']]},
+ {id:'sc_dengxian',n:'方源·登仙明志',s:'拔剑斩落九重天',g:'原著回放',scene:true,
+  d:'方源早年立下的明志诗，是他一路求道的写照。',
+  b:['原著诗句：登仙明志诗。','演出形式：方源独白。'],
+  rel:['古月方源','道心','永生'],src:'原著明确',
+  lines:[['旁白','风霜扑面，少年负手而立，望向云海尽头。'],['方源','早岁已知世事艰，仍许飞鸿荡云间。'],['方源','一路寒霜明月照，拔剑斩落九重天！']]},
+ {id:'sc_madao',n:'方源·魔道求索',s:'朝闻道，夕死可矣',g:'原著回放',scene:true,
+  d:'方源对梦想、永生与世人评价的自述。',
+  b:['原著独白：魔道求索之言。','核心：求道高于成败与名声。'],
+  rel:['古月方源','永生','道心'],src:'原著明确',
+  lines:[['方源','只要一个人还在追求梦想的路上，哪怕倒下了，他也绝不算失败。'],['方源','永生或许根本不存在，但那又如何？朝闻道，夕死可矣。只要行走在这条路上，粉身碎骨我也从不懊悔。'],['方源','世人都骂我是魔，殊不知，这天地不仁，本就视万物为刍狗；我视万物为刍狗，亦视我自己为刍狗。']]},
+ {id:'sc_daxian',n:'大爱仙尊·仙蛊管够',s:'成尊后的自封与讽刺',g:'原著回放',scene:true,
+  d:'方源成尊后自封大爱仙尊，对外以慈悲面目示人。',
+  b:['原著台词：大爱仙尊宣言。','反差：尊号与行事之间的讽刺。'],
+  rel:['大爱仙尊','炼天魔尊','仙蛊'],src:'原著明确',
+  lines:[['旁白','五域宾服，众仙来朝。高座之上的尊者含笑开口。'],['大爱仙尊','我是大爱仙尊，我心中装的是全天下的苍生，全天下的福祉……'],['大爱仙尊','只要各位仙友出得起仙材，仙蛊管够！']]}
+];
+var SCENE_ID=null,SCENE_I=0;
+function sceneOpen(id){var e=codexFind(id);if(!e||!e.lines||!e.lines.length)return;var ov=$('sceneOverlay');if(!ov)return;SCENE_ID=id;SCENE_I=0;ov.classList.remove('hidden');sceneRender();}
+function sceneRender(){
+ var e=codexFind(SCENE_ID);if(!e)return;
+ var L=e.lines[SCENE_I]||['旁白',''];
+ var who=$('sceneWho'),tx=$('sceneText'),dt=$('sceneDots'),tt=$('sceneTitle'),nx=$('sceneNext');
+ if(tt)tt.textContent=e.n;
+ if(who)who.textContent=L[0]==='旁白'?'':L[0];
+ if(tx){tx.textContent=L[1];tx.className=L[0]==='旁白'?'narr':'';}
+ if(dt){var s='';for(var i=0;i<e.lines.length;i++)s+=(i===SCENE_I?'●':'○');dt.textContent=s;}
+ if(nx)nx.textContent=(SCENE_I>=e.lines.length-1)?'结 束':'继 续';
+}
+function sceneNext(){var e=codexFind(SCENE_ID);if(!e)return;if(SCENE_I<e.lines.length-1){SCENE_I++;sceneRender();}else sceneClose();}
+function sceneClose(){var ov=$('sceneOverlay');if(ov)ov.classList.add('hidden');SCENE_ID=null;SCENE_I=0;}
+on('sceneNext','click',sceneNext);
+on('sceneExit','click',sceneClose);
 function dexRender(){
  var list=dexStatics(DEX_TAB);var got=dexGet()[DEX_TAB]||[];
  got.forEach(function(id){if(list.indexOf(id)<0)list.push(id);}); /* 动态补录并入展示 */
@@ -15823,7 +17600,7 @@ function syncToggles(){var _a=$('autoBtn');if(_a)_a.className='opSide'+(AUTO?' o
    启动脚本自此中断，runGame() 永不执行 → 页面停在静态外壳、所有按钮无响应（＝卡死）。
    教训：验收桩的 getElementById 会自动补建元素，这类「元素缺失」错误只能在真实浏览器暴露。 */
 function on(id,ev,fn){var el=$(id);if(el)el.addEventListener(ev,fn);}
-['autoBtn','fastBtn','restartBtn','voiceBtn','rigBtn','achvBtn','dexBtn'].forEach(function(id){
+['autoBtn','fastBtn','restartBtn','voiceBtn','rigBtn','achvBtn','dexBtn','codexBtn'].forEach(function(id){
  on(id,'pointerdown',function(e){e.stopPropagation();});
 });
 /* v1.4.13：指定落点状态刷新（AUTO/指定 互斥时复用）——盘中途开关即时刷新当前盘的可点状态与提示（已锁定/已开转的盘不动） */
@@ -15847,6 +17624,12 @@ on('achvBtn','click',function(e){e.stopPropagation();achvRender();$('achvOverlay
 on('achvClose','click',function(){$('achvOverlay').classList.add('hidden');});
 on('dexBtn','click',function(e){e.stopPropagation();dexRender();$('dexOverlay').classList.remove('hidden');}); /* v1.4.17 图鉴面板 */
 on('dexClose','click',function(){$('dexOverlay').classList.add('hidden');});
+/* v2.01 典籍面板 */
+on('codexBtn','click',function(e){e.stopPropagation();codexOpen();});
+on('codexClose','click',function(){$('codexOverlay').classList.add('hidden');});
+on('codexTabs','click',function(e){var t=e.target&&e.target.getAttribute&&e.target.getAttribute('data-codexcat');if(t){CODEX_CAT=t;CODEX_Q='';CODEX_DETAIL=null;var s=$('codexSearch');if(s)s.value='';codexRender();}});
+on('codexList','click',function(e){var t=e.target;if(t&&t.id==='codexBack'){CODEX_DETAIL=null;codexRender();return;}var p=t;while(p&&p!==this){if(p.getAttribute&&p.getAttribute('data-codex-id'))break;p=p.parentNode;}if(p&&p!==this&&p.getAttribute){var cid=p.getAttribute('data-codex-id');var ce=codexFind(cid);if(ce&&ce.scene){sceneOpen(cid);return;}CODEX_DETAIL=cid;codexRender();}});
+on('codexSearch','input',function(){CODEX_Q=this.value||'';CODEX_DETAIL=null;codexRender();});
 on('saveExportBtn','click',function(e){e.stopPropagation();doSaveExport();});
 on('saveImportBtn','click',function(e){e.stopPropagation();doSaveImport();});
 on('saveExportBtn2','click',function(e){e.stopPropagation();doSaveExport();});
@@ -15868,18 +17651,19 @@ try{starThemeInit();}catch(e){}
 on('chgClose','click',function(){closeChangelog();});
 /* v1.96：点浮层遮罩（非卡片）关闭；Esc 关闭最上层浮层 */
 function closeTopOverlay(){
- var ids=['chgOverlay','dexOverlay','achvOverlay','logOverlay'],i,el;
+ var ids=['sceneOverlay','chgOverlay','codexOverlay','dexOverlay','achvOverlay','logOverlay'],i,el;
  for(i=0;i<ids.length;i++){
   el=$(ids[i]);
   if(el&&!el.classList.contains('hidden')){
    if(ids[i]==='chgOverlay')closeChangelog();
+   else if(ids[i]==='sceneOverlay')sceneClose();
    else el.classList.add('hidden');
    return true;
   }
  }
  return false;
 }
-['logOverlay','achvOverlay','dexOverlay','chgOverlay'].forEach(function(id){
+['logOverlay','achvOverlay','dexOverlay','chgOverlay','codexOverlay','sceneOverlay'].forEach(function(id){
  on(id,'click',function(e){
   if(e.target&&e.target.id===id){
    if(id==='chgOverlay')closeChangelog();
