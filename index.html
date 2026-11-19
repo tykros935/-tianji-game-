@@ -72,6 +72,11 @@ html,body{max-width:100%;overflow-x:hidden}body{-webkit-tap-highlight-color:tran
 #rigBtn:disabled{cursor:not-allowed;opacity:.45}
 #keyHint{text-align:center;font-size:12px;color:#A8A296;letter-spacing:1px;padding:2px 0 8px;user-select:none}
 #panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px;font-size:13.5px;line-height:1.8}
+.moveTypeTag{display:inline-block;font-size:11px;font-weight:900;line-height:1.5;padding:0 4px;margin:0 2px 0 0;border-radius:4px;white-space:nowrap}
+.moveTypeTag.attack{color:#C0392B;background:rgba(192,57,43,.10)}
+.moveTypeTag.defense{color:#2471A3;background:rgba(36,113,163,.10)}
+.moveTypeTag.control{color:#8E44AD;background:rgba(142,68,173,.10)}
+.moveTypeTag.buff{color:#239B56;background:rgba(35,155,86,.10)}
 #pTitle{text-align:center;font-weight:800;letter-spacing:2px;color:#6B6455;border-bottom:1px dashed var(--line);padding-bottom:6px;margin-bottom:6px}
 .pRow{display:flex;gap:6px}
 .pRow b{flex:none;color:#161616;font-weight:700}
@@ -1076,10 +1081,25 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
-var APP_VER='v2.16'; /* v2.16：补齐敌方通用招式属性识别；四属性统一配色并展示战斗结算明细 */
+var APP_VER='v2.19'; /* v2.19：特殊杀招效果扩展（权重转移、随机封招） */
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡；v1.92 起累计补齐重构阶段日志。 */
 var CHANGELOG=[
+  {v:'v2.19',items:[
+    ['new','特殊杀招效果扩展：无相手截取敌方本回合总权重的35%，大盗鬼手截取25%；两式同场触发时合计封顶70%，截取部分转入我方权重。'],
+    ['new','阎帝新增特殊结算：令敌方本回合随机一式权重归零；与空裂的最高权重封招区分，分别体现随机压制与定点抹除。该效果属于游戏战斗适配，不冒充原著逐字机制。'],
+    ['fix','特殊效果在双方招式抽取完成、既有属性结算后执行，并同步重算双方总权重；不改变招式池、出手次数盘及抽取概率。']
+  ]},
+  {v:'v2.18',items:[
+    ['fix','审查敌方通用招式四属性分类，修正名称关键词重叠造成的误判：「雾隐刺」固定归入防御，「青囊手」固定归入增益。'],
+    ['fix','具名例外优先于通用语义正则，避免控制/防御/增益关键词先后顺序改变指定招式属性；不改变招式名称、权重、抽取概率与战斗倍率。'],
+    ['test','逐项检查当前各流派通用招式池，确认发现的两处跨类别命中均已加入明确归类。']
+  ]},
+  {v:'v2.17',items:[
+    ['fix','角色属性面板中的已掌握杀招增加攻击、防御、控制、增益彩色标签，颜色与战斗盘保持一致。'],
+    ['new','杀招图鉴每条招式固定显示四属性标签，触发条件仍保留在标签之后；敌方专属及不可获得招式也能辨明属性。'],
+    ['fix','面板与图鉴共用 combatMoveDir/combatMoveDirName 识别属性，不另设分类规则；本次仅完善显示，不改动任何战斗数值与结算。']
+  ]},
   {v:'v2.16',items:[
     ['fix','敌方通用招式不再全部默认显示为攻击：按招式语义识别攻击、防御、控制、增益，并将属性带入实际结算。'],
     ['new','四种属性使用固定颜色：攻击红、防御蓝、控制紫、增益绿；我方与敌方招式盘保持一致，战斗结束增加双方属性效果汇总。'],
@@ -2035,9 +2055,9 @@ var SPEC_LIB = {
   {id:'bairimeng',      name:'白日梦',     school:'梦道', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'amp', trigger:'彩蛋梦境（仅梦道修行者 20%）', effect:'+30 权重，敌方本场出手 -2（本式每场战斗仅可使用一次）', limit:'隐藏彩蛋，界面不显示概率', holder:'玩家', source:'219,1860,2222', status:'live'},
   {id:'guibujue',       name:'鬼不觉',     school:'偷道', type:'spec', grade:'特殊仙道', dir:'控', effectKey:'amp', mulF:1.2, trigger:'盗天真传灌顶（仙蛊拍卖会→落魄谷存活）', effect:'主动：抽中时权重 ×1.2 并额外获得一次抽取（每场战斗仅可使用一次——用后本场不可再抽中）；被动：被发现的权重降至 10%（隐匿）', limit:'主动每场限一次；被动仅作用于「被发现/被追击」类判定，不直接提升战力', holder:'玩家', source:'1918,2384', status:'live'},
   /* ---- 削减类 cut ---- */
-  {id:'wuxiangshou',    name:'无相手',     school:'盗天魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'盗天魔尊残念传承', effect:'截取对方权重 35%', limit:'与大盗鬼手叠加封顶 70%', holder:'玩家', source:'221,2390,2414', status:'live'},
-  {id:'dadaoguishou',   name:'大盗鬼手',   school:'盗天魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'盗天魔尊残念传承', effect:'截取对方权重 25%', limit:'同上封顶 70%', holder:'玩家', source:'221,2391', status:'live'},
-  {id:'yandi',          name:'阎帝',       school:'幽魂魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'幽魂真传·阎罗杀招的游戏适配名（原著中方源改称「阎帝」）', effect:'对方本回合 ×0.75', limit:'—', holder:'玩家', source:'221,2392', status:'live'},
+  {id:'wuxiangshou',    name:'无相手',     school:'盗天魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'盗天魔尊残念传承', effect:'特殊结算：截取敌方本回合总权重 35%，转入自身；与大盗鬼手叠加封顶 70%（游戏战斗适配）', limit:'与大盗鬼手叠加封顶 70%', holder:'玩家', source:'221,2390,2414', status:'live'},
+  {id:'dadaoguishou',   name:'大盗鬼手',   school:'盗天魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'盗天魔尊残念传承', effect:'特殊结算：截取敌方本回合总权重 25%，转入自身；与无相手叠加封顶 70%（游戏战斗适配）', limit:'同上封顶 70%', holder:'玩家', source:'221,2391', status:'live'},
+  {id:'yandi',          name:'阎帝',       school:'幽魂魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'幽魂真传·阎罗杀招的游戏适配名（原著中方源改称「阎帝」）', effect:'特殊结算：敌方随机一式权重归零，并压低敌方本回合权重（游戏战斗适配）', limit:'随机封招每次触发一式', holder:'玩家', source:'221,2392', status:'live'},
   {id:'jianmiancengxiangshi', name:'见面曾相识', school:'盗天魔尊', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'盗天魔尊残念传承', effect:'对方本回合 ×0.5', limit:'—', holder:'玩家', source:'221,2393', status:'live'},
   {id:'wujinxuanguangqi', name:'五禁玄光气', school:'mainSchool()', type:'spec', grade:'特殊仙道', dir:'攻', effectKey:'cut', trigger:'陶铸真传·毁山 / 超级蛊阵 10% / 调试钩子', effect:'释放当回合敌方权重 ×0.9', limit:'每场战斗限一次（wjUsed）', holder:'玩家', source:'219,1824,1863,2073,2098', status:'live'},
   {id:'xueshenzi',      name:'血神子',     school:'血道', type:'spec', grade:'六转→八转（随血道境界）', dir:'被动', effectKey:'passive', trigger:'血道蛊仙 + 血海真传（血海老祖）· 概率获得', effect:'占杀招盘但权重恒 0（永不被抽中）；每场战斗结算额外 +1 次对应等级普攻权重', limit:'仅血道蛊仙可得；实际可用杀招只剩 7 格', holder:'玩家', source:'SPEC_LIB新增', status:'live'},
@@ -4416,7 +4436,7 @@ function hud(){
 function panelHTML(){
  var marks=S.marks.length?S.marks.join(' / '):'—';
  var sch=S.schools.map(function(s,i){return s.name+'('+GROUP_N[s.dir]+'·'+REALMS[s.realm]+(i===S.mainIdx?'·主修':'')+')';}).join('、')||'—';
- var mv=S.moves.map(function(m){return '【'+combatMoveDirName(m)+'】'+m.name;}).join('、')||'—';
+ var mv=S.moves.map(function(m){return combatMoveTagHtml(m)+escHtml(m.name||'无名招式');}).join('、')||'—';
  var dx=(S.deducX==null)?'—':S.deducX;
  var lyn=S.age+'岁 · 出身'+S.region+S.birth+' · '+(S.identity||'')+(S.stance?'·'+S.stance:'');
  function row(k,v){return '<div class="pRow"><b>'+k+'</b><span>'+v+'</span></div>';}
@@ -9789,10 +9809,25 @@ function combatMoveDirName(m){var d=combatMoveDir(m);return d==='攻'?'攻击':(
 function combatMoveLabel(m){return '【'+combatMoveDirName(m)+'】'+(m&&m.name?m.name:'无名招式');}
 /* v2.16：四属性固定配色，确保我敌双方招式盘视觉一致。 */
 function combatMoveColor(m){var d=combatMoveDir(m);return d==='攻'?'#C0392B':(d==='防'?'#2471A3':(d==='控'?'#8E44AD':'#239B56'));}
+/* v2.19：特殊招式效果登记表。普通招式不自动继承；新增特殊效果只需登记招式与效果参数。 */
+var COMBAT_SPECIAL_FX={
+ '无相手':{steal:0.35,desc:'截取敌方本回合总权重的35%，转入我方'},
+ '大盗鬼手':{steal:0.25,desc:'截取敌方本回合总权重的25%，转入我方'},
+ '阎帝':{nullRandom:1,desc:'令敌方本回合随机一式失去结算资格'}
+};
+function combatSpecialFx(name){return COMBAT_SPECIAL_FX[name]||null;}
+function combatMoveTagHtml(m){
+ var d=combatMoveDir(m),name=combatMoveDirName(m);
+ var cls=d==='攻'?'attack':(d==='防'?'defense':(d==='控'?'control':'buff'));
+ return '<span class="moveTypeTag '+cls+'">【'+name+'】</span>';
+}
 /* v2.16：敌方通用招式原本只有名称，没有 dir 元数据，导致全部显示为攻击。
    依据招式语义补充游戏战斗分类；无法明确判断的基础攻击仍归攻击，不伪造原著机制。 */
 function genericEnemyMoveDir(name,index,school){
  var n=String(name||'');
+ /* v2.18：先处理跨类别关键词重叠的具名招式，避免被前置正则抢先归类。 */
+ if(n==='雾隐刺')return '防'; /* 身法闪避/隐匿防护，不按「雾隐」字面误判控制 */
+ if(n==='青囊手')return '增'; /* 辅助疗养/培元，不因「青囊」字根误判防御 */
  if(/(封|锁|困|禁|缠|盲|瘴|蚀心|寒域|慢一息|迟时|情障|魇压|摄魂|夺魄|雾隐|云锁|禁步|哑火|规则压|名分压|梦呓|真假手|落笔封)/.test(n))return '控';
  if(/(壁|护|盾|守|镇岳|镇山|厚土|青囊|寒铁印|化劲|中和|反哺|回风掌|无形飘|雾隐刺|随身闪|九龙纹)/.test(n))return '防';
  if(/(聚气|借运|顺水|信标|淬体|点睛|驱役|役兽|言出法随|吞力|反嚼|借势|鸿运印|青囊手|气机拨|奴印激|易形|兽化|化形)/.test(n))return '增';
@@ -9891,7 +9926,7 @@ async function duel(eT,label,opts){
  /* v1.0.13 分段出手：我方先连出 nP 式，敌方再连出 nE 式（不再交替） */
  var myW=0,enW=0,wjCut=1; /* v1.0.20：五禁玄光气对敌折扣 */
  /* v2.14：四属性效果累积值；增益只强化后续出手，防御/控制在双方出手后结算。 */
- var myMoves=[],myBuffMul=1,myGuardMul=1,myControlMul=1,myAttackN=0;
+ var myMoves=[],myBuffMul=1,myGuardMul=1,myControlMul=1,myAttackN=0,myStealRate=0,myNullRandomN=0;
  var enBuffMul=1,enGuardMul=1,enControlMul=1,enAttackN=0;
  await say('—— 我方出手段 ——','battle');
  for(var i=0;i<nP;i++){
@@ -9920,6 +9955,12 @@ async function duel(eT,label,opts){
    if(mv.name==='空裂'){ /* v1.1.8 空裂：增自身权重 + 抹除对方一次最高权重攻击（每局限一次，用完遗忘） */
     if(S.flags.konglieUsed){konglieForget();v=0;await say('【空裂】已用尽——空间合拢，此式自列表遗忘。','bad');}
     else{S.flags.konglieUsed=true;v=Math.round(v*1.35);S.flags.konglieErase=true;await say('【空裂】撕开虚空——本式 ×1.35，并抹除对方一次权重最高的攻击！','gold');}
+   }
+   /* v2.19：特殊杀招专属结算效果。只对明确列出的特殊招式生效，不把效果泛化到整个流派。 */
+   var specialFx=combatSpecialFx(mv.name);
+   if(specialFx){
+    if(specialFx.steal){myStealRate=Math.min(0.70,myStealRate+specialFx.steal);await say('【'+mv.name+'】'+specialFx.desc+'（与同类盗取招式合计封顶70%）。','gold');}
+    if(specialFx.nullRandom){myNullRandomN+=specialFx.nullRandom;await say('【'+mv.name+'】'+specialFx.desc+'。','gold');}
    }
    var bfx=batchFx(mv.name); /* v1.1.6【接线】批量杀招数据驱动落账 */
    if(bfx&&(bfx.mul!==1||bfx.cut!==1||bfx.once)){
@@ -9996,6 +10037,23 @@ async function duel(eT,label,opts){
  if(enControlMul<1&&myMoves.length){var mMaxI=0;for(var mcI=1;mcI<myMoves.length;mcI++)if(myMoves[mcI]>myMoves[mMaxI])mMaxI=mcI;var mOld=myMoves[mMaxI];myMoves[mMaxI]=Math.round(mOld*enControlMul);myW=myMoves.reduce(function(a,b){return a+b;},0);await say('敌方控制招式生效——我方最高单式 '+mOld+' → '+myMoves[mMaxI]+'。','bad');}
  if(myGuardMul<1){var enBeforeGuard=enW;enW=Math.round(enW*myGuardMul);await say('我方防御招式生效——敌方总权重 '+enBeforeGuard+' → '+enW+'。','gold');}
  if(enGuardMul<1){var myBeforeGuard=myW;myW=Math.round(myW*enGuardMul);await say('敌方防御招式生效——我方总权重 '+myBeforeGuard+' → '+myW+'。','bad');}
+ /* v2.19：特殊招式结算。随机封招与空裂（最高权重封招）分开处理。 */
+ if(myNullRandomN>0&&enMoves.length){
+  var nullCount=0;
+  for(var nr=0;nr<myNullRandomN;nr++){
+   var eligible=[];for(var ni=0;ni<enMoves.length;ni++)if(enMoves[ni]>0)eligible.push(ni);
+   if(!eligible.length)break;
+   var chosen=eligible[Math.floor(RNG()*eligible.length)];
+   var nulled=enMoves[chosen];enMoves[chosen]=0;nullCount++;
+   await say('【阎帝】随机抹去敌方第'+(chosen+1)+'式（权重 '+nulled+'），该式不参与胜负结算。','gold');
+  }
+  if(nullCount){enW=enMoves.reduce(function(a,b){return a+b;},0);}
+ }
+ if(myStealRate>0&&enW>0){
+  var stolen=Math.min(enW,Math.round(enW*myStealRate));
+  enW-=stolen;myW+=stolen;
+  await say('【盗天杀招】截取敌方权重 '+stolen+' 并纳入我方——双方总账同步变化。','gold');
+ }
  await say('【四属性结算明细】我方：攻击 '+myAttackN+' 式（每式×1.2），后续增益×'+myBuffMul.toFixed(2)+'，防御压低敌方总权重×'+myGuardMul.toFixed(2)+'，控制压低敌方最高单式×'+myControlMul.toFixed(2)+'。敌方：攻击 '+enAttackN+' 式（每式×1.2），后续增益×'+enBuffMul.toFixed(2)+'，防御压低我方总权重×'+enGuardMul.toFixed(2)+'，控制压低我方最高单式×'+enControlMul.toFixed(2)+'。','gold');
  await say('—— 敌方出手完毕（'+nE+' 式 · 合计 '+enW+'）——','battle');
  var mul=S.flags.molu?1.5:1; /* v2.10：魔罗仍全局×1.5；血道×2已在每式血道招式中结算 */
@@ -15275,11 +15333,12 @@ function dexStatics(k){
 }
 function dexHint(k,id){
  if(k==='spec'){var e=specEntry(id)||batchEntry(id);if(!e)return '';
+  var type='【'+combatMoveDirName(e)+'】';
   var t=String(e.trigger||'');
-  /* 敌方专属/不可获得的，不显示触发，退回流派·方向 */
-  if(t&&t!=='——'&&t.indexOf('专属')<0&&t.indexOf('不可获得')<0&&t.indexOf('玩家不可')<0)return t;
+  /* 敌方专属/不可获得的，不显示触发条件，但仍明确显示招式属性 */
+  if(t&&t!=='——'&&t.indexOf('专属')<0&&t.indexOf('不可获得')<0&&t.indexOf('玩家不可')<0)return type+t;
   var sc=e.school||'';if(sc.indexOf('(')>=0)sc=''; /* 数据表个别条目 school 为函数字样串，提示位不显示 */
-  return (sc?sc:'')+(e.dir?(sc?' · ':'')+e.dir:'');}
+  return type+(sc?sc+(e.dir?' · ':''):'')+(e.dir||'');}
  if(k==='ev'){
   if(IDENTITY_EVENT_META[id])return IDENTITY_EVENT_META[id].kind+' · '+IDENTITY_EVENT_META[id].basis;
   if(identityEventNames().indexOf(id)>=0)return '身份经历';
