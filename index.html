@@ -5317,7 +5317,7 @@ async function W(title,sub,secs,opt){
  /* v1.5.1：命运盘判定 —— 可显式 opt.fate，否则按标题关键词命中 */
  sp._isFate=(opt.fate!==undefined)?!!opt.fate:(function(){for(var fi=0;fi<_FATE_KW.length;fi++){if(title.indexOf(_FATE_KW[fi])>=0)return true;}return false;})();
  sp._rig=null;sp._rigCost=1;sp._locked=false;CUR_SP=sp;
- var _wwb=$('wheelWrap');if(_wwb)_wwb.classList.add('spinning'); /* v2.50：转动中锁点击，落定后恢复 */
+ var _wwb=$('wheelWrap');
  sp.secs.forEach(function(s0,i0){
   if(!s0._el)return;
   if(RIG_ON)s0._el.classList.add('rigAble');
@@ -5335,6 +5335,7 @@ async function W(title,sub,secs,opt){
  });
  if(RIG_ON){var rm0=$('resMain');if(rm0)rm0.textContent=chanTier()>0?('点盘面扇区，指定落点'+(sp._isFate?'（命运盘 · 消耗2次）':'')):'未得春秋蝉，定不得落点';}
  await fire();
+ if(_wwb)_wwb.classList.add('spinning'); /* v2.50：只在真正转动期间锁点击（开转前仍可点盘面指定落点） */
  sp._locked=true;
  var ws=[];for(var i=0;i<sp.secs.length;i++)ws.push(sp.secs[i].w);
  var rigged=(RIG_ON&&sp._rig!==null);
