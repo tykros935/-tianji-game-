@@ -2801,16 +2801,8 @@ var MORTAL_SCENES={
    事件池精简：坊间论道、临时委托、野地采蛊、竹林酒香、花酒遗洞退役；保留酒仙遗踪等原著辨识度更高的内容。 */
 
 
-/* 原著地点锚点：白骨山与三王传承。以下均为外围原创支线，不夺取方源所得传承、不改写铁若男追查主线。 */
+/* 原著地点锚点：白骨山与三王山外围。以下均为外围原创支线，不夺取方源所得传承、不改写铁若男追查主线。 */
 
-MORTAL_SCENES['三王传承']={
- opening:'三叉山周围人声鼎沸。犬王、信王、霸王三处传承接连开启，正魔两道蛊师在山道上来回穿梭，外围也成了争夺落脚点的战场。',
- context:'你没有进入三王传承核心，只在外围发现一处临时通道标记。另一队蛊师也盯上了它；若被他们抢先封住，你便只能绕行，甚至错过下一轮入口变化。',
- combat:[0,2],foe:'三王传承·外围争夺者',
- battle:'对方先以侦察蛊锁定你的位置，随后两名蛊师一前一后夹击。山道碎石滚动，身后还有其他队伍逼近，这场争斗必须速战速决。',
- victory:'你逼退对手，记下外围通道的变化规律。三处传承仍由原著人物与各方强者争夺，你得到的只是外围行路经验，并未截走任何核心传承。',
- records:['三王传承外围争道']
-};
 MORTAL_SCENES['三王山·犬群冲阵']={
  opening:'三王传承外围的山道忽然响起密集犬吠。几支犬群循着传承气息涌出林间，受伤蛊师与落单行人被逼到狭窄石坡。',
  context:'犬王传承以犬群为核心考验，外围犬群虽非传承核心的守关兽，却已足以冲散普通蛊师队伍。你可以迎战、借地势引开犬群，或先护送伤者撤离。',
@@ -3083,7 +3075,7 @@ var ERA_PLOT_REBUILD={
   factionBoundaries:['古月一族、白家、熊家、商家、北原部族、天庭、影宗、琅琊派、长生天及五域超级势力按各自原著时代阶段出现，不把后期组织形态提前。','影宗在义天山前的计划、至尊仙胎蛊炼制与核心争夺必须按阶段推进；玩家夺得仙胎后，方源失去原轨迹中的至尊仙胎机缘，后续影宗与天庭行动应读取本局归属。','宿命大战前后的天庭、长生天、影宗及五域联军状态必须根据本局事件结果变化，不得只改叙述。'],
   acts:[
    {id:'opening',name:'青茅山·重生起点',plot:'第二世从青茅山重新开始。玩家以自己的家族身份、资质与出身进入蛊师社会，经历古月学舍、三家竞争、元泉与蛊虫资源争夺，并在方源重生后与其处于同一时代。玩家可以选择与方源保持距离、交易或在局部事件中合作，但不会取代方源的重生身份与前世记忆。',goal:'建立玩家独立身份，实际参与青茅山资源与人物冲突，明确方源第二世起点与第一世背景的区别。',events:['蛤蟆商队','灵泉告急','青茅山祭祖','古月学舍','白家冰心','熊家猎场','方源同门','白凝冰·月下','古月方正','古月青书',],basis:'原著明确内容（青茅山、古月学堂、方源重生、白凝冰与古月方正等人物）＋游戏原创玩家经历',boundary:'玩家是游戏原创同代蛊师；玩家的青茅山经历为原创支线，不得将其写成春秋蝉本体、真传或重生凭证。'},
-   {id:'growth',name:'商家城·三王传承',plot:'玩家离开青茅山后进入商队与商家城的利益网络，参与赌石、拍卖、擂台、商家内部竞争，并在三叉山与三王传承外围争夺中亲自战斗。外围战斗可以改变玩家获得的资源、线索与伤势，但只有真正进入对应核心关卡并通过考验，才有资格争夺原著关键传承；方源的三王传承路线仍按其自身选择推进。',goal:'把商家城与三王传承从旁观叙述改为可参与的资源、战斗与人物选择，同时守住核心传承归属门槛。',events:['贾金生·赌石','商心慈·账房','商睚·比宝','商家夜宴','商城拍卖','商心慈·密谈','商心慈·联姻局','三王传承','三王山·犬群冲阵','三王山·断道救援','三王山·侧道抉择','三王山·信道残阵','铁若男·三叉山追查','铁若男·旧案旁证'],basis:'原著明确内容（三王传承、商家城、人物与势力）＋游戏原创外围争夺和玩家支线',boundary:'本幕当前登记的三王传承事件均为外围参与；不因完成外围事件自动获得犬王、信王、霸王核心传承或改写方源原著闯关。'},
+   {id:'growth',name:'商家城·三王传承',plot:'玩家离开青茅山后进入商队与商家城的利益网络，参与赌石、拍卖、擂台、商家内部竞争，并在三叉山与三王传承外围争夺中亲自战斗。外围战斗可以改变玩家获得的资源、线索与伤势，但只有真正进入对应核心关卡并通过考验，才有资格争夺原著关键传承；方源的三王传承路线仍按其自身选择推进。',goal:'把商家城与三王传承从旁观叙述改为可参与的资源、战斗与人物选择，同时守住核心传承归属门槛。',events:['贾金生·赌石','商心慈·账房','商睚·比宝','商家夜宴','商城拍卖','商心慈·密谈','商心慈·联姻局','三王山·犬群冲阵','三王山·断道救援','三王山·侧道抉择','三王山·信道残阵','铁若男·三叉山追查','铁若男·旧案旁证'],basis:'原著明确内容（三王传承、商家城、人物与势力）＋游戏原创外围争夺和玩家支线',boundary:'本幕当前登记的三王传承事件均为外围参与；不因完成外围事件自动获得犬王、信王、霸王核心传承或改写方源原著闯关。'},
    {id:'conflict',name:'北原·王庭与真阳楼',plot:'北原王庭之争、黑楼兰与黄金血脉的利益冲突逐步展开。玩家应有机会进入部族联盟、争夺王庭福地外围资源、参与真阳楼相关行动；王庭福地和八十八角真阳楼的核心机缘必须由实际进入、破解与胜利决定归属。',goal:'让玩家实质参与北原王庭与真阳楼争夺，并使玩家取得的资源、仙蛊和身份标记影响后续势力判断。',events:[],trialEvents:['王庭福地·完整争夺','八十八角真阳楼·核心夺取'],basis:'原著明确内容（王庭之争、黑楼兰、王庭福地与八十八角真阳楼）＋游戏原创玩家支线',boundary:'玩家可实际争夺完整王庭福地与八十八角真阳楼；成功通关核心争夺可取得完整王庭福地与八十八角真阳楼；失败则不获得本体。'},
    {id:'turning',name:'炼道大会·琅琊与影宗布局',plot:'炼道大会、不败福地成功道痕与琅琊福地构成炼道主线；其后影宗、东海龙宫、南疆梦境战场与五域势力布局逐渐交汇。玩家可以参与炼道竞争、协助或争夺资源、破解阵法并影响原著机缘归属；南疆梦境资源点须通过两阶段战斗完整夺取，不能以梦境碎片代替。',goal:'把炼道大会、琅琊、影宗、东海与南疆梦境战场转化为有门槛的行动节点，令资源归属与方源后续行动发生变化。',events:['白凝冰·竹林试剑',],trialEvents:['不败福地·成功道痕争夺','琅琊派·炼炉护阵'],basis:'原著明确内容（炼道大会、不败福地成功道痕、琅琊福地、九九连环不绝阵等）＋游戏原创玩家参与支线',boundary:'玩家可参与炼道外围竞试，并在满足条件后争夺完整不败福地及成功道痕；南疆梦境资源点为游戏原创完整资源点，不冒充原著具名洞天、仙蛊或仙蛊屋。'},
    {id:'ending',name:'义天山·宿命大战',plot:'义天山大战是第二世最重要的分支节点之一。玩家从外围战场进入蛊仙层，再根据身份与条件介入影宗核心；只有实际突破至尊仙胎核心阵眼并获胜，才开放至尊仙胎蛊争夺。宿命大战随后按玩家是否为天外之魔、是否真正参与并取得关键机缘，以及各方战果结算；战后再读取本局世界资产账本，分别调整方源、凤九歌、天庭、影宗、长生天及南疆势力的后续状态，不把原著结局无条件套用到所有存档。',goal:'以多阶段战斗与明确资格门槛决定至尊仙胎蛊及宿命大战的真实归属，建立可追踪的历史偏移。',events:['商心慈·危城夜'],trialEvents:['义天山大战','超级蛊阵争夺战','五界山脉混战','仙蛊拍卖会','逆流河历练'],route:'义天山大战 / fateWarAftermath() / tryEraZun()',basis:'原著明确内容（义天山大战、影宗仙胎计划、宿命大战）＋本局玩家干预分支',boundary:'战斗阶段、进入资格、核心归属与宿命蛊摧毁资格必须分别判定；观战和战败不能取得核心机缘。'},
@@ -3738,7 +3730,7 @@ var EVENT_ERA = {
   
   '三王山·断道救援':{minEra:10,maxEra:10},'三王山·侧道抉择':{minEra:10,maxEra:10},
   
-  '三王传承':{minEra:10},'三王山·犬群冲阵':{minEra:10},'铁若男·三叉山追查':{minEra:10},
+  '三王山·犬群冲阵':{minEra:10},'铁若男·三叉山追查':{minEra:10},
   '三王山·信道残阵':{minEra:10},'铁若男·旧案旁证':{minEra:10},
   '狐仙福地·荡魂山':{minEra:10},'繁星洞天·梦境残层':{minEra:10},
   '真阳楼·残阵余烬':{minEra:10},'琅琊福地·炼炉':{minEra:10},
@@ -4205,7 +4197,7 @@ function auditImmortalTravelExpansion(){
  out.ok=out.errors.length===0;return out;
 }
 function auditFangYuanCombatExpansion(){
- var out={ok:true,errors:[],checks:[],mortalEvents:['三王传承','三王山·犬群冲阵','三王山·信道残阵','铁若男·旧案旁证']},i,n,scene,srcB=String(battleRound),srcN=String(lianF10),srcF=String(doKeyTrial),srcD=String(doTravail),srcC=String(doCanonImmortalTravel);
+ var out={ok:true,errors:[],checks:[],mortalEvents:['三王山·犬群冲阵','三王山·信道残阵','铁若男·旧案旁证']},i,n,scene,srcB=String(battleRound),srcN=String(lianF10),srcF=String(doKeyTrial),srcD=String(doTravail),srcC=String(doCanonImmortalTravel);
  function check(name,ok){out.checks.push({name:name,ok:!!ok});if(!ok)out.errors.push(name);}
  for(i=0;i<out.mortalEvents.length;i++){
   n=out.mortalEvents[i];scene=MORTAL_SCENES[n];
@@ -4213,18 +4205,18 @@ function auditFangYuanCombatExpansion(){
   check('凡人战斗事件有战斗场景：'+n,!!(scene&&scene.combat&&scene.foe&&scene.battle));
   check('凡人战斗事件有图鉴与时代门控：'+n,DEX_ERA_EVENTS.indexOf(n)>=0&&!!EVENT_ERA[n]&&EVENT_ERA[n].minEra===10);
  }
- check('保留的凡人战斗事件胜负前写入一次性标记',/S\.marks\.push\('已见·三王传承'\)/.test(String(fangyuanMortalCombat))&&/S\.marks\.push\('已见·三王山·犬群冲阵'\)/.test(String(fangyuanMortalCombat)));
+ check('保留的凡人战斗事件胜负前写入一次性标记',true&&/S\.marks\.push\('已见·三王山·犬群冲阵'\)/.test(String(fangyuanMortalCombat)));
  check('战斗引擎支持专属敌方招式配置',/async function battleRound\(eT,label,onWin,opts\)/.test(srcB)&&/duel\(eT,label,opts\)/.test(srcB));
  check('原著人物切磋不会被误判为击杀/掠夺',/opts\.nonLethal/.test(srcB)&&/if\(!opts\.nonLethal\)/.test(srcB)&&/playerDefeat\(eT,label,at===0,opts\.deathName,opts\.saves,opts\.deathCut,opts\)/.test(srcB));
  check('古月青书新增非致死切磋分支',/古月青书（护寨切磋）/.test(String(lianF11))&&/nonLethal:true,fatalAsHurt:true/.test(String(lianF11)));
  check('低辨识度凡人事件已退役且不能直接调用',isRetiredMortalEvent('坊间论道')&&isRetiredMortalEvent('临时委托')&&isRetiredMortalEvent('野地采蛊')&&isRetiredMortalEvent('竹林酒香')&&isRetiredMortalEvent('花酒遗洞')&&!ERA_MORTAL_EVENTS[10].some(function(x){return x.n==='坊间论道'||x.n==='临时委托'||x.n==='野地采蛊'||x.n==='竹林酒香'||x.n==='花酒遗洞';}));
  check('退役事件不再保留时代门控',!EVENT_ERA['坊间论道']&&!EVENT_ERA['临时委托']&&!EVENT_ERA['野地采蛊']&&!EVENT_ERA['竹林酒香']&&!EVENT_ERA['花酒遗洞']);
- check('三王山犬群事件仅在第二世南疆外围传承后开放',/S\.fyLife===2&&S\.region==='南疆'&&hasMark\('已见·三王传承'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='三王山·犬群冲阵';})[0].g)));
- check('铁若男追查事件具有第二世、南疆与三王传承前置门控',/S\.fyLife===2&&S\.region==='南疆'&&hasMark\('已见·三王传承'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='铁若男·三叉山追查';})[0].g)));
+ check('三王山犬群事件仅在第二世南疆外围传承后开放',/S\.fyLife===2&&S\.region==='南疆'&&!hasMark\('已见·三王山·犬群冲阵'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='三王山·犬群冲阵';})[0].g)));
+ check('铁若男追查事件具有第二世、南疆门控',/S\.fyLife===2&&S\.region==='南疆'&&!hasMark\('已见·三王山·犬群冲阵'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='铁若男·三叉山追查';})[0].g)));
  check('铁若男事件只与铁家护卫非致死试招，不改写铁若男原著战斗',/铁家护卫（铁若男旁观试招）/.test(String(fangyuanMortalCombat))&&/nonLethal:true,fatalAsHurt:true/.test(String(fangyuanMortalCombat)));
  check('保留的信道残阵与铁若男旁证有独立处理与一次性标记',['三王山·信道残阵','铁若男·旧案旁证'].every(function(n){return String(fangyuanMortalCombat).indexOf("name==='"+n+"'")>=0&&/S\.marks\.push\('已见·/.test(String(fangyuanMortalCombat))&&DEX_ERA_EVENTS.indexOf(n)>=0&&!!EVENT_ERA[n]&&!!ERA_EVENT_REVIEW[10][n];}));
  check('信道残阵与铁若男旁证均有前置事件门控',/hasMark\('已见·三王山·犬群冲阵'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='三王山·信道残阵';})[0].g))&&/hasMark\('已见·铁若男·三叉山追查'\)/.test(String(ERA_MORTAL_EVENTS[10].filter(function(x){return x.n==='铁若男·旧案旁证';})[0].g)));
- check('三王传承外围事件不夺取原著核心传承',/没有改变原著传承归属/.test(String(fangyuanMortalCombat)));
+
  check('白凝冰竹林试剑采用原著冰雪道招式',/冰刃风暴/.test(srcN)&&/冰雨冻土/.test(srcN)&&/彻冰刀/.test(srcN));
  check('凤九歌命运歌事件包含原著歌类杀招战斗',/命运歌/.test(srcF)&&/fengMoveWheel\(8\)/.test(srcF)&&FENG_MOVES_8.indexOf('命运歌')>=0&&FENG_MOVES_8.indexOf('碧玉歌')>=0);
  check('天庭防线事件包含龙公原著招式战斗',/龙公·九龙压阵/.test(srcD)&&/乱龙拳/.test(srcD)&&/撼世龙锤/.test(srcD)&&/九龙纹护身/.test(srcD));
@@ -9223,7 +9215,7 @@ async function eraMortalExtraDispatch(name){
  }
  /* v2.50：炼天第二世四条游历事件改为多段盘（三路门槛／判定／单场死斗／硬失败／世界资产／一次性门控），
     不再走数据表的「三选一即结」。 */
- if(S.eraIdx===10&&name==='三王传承')return await fangyuanMortalCombat(name);
+
  if(S.eraIdx===10&&name==='界壁消散·跨域行商'){
   if(name==='界壁消散·跨域行商')await eraCrossRealmCaravan();
   else await eraFengMoKuOuter();
@@ -9798,112 +9790,7 @@ async function eraFengMoKuOuter(){
 }
 async function fangyuanMortalCombat(name){
  var c,eT,won;
-  if(name==='三王传承'){
-  if(S.flags.sanwangOuterDone){await say('三叉山外围的通道你已争过一次。山道上换了新的队伍，与你无关了。','');chr('三王传承·重游');return true;}
-  S.flags.sanwangOuterDone=true;
-  await say('三叉山上，犬王、信王、爆王三处传承的气息此起彼伏。各路蛊师为争夺入场时机与外围路线大打出手，你发现一处临时通道标记正被另一队人强行占据。','sys');
-  /* 第一段·入山三路：只有争通道一路是死斗；引兽与记录两路是判定，败了只写代价。 */
-  var c=await optW('三王传承·入山盘',[['抢下通道标记',40],['引兽群冲散对方阵形',35],['放弃争夺，记下入口变化',25]]);
-  var ev0=enemyMoveVal(foeAnchor(0,2)),opened=false,lured=false,kept=false,alive=true;
-  if(c===0){
-   alive=await backRound(foeAnchor(0,2),'三王传承｜对手：三王外围争夺者（无名蛊师）',async function(){
-    S.tIdx=Math.min(8,S.tIdx+1);
-    S.marks.push('三王外围收获·通道标记','三王外围经历·守住通道');
-    ensureWorldAssetState();
-    S.flags.worldAssets['三王传承·外围通道凭记']={id:'三王传承·外围通道凭记',name:'三王传承·外围通道凭记',state:'抢下的外围通道凭记',owner:'玩家',source:'三王传承',acquiredAge:S.age,basis:'外围通道争夺所得；三王传承本体仍归各方强者与原著归属',contents:['一段通道标记','两处换岗时辰的记号']};
-    setWorldAssetOwner('三王传承·外围通道凭记','玩家','三王传承','抢下的外围通道凭记，不涉三王传承本体');
-    await say('你击退对手，夺得一段外围路线标记。三王传承核心仍在各方强者手中，你没有改变原著传承归属。才情+1，得【三王传承·外围通道凭记】。','gold');
-   },{enemyMoves:[['犬群冲锋',ev0+7],['钢甲犬阵',ev0+8],['短桩',ev0+6],['爬山刀',ev0+5],['联手围堵',ev0+10]],enemySchool:'奴道',deathName:'三王山·外围争夺者',deathCut:0.10});
-   if(!alive){
-    S.flags.sanwangOuterFailed=true;S.flags.injured=2;S.flags.injuredFresh=true;
-    await say('犬群把你按在外围山道上。等你爬起来，通道已经换了主人——这一趟到此为止。','bad');
-    chr('三王传承·重伤退场');return true;
-   }
-   opened=true;
-  }else if(c===1){
-   if(await rollW(50+S.tIdx*3+rlm('变化道')*2,'三王传承引兽盘')){
-    S.flags.daoYuan=(S.flags.daoYuan||0)+1;lured=true;
-    S.marks.push('三王外围线索·引兽路线','三王外围经历·扰乱争夺者');
-    await say('你顺着兽道引来一群山兽，对方阵形被冲散，你趁乱穿过外层封锁。道缘+1，留下【三王外围线索·引兽路线】。','gold');
-   }else{
-    spendLife(2);S.pctMods-=0.06;
-    await say('兽群被对方提前引开，反把山道堵死。你困了两个时辰才出来。寿元-2，权重-6%。','bad');
-   }
-  }else{
-   S.tIdx=Math.min(8,S.tIdx+1);kept=true;
-   S.marks.push('三王外围线索·通道开启规律');
-   await say('你放弃争夺，观察三处传承气息变化，记下下一轮通道开启的时间规律。才情+1，留下【三王外围线索·通道开启规律】。','gold');
-  }
-  /* 第二段·三方周旋：正道、魔道、散修各记一份态度，态度决定之后能在外层夹道里取到什么。 */
-  await say('外围营地分成三处：正道联军在山门侧扎帐，魔道散修占着崖下的火堆，散修与游商挤在官道边换货。','sys');
-  var faction=await optW('三王传承·周旋盘',[['去正道帐前答话，认下过道次序',40],['到崖下火堆边与魔道散修换货',35],['留在官道边，与游商互通消息',25]]);
-  var attR=0,attD=0,attS=0;
-  if(faction===0){
-   if(await rollW(54+S.dhIdx*3,'三王传承·正道盘')){attR++;if(dhStep())await say('你把外围通道的次序讲清楚，正道联军认下你的说辞。道心+1（正道态度 +1）。','good');}
-   else{spendLife(2);S.dhIdx=Math.max(0,S.dhIdx-1);await say('正道嫌你来路不明，把你晾在帐外半日。道心-1，寿元-2。','bad');}
-  }else if(faction===1){
-   if(await rollW(52+S.tIdx*3,'三王传承·魔道盘')){attD++;S.tIdx=Math.min(8,S.tIdx+1);S.morIdx=Math.max(0,S.morIdx-1);await say('崖下的散修与你换了货，也把外层夹道的暗格位置漏给你（才情+1，道德-1，魔道态度 +1）。','bad');}
-   else{spendLife(2);S.morIdx=Math.max(0,S.morIdx-1);await say('换货换到一半被掀了摊子，你只落了一身灰。道德-1，寿元-2。','bad');}
-  }else{
-   if(await rollW(56+S.tIdx*3,'三王传承·游商盘')){attS++;S.tIdx=Math.min(8,S.tIdx+1);await say('官道边的游商把三处的换岗时辰拼给你听（才情+1，散修态度 +1）。','good');}
-   else{spendLife(2);S.tIdx=Math.max(0,S.tIdx-1);await say('游商的话半真半假，你听了一整日才辨出假的那些（才情-1，寿元-2）。','bad');}
-  }
-  /* 第三段·夹道取物：只看不取的旧例改成真取——按态度拿到不同的实体蛊材。 */
-  await say('通道开了一条缝。缝隙后是传承外层的夹道，光柱在里面折成三色；再往里就是各方强者接手的地方。','bad');
-  var attMax=Math.max(attR,attD,attS);
-  if(await rollW(56+S.tIdx*3+attMax*6,'三王传承·夹道取物盘'+(attMax?'（周旋加成）':''))){
-   await mortalLvGain(0.5,'三王传承·夹道取物');
-   ensureWorldAssetState();
-   var _got=null;
-   if(attR>=attD&&attR>=attS){
-    S.flags.worldAssets['三王传承·犬奴蛊材']={id:'三王传承·犬奴蛊材',name:'三王传承·犬奴蛊材',state:'外层夹道剥下的一具犬奴蛊材（本体）',owner:'玩家',source:'三王传承',acquiredAge:S.age,basis:'正道联军许可下自外层夹道取回，未进入传承核心',contents:['犬奴甲片一副','两条带着犬王气息的蛊纹']};
-    _got='三王传承·犬奴蛊材';
-   }else if(attD>=attS){
-    S.flags.worldAssets['三王传承·爆裂蛋蛊残蛋']={id:'三王传承·爆裂蛋蛊残蛋',name:'三王传承·爆裂蛋蛊残蛋',state:'外层夹道拾得的两枚爆裂蛋蛊残蛋（本体）',owner:'玩家',source:'三王传承',acquiredAge:S.age,basis:'魔道散修指路后自外层夹道取回，未进入传承核心',contents:['爆裂蛋蛊残蛋两枚','一段火痕壳纹']};
-    _got='三王传承·爆裂蛋蛊残蛋';
-   }else{
-    S.flags.worldAssets['三王传承·纸鹤信线']={id:'三王传承·纸鹤信线',name:'三王传承·纸鹤信线',state:'外层夹道截下的纸鹤信线（本体）',owner:'玩家',source:'三王传承',acquiredAge:S.age,basis:'游商指路后自外层夹道截下，未进入传承核心',contents:['纸鹤信线一束','两枚折痕不同的鹤羽']};
-    _got='三王传承·纸鹤信线';
-   }
-   setWorldAssetOwner(_got,'玩家','三王传承','外围夹道所得，未进入传承核心');
-   await wormUp(1);
-   if(!hasMark('三王外围经历·夹道取物'))S.marks.push('三王外围经历·夹道取物');
-   await say('你贴着夹道壁走了一段，只取外层可见的那一件，随后退出来。境界+半转，完善度+1，得【'+_got+'】。','gold');
-  }else{
-   spendLife(3);S.pctMods-=0.06;
-   await say('缝口在你身上合了一半，你半个人被卡在石缝里，靠外人拽才出来。寿元-3，权重-6%。','bad');
-  }
-  /* 第四段·收场：外围所得按分支登记。 */
-  var fin=await optW('三王传承·收场盘',[['把外围所见整理成一册',34],['替后来的人标出安全的走法',33],['守在外围，等下一轮通道开启',33]]);
-  ensureWorldAssetState();
-  var road=false;
-  if(fin===0){
-   S.tIdx=Math.min(8,S.tIdx+1);
-   if(!hasMark('三王外围经历·整理成册'))S.marks.push('三王外围经历·整理成册');
-   S.flags.worldAssets['三王传承·外围路线图']={id:'三王传承·外围路线图',name:'三王传承·外围路线图',state:'外围通道、犬群常路与换岗时辰的整理图',owner:'玩家',source:'三王传承',acquiredAge:S.age,basis:'以外围所见整理，属外围所得',contents:['一条避开犬群常路的山道','两处可供歇脚的石台','三处换岗时辰']};
-   setWorldAssetOwner('三王传承·外围路线图','玩家','三王传承','以外围所见整理');
-   await say('你把通道、犬群常路与换岗时辰并成一册，翻一遍就知道外围怎么走。才情+1，得【三王传承·外围路线图】。','gold');
-  }else if(fin===1){
-   dhStep();S.flags.daoYuan=(S.flags.daoYuan||0)+1;road=true;
-   if(!hasMark('三王外围经历·留下走法'))S.marks.push('三王外围经历·留下走法');
-   await say('你在山道口的石壁上刻了几处记号，标出犬群常路与能歇脚的石台。后来的队伍照着走，少绕了许多路。道心+1，道缘+1。','good');
-  }else{
-   if(await rollW(58+S.dhIdx*3,'三王传承·候门盘')){
-    dhStep();
-    if(!hasMark('三王外围经历·候到开门'))S.marks.push('三王外围经历·候到开门');
-    await say('你守在外围，等通道第二次开启。这一次你比谁都早半步站在缝口。道心+1，留下【三王外围经历·候到开门】。','good');
-   }else{
-    spendLife(2);S.pctMods-=0.06;
-    await say('你在山道口守了两日，通道始终没开，干粮先见了底。寿元-2，权重-6%。','bad');
-   }
-  }
-  /* 第五段·收场结算：按分支决定所得。 */
-  if(opened&&road){if(dhStep())await say('凭记换来的那条走法，往后你还用得上。道心+1。','good');}
-  if(kept&&!lured&&!opened)await say('你没有抢到任何标记，只带走一份开启规律——通道下次开时，你比别人早半步。','sys');
-  await say('三王的传承本体仍在夹道深处，由各方强者与原著归属决定；你带走的是外围能带走的那一份。','sys');
-  S.marks.push('已见·三王传承');chr('三王传承');return true;
- }
- if(name==='三王山·犬群冲阵'){
+  if(name==='三王山·犬群冲阵'){
   await say('三王传承外围的山道忽然响起密集犬吠。几支犬群循着传承气息涌出林间，受伤蛊师与落单行人被逼到狭窄石坡。','sys');
   await say('犬王传承的核心考验仍在更深处。你面对的只是外围被气息引动的犬群，但若处理不当，仍可能被兽群冲散。','bad');
   c=await optW('三王山·犬群冲阵',[['正面迎战，护住山道',40],['引犬群冲击争夺者阵形',35],['先护送伤者撤离',25]]);
@@ -9928,12 +9815,8 @@ async function fangyuanMortalCombat(name){
   S.marks.push('已见·铁若男·三叉山追查');chr('铁若男·三叉山追查');return true;
  }
   if(name==='三王山·信道残阵'){
-  var priorRoute=hasMark('三王外围收获·通道标记')||hasMark('三王外围线索·争夺路线'),priorBeast=hasMark('三王外围线索·引兽路线'),priorTiming=hasMark('三王外围线索·通道开启规律'),priorRescue=hasMark('三王山经历·护送伤者');
+  var priorRescue=hasMark('三王山经历·护送伤者');
   await say('犬群冲阵后，你沿外围山道寻找退路。雨水冲开一段旧石阶，石阶下露出数块刻有纹路的石板。纹路彼此勾连，像是某种残缺的传讯阵式。','sys');
-  if(priorRoute)await say('你此前夺得过外围通道标记，石板上的一处刻痕与那段路线相互印证，至少能确认残阵指向的不是传承核心入口。','good');
-  else if(priorBeast)await say('你此前引动过山兽冲散争夺者，石板周围残留的兽道痕迹让你意识到：阵纹有一部分可能只是引导外围行路的标记。','sys');
-  else if(priorTiming)await say('你此前记录过三处传承气息变化的时序，眼前几道纹路的明暗节奏与那份记录大致吻合。','good');
-  else if(priorRescue)await say('此前获救的伤者队伍给你指过一条避开争夺者的山道，你因此能从较安全的位置观察石板，不必贸然靠近。','sys');
   await say('三王传承中确有信王传承，但眼前残阵并不能证明与信王核心真传有关。几名蛊师已经围在石板旁：有人想强行拆走，有人认为阵纹仍在运转，拆错一块便会引发山石崩塌。你必须先判断残阵是否值得冒险。','bad');
   c=await optW('三王山·信道残阵',[['逐块辨认阵纹，尝试复原讯息',40],['阻止争阵者强拆石板',35],['记下方位与纹路后撤离',25]]);
   if(c===0){if(await rollW(54+S.tIdx*3+rlm('信道')*2,'信道残阵推演盘')){S.flags.daoYuan=(S.flags.daoYuan||0)+1;S.marks.push('三王山残阵线索·外围旧山道','三王山残阵经历·成功推演');await mortalGrowthReward('信道','信道残阵推演');await say('你将石板上的断纹按方位重新排列，读出几段残缺的路线提示。它们只指向外围一处旧山道，并非开启信王传承的钥匙。道缘+1，信道有所领会。','gold');}
@@ -9971,15 +9854,14 @@ function auditMortalOuterClueFlow(){
  var a=String(fangyuanMortalCombat),out={ok:true,checks:[],errors:[]};
  function ck(n,ok){out.checks.push({name:n,ok:!!ok});if(!ok)out.errors.push(n);}
  ck('白骨山胜利/成功分支保存实际骨材与路线线索',a.indexOf('白骨山收获·少量骨材')>=0&&a.indexOf('白骨山线索·外围路线拓印')>=0&&a.indexOf('白骨山线索·山势变化')>=0);
- ck('三王外围三种选择分别保存通道、引兽或时序线索',a.indexOf('三王外围收获·通道标记')>=0&&a.indexOf('三王外围线索·引兽路线')>=0&&a.indexOf('三王外围线索·通道开启规律')>=0);
  ck('犬群成功分支保存迎战、引犬或护送经历',a.indexOf('三王山经历·正面迎犬')>=0&&a.indexOf('三王山经历·引犬脱身')>=0&&a.indexOf('三王山经历·护送伤者')>=0);
- ck('信道残阵读取先前三王外围经历',a.indexOf('priorRoute=hasMark')>=0&&a.indexOf('priorBeast=hasMark')>=0&&a.indexOf('priorTiming=hasMark')>=0&&a.indexOf('priorRescue=hasMark')>=0);
+ ck('信道残阵读取先前犬群冲阵经历',a.indexOf('priorRescue=hasMark')>=0);
  ck('信道残阵三类结果均记录实际线索或经历',a.indexOf('三王山残阵线索·外围旧山道')>=0&&a.indexOf('三王山残阵经历·阻止强拆')>=0&&a.indexOf('三王山残阵线索·纹路方位')>=0);
  out.ok=out.errors.length===0;return out;
 }
 
-/* 炼天第二世四条游历事件（界壁消散·跨域行商／疯魔窟·外围异象／五域气潮迁徙／三王传承）重做后的静态只读审计。 */
-/* 炼天第二世四条游历事件（界壁消散·跨域行商／疯魔窟·外围异象／五域气潮迁徙／三王传承）重做后的静态只读审计。
+/* 炼天第二世三条游历事件（界壁消散·跨域行商／疯魔窟·外围异象／五域气潮迁徙）重做后的静态只读审计。 */
+/* 炼天第二世三条游历事件（界壁消散·跨域行商／疯魔窟·外围异象／五域气潮迁徙）重做后的静态只读审计。
    v2.50 第二轮：四条各有各的走法（无战斗的议价连锁／三夜浓度递进／抢运计数分档／三方态度取材），
    并核对「致死对局落败即硬失败、当场结束、不发资产」与「按分支给实体所得」。 */
 function auditEraVoyageRework(pool10){
@@ -9987,31 +9869,30 @@ function auditEraVoyageRework(pool10){
  var p10=(pool10&&pool10.length)?pool10:((typeof ERA_MORTAL_EVENTS!=='undefined'&&ERA_MORTAL_EVENTS[10])?ERA_MORTAL_EVENTS[10]:[]);
  function gateSrc(n){for(var i=0;i<p10.length;i++){if(String(p10[i].n)===n)return String(p10[i].g||'');}return '';}
  var cr=String(eraCrossRealmCaravan),fk=String(eraFengMoKuOuter);
- var sw=String(fangyuanMortalCombat),ex=String(eraMortalExtraDispatch);
+ var ex=String(eraMortalExtraDispatch);
  var run=String(runGame),ddy=String(destroyDestinyWorm),gate=String(mortalEraExtraGate),deck=String(greatEraEventDeck);
  var lvG=(typeof mortalLvGain==='function')?String(mortalLvGain):'';
  function ck(name,ok,detail){out.checks.push({name:name,ok:!!ok,detail:detail||''});if(!ok)out.errors.push(name);}
- var hook=/S\.eraIdx===10&&name==='三王传承'\)return await fangyuanMortalCombat\(name\)/.test(ex)&&/S\.eraIdx===10&&name==='界壁消散·跨域行商'/.test(ex);
+ var hook=/S\.eraIdx===10&&name==='界壁消散·跨域行商'/.test(ex);
  ck('三条事件改由多段处理器接管，不再即时结算',hook&&/await eraCrossRealmCaravan\(\)/.test(ex)&&/await eraFengMoKuOuter\(\)/.test(ex)&&!/eraQiChaoMigration/.test(ex));
- ck('三条事件仍保留一次性门控',/S\.marks\.push\('已见·'\+name\)/.test(ex)&&/S\.marks\.push\('已见·三王传承'\)/.test(sw)&&/crossRealmDone/.test(cr)&&/fengMoKuDone/.test(fk)&&/sanwangOuterDone/.test(sw));
- ck('三条不再共用同一模板：各有各的机制',/basis\?10:0/.test(cr)&&!/moN|attR/.test(cr)&&/moN/.test(fk)&&/moN<=0/.test(fk)&&!/basis\?10:0/.test(fk)&&/attR/.test(sw)&&/attD/.test(sw)&&/attS/.test(sw)&&!/basis\?10:0/.test(sw),'议价连锁／三夜浓度／三方态度，机制互不重复');
+ ck('三条事件仍保留一次性门控',/S\.marks\.push\('已见·'\+name\)/.test(ex)&&/crossRealmDone/.test(cr)&&/fengMoKuDone/.test(fk));
+ ck('三条不再共用同一模板：各有各的机制',/basis\?10:0/.test(cr)&&!/moN/.test(cr)&&/moN/.test(fk)&&/moN<=0/.test(fk)&&!/basis\?10:0/.test(fk),'议价连锁／三夜浓度／三方态度，机制互不重复');
  ck('无谓战斗继续压减：界壁消散完全不打',!/await backRound\(/.test(cr)&&!/await duel\(/.test(cr)&&!/await sparRound\(/.test(cr));
- ck('保留的两场死斗各只有一场',(fk.match(/await backRound\(/g)||[]).length===1&&(sw.match(/await backRound\(/g)||[]).length===1&&(fk.match(/await sparRound\(/g)||[]).length===0);
- ck('死斗具名死法与致死分级 0.10',/deathName:'疯魔窟·蜕壳异蛊'/.test(fk)&&/deathCut:0\.10/.test(fk)&&/deathName:'三王山·外围争夺者'/.test(sw)&&/deathCut:0\.10/.test(sw));
- ck('致死对局落败即硬失败：重伤退出并当场结束',/if\(!alive\)\{[\s\S]{0,120}S\.flags\.fengMoKuFailed=true;S\.flags\.injured=2;S\.flags\.injuredFresh=true;[\s\S]{0,220}return;/.test(fk)&&/if\(!alive\)\{[\s\S]{0,120}S\.flags\.sanwangOuterFailed=true;S\.flags\.injured=2;S\.flags\.injuredFresh=true;[\s\S]{0,260}return true;/.test(sw),'落败分支在播出任何后续段落之前返回');
- ck('落败分支不发资产、不给主属性',!/if\(!alive\)\{[\s\S]{0,300}worldAssets/.test(fk)&&!/if\(!alive\)\{[\s\S]{0,300}worldAssets/.test(sw)&&!/if\(!alive\)\{[\s\S]{0,200}S\.tIdx=Math\.min/.test(sw));
- ck('四条都给出实体所得（蛊材／蛊虫／文书／灵液）',['跨域坊市·东海水货蛊材','跨域坊市·北原皮张','跨域坊市·价目对照册'].every(function(k){return cr.indexOf("worldAssets['"+k+"']")>=0;})&&['疯魔窟外围·蜕壳异蛊残壳','疯魔窟外围·逆壳蛊','疯魔窟外围·双井水源'].every(function(k){return fk.indexOf("worldAssets['"+k+"']")>=0;})&&!/五域气潮迁徙/.test(qcGone)&&['三王传承·犬奴蛊材','三王传承·爆裂蛋蛊残蛋','三王传承·纸鹤信线'].every(function(k){return sw.indexOf("worldAssets['"+k+"']")>=0;})&&/setWorldAssetOwner\(/.test(cr+fk+sw));
- ck('实体所得同时落到蛊虫完善度',/await wormUp\(1\)/.test(cr)&&/await wormUp\(2\)/.test(fk)&&/await wormUp\(1\)/.test(sw));
+ ck('保留的两场死斗各只有一场',(fk.match(/await backRound\(/g)||[]).length===1&&(fk.match(/await sparRound\(/g)||[]).length===0);
+ ck('死斗具名死法与致死分级 0.10',/deathName:'疯魔窟·蜕壳异蛊'/.test(fk)&&/deathCut:0\.10/.test(fk));
+ ck('致死对局落败即硬失败：重伤退出并当场结束',/if\(!alive\)\{[\s\S]{0,120}S\.flags\.fengMoKuFailed=true;S\.flags\.injured=2;S\.flags\.injuredFresh=true;[\s\S]{0,220}return;/.test(fk),'落败分支在播出任何后续段落之前返回');
+ ck('落败分支不发资产、不给主属性',!/if\(!alive\)\{[\s\S]{0,300}worldAssets/.test(fk));
+ ck('三条都给出实体所得（蛊材／蛊虫／文书／灵液）',['跨域坊市·东海水货蛊材','跨域坊市·北原皮张','跨域坊市·价目对照册'].every(function(k){return cr.indexOf("worldAssets['"+k+"']")>=0;})&&['疯魔窟外围·蜕壳异蛊残壳','疯魔窟外围·逆壳蛊','疯魔窟外围·双井水源'].every(function(k){return fk.indexOf("worldAssets['"+k+"']")>=0;})&&!/五域气潮迁徙/.test(qcGone)&&/setWorldAssetOwner\(/.test(cr+fk));
+ ck('实体所得同时落到蛊虫完善度',/await wormUp\(1\)/.test(cr)&&/await wormUp\(2\)/.test(fk));
  var qcGone='五域气潮迁徙';
  ck('入口三路各有门槛且门槛不足自动降档',/canGoods/.test(cr)&&/canLedger/.test(cr)&&/route=2;/.test(cr)&&/canWell/.test(fk)&&/canGuard/.test(fk));
- ck('失败分支只写代价、不给补偿',/权重-6%/.test(cr)&&/寿元-2/.test(cr)&&/才情-1/.test(fk)&&/道心-1/.test(fk)&&/权重-6%/.test(sw));
+ ck('失败分支只写代价、不给补偿',/权重-6%/.test(cr)&&/寿元-2/.test(cr)&&/才情-1/.test(fk)&&/道心-1/.test(fk));
  ck('五域气潮迁徙已按用户要求删除',typeof eraQiChaoMigration==='undefined'&&LIFE_GATE.indexOf('五域气潮迁徙')<0&&!EVENT_ERA['五域气潮迁徙']&&DEX_ERA_EVENTS.indexOf('五域气潮迁徙')<0&&(ERA_MORTAL_EXTRA||[]).every(function(x){return x.n!=='五域气潮迁徙';})&&!/五域气潮迁徙/.test(deck),'处理器、登记表、时代池与转盘都不再包含该条');
- ck('三王传承仍只取外围，不改原著传承归属',/三王传承本体仍归各方强者与原著归属/.test(sw)&&/你没有改变原著传承归属/.test(sw)&&/未进入传承核心/.test(sw)&&/三王外围收获·通道标记/.test(sw)&&/三王外围线索·引兽路线/.test(sw)&&/三王外围线索·通道开启规律/.test(sw));
  ck('不再走数据表的即时流派奖励',!/mortalEraRewardSchool/.test(cr+fk));
    ck('疯魔窟·外围异象已按用户要求删除',!/已见·疯魔窟·外围异象'\)\)travPool\.push/.test(run)&&!/n==='疯魔窟·外围异象'/.test(gate)&&!/name==='疯魔窟·外围异象'/.test(ex));
  ck('宿命大战后事件不再走凡人期时代盘',/n==='界壁消散·跨域行商'\)return !!S\.flags\.fateWarComplete/.test(gate)&&/mortalEraExtraGate/.test(gateSrc('界壁消散·跨域行商')),'改由五域大时代·事件盘承接');
  ck('凡人期境界奖励带升仙前封顶',/S\.lv>=6\)\?9:5/.test(lvG)&&/Math\.min\(cap,S\.lv\+v\)/.test(lvG)&&/蛊师等级/.test(lvG),'可给半转或一转，升仙前五域封顶不破六转');
-   ck('部分重奖励已换成境界',/mortalLvGain\(/.test(cr)&&/mortalLvGain\(/.test(sw)&&/境界\+半转/.test(sw)&&/境界\+半转/.test(cr),'部分重奖励改为蛊师等级半转／一转');
+   ck('部分重奖励已换成境界',/mortalLvGain\(/.test(cr)&&/境界\+半转/.test(cr),'部分重奖励改为蛊师等级半转／一转');
  ck('原著事件盘加次数盘（1~3 次，各约三分之一）',/canonCntSecs=\[\['1次',34\],\['2次',33\],\['3次',33\]\]/.test(run)&&/canonFresh\(/.test(run)&&/_cd<canonTimes/.test(run),'抽到参与后按次数盘抽 1~3 条，抽过的条目移出本局候选池');
  ck('五域大时代·事件盘只在宿命大战结束后走一次',/五域大时代·事件盘/.test(deck)&&/greatEraDeckDone/.test(deck)&&/await eraCrossRealmCaravan\(\)/.test(deck)&&!/五域气潮迁徙/.test(deck)&&/await fateWarAftermath\(\);\n await greatEraEventDeck\(\);[^\n]*\n await fengkoku\(\);/.test(ddy),'顺序：战后余波 → 大时代事件盘（只余界壁消散）→ 疯魔窟');
  out.ok=out.errors.length===0;return out;
@@ -11701,11 +11582,10 @@ var ERA_MORTAL_EVENTS={
      {n:'商心慈·危城夜',w:10,g:function(){return (hasMark('商家定约·合作')||hasMark('商家定约·姻盟')||hasMark('商心慈同盟'))&&!hasMark('商心慈危城夜已结');}},
      {n:'外出历练',w:12},
      {n:'研习流派',w:10},
-     /* 原著锚点：白骨山传承、三王传承；具体外围遭遇为游戏原创，不改变方源主线。 */
+     /* 原著锚点：白骨山传承、三王山外围；具体外围遭遇为游戏原创，不改变方源主线。 */
      
-     {n:'三王传承',w:8,g:function(){return S.fyLife===2&&S.region==='南疆'&&!hasMark('已见·三王传承');}},
-     {n:'三王山·犬群冲阵',w:8,g:function(){return S.fyLife===2&&S.region==='南疆'&&hasMark('已见·三王传承')&&!hasMark('已见·三王山·犬群冲阵');}},
-     {n:'铁若男·三叉山追查',w:7,g:function(){return S.fyLife===2&&S.region==='南疆'&&hasMark('已见·三王传承')&&!hasMark('已见·铁若男·三叉山追查');}},
+     {n:'三王山·犬群冲阵',w:8,g:function(){return S.fyLife===2&&S.region==='南疆'&&!hasMark('已见·三王山·犬群冲阵');}},
+     {n:'铁若男·三叉山追查',w:7,g:function(){return S.fyLife===2&&S.region==='南疆'&&!hasMark('已见·铁若男·三叉山追查');}},
      {n:'三王山·信道残阵',w:8,g:function(){return S.fyLife===2&&S.region==='南疆'&&hasMark('已见·三王山·犬群冲阵')&&!hasMark('已见·三王山·信道残阵');}},
      {n:'铁若男·旧案旁证',w:7,g:function(){return S.fyLife===2&&S.region==='南疆'&&hasMark('已见·铁若男·三叉山追查')&&!hasMark('已见·铁若男·旧案旁证');}},
      {n:'三王山·断道救援',w:9,g:function(){return S.fyLife===2&&S.region==='南疆'&&!hasMark('已见·三王山·断道救援');}},
@@ -11958,7 +11838,6 @@ var ERA_EVENT_REVIEW={
   
   
   
-  '三王传承':{actId:'conflict',kind:'传承外围战斗',status:'已核对',basis:'原著明确内容＋游戏原创遭遇（三王传承、犬王/信王/霸王传承为原著内容；外围通道争夺为原创）',note:'玩家只争夺外围通道标记与行路经验，不进入核心关卡，不获得原著关键传承，不改变方源、白凝冰、铁若男及各方强者的传承归属。'},
   '三王山·犬群冲阵':{actId:'conflict',kind:'兽群战斗',status:'已核对',basis:'原著明确背景＋游戏原创遭遇（三王传承中的犬王传承与犬群考验有原著依据；外围犬群冲阵为原创）',note:'玩家只在三叉山外围遭遇被传承气息引动的犬群，不进入犬王传承核心、不夺取传承，不替代方源及其他强者的原著闯关。'},
   '铁若男·三叉山追查':{actId:'turning',kind:'原著人物遭遇',status:'已核对',basis:'原著明确人物与动机＋游戏原创支线（铁若男追查铁血冷死于青茅山的真相有原著依据；玩家提供外围见闻为原创）',note:'铁若男仍沿原著线索追查父亲之死；玩家提供的外围蛊痕不揭穿方源身份、不替代原著关键证据。护卫试招仅为非致死原创切磋，不与铁若男本人交战。'},
   
@@ -16186,7 +16065,7 @@ async function doKeyTrial(n,force){
      await say('你截下百战不殆蛊，信王百关的纸鹤改认你为主（才情+1，道缘+1）。','gold');
     },{enemyMoves:[['纸鹤传信',ev2+6],['信线缠身',ev2+8],['毛民百关',ev2+9],['百战不殆',ev2+10],['信道封锁',ev2+5],['纸鹤分身',ev2+7]],enemySchool:'信道',deathName:'三叉山·冯天宇'});
    }else{
-    await say('你挟纸鹤信线直取中央大殿，半路被铁家【铁若男】截住。她为铁木白之死而来，金道杀招一寸寸封死信线。','sys');
+    await say('你挟纸鹤信线直取中央大殿，半路被铁家【铁若男】截住。她为青茅山铁血冷旧案而来，金道杀招一寸寸封死信线。','sys');
     all=await backRound(e2,'三叉山·信线突围｜对手：铁家·铁若男（四转·金道）',async function(){
      S.pctMods+=0.05;await say('你冲破铁若男的金道封锁，抢先进入中央大殿（权重+5%）。','good');
     },{enemyMoves:[['金铁拳',ev2+8],['铁壁',ev2+5],['金风',ev2+6],['金龙',ev2+9],['化金',ev2+10],['铁家搜魂锁',ev2+7]],enemySchool:'金道',deathName:'三叉山·铁若男'});
@@ -18179,7 +18058,7 @@ var DEX_ERA_EVENTS=[ /* 各时代异闻（genericEvent 按名分发；顺序与�
  
  /* v1.42：新增十一时代凡人事件 */ '气脉分田', '元始遗训', '异人来使', '天庭旧制',  '气脉巡渠', '山道伏兽', '古寨炼摊',  '木灵采种', '星宿棋痕', '智道书院', '天庭旧册', '星门传令', '无极石壁', '疯魔窟役工',  '道场封门', '狂蛮兽图', '部族盟誓', '异人猎场', '变化道遗骨', '红莲残瓣', '光阴渡口', '宿命旧说', '红莲棋局', '元莲画意', '画坊修卷', '天元宝莲', '豆神宫旧闻', '盗天空门', '本杰孙旧闻', '遁空蛊残图', '长毛炼场', '巨阳王庭', '黄金血脉', '运道签摊', '北原婚盟', '幽魂魂碑', '影宗余烬', '青家旧恨',  '乐土行愿', '乐土门人传法', '悔哭海传闻', '净土遗规', '灾田复耕', '魂兽余患',
  
- '三王传承','三王山·犬群冲阵','三王山·断道救援','三王山·侧道抉择','铁若男·三叉山追查',
+ '三王山·犬群冲阵','三王山·断道救援','三王山·侧道抉择','铁若男·三叉山追查',
  '三王山·信道残阵','铁若男·旧案旁证','仇家追杀',
  /* v1.43：时代连续支线后续（只登记时代池事件；凡人场景/随机奇遇不登记） */
  '气脉旧契','星棋续局','石壁守夜','兽图盟约','渡口归信','画工留名','归乡残页','王庭分肉','余烬密令','行愿回灯',
