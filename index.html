@@ -1129,7 +1129,7 @@ var $=function(id){
 function $invalidate(id){if(id)delete _domCache[id];else _domCache=Object.create(null);}
 var RNG=Math.random; /* v1.1.2：种子机制已删除，随机源恢复为原生随机 */
 /* 版本号与更新日志（玩家可见）：标题、分享游戏文件、分享战报统一读取此值。 */
-var APP_VER='v2.50'; /* v2.50：炼天第二世三王山外围新增断道救援/侧道抉择；全量解除炼天专属退役，事件按原著时序全部归位可玩 */
+var APP_VER='v2.51'; /* v2.51：战斗权重改为「转数给底＋原著分量加成」；磨砂层不再频繁重算背景模糊，明显掉帧时自动关闭；播报的语音列表只查询一次并缓存 */
 /* v2.45 更新：从十个时代池移除25条重复/空泛遭遇；移除11条时代余烬纯旁白入口；同步清理 ERA_MORTAL_EVENTS、ERA_MORTAL_EXTRA 与 DEX_ERA_EVENTS。 */
 /* v2.47 修正：恢复误删的尊者时代事件；本分支只保留炼天时期凡人事件删减。 */
 /* v2.50 全量归位：炼天时期专属事件全部恢复可玩。
@@ -1161,7 +1161,11 @@ function isReworkEvent(n){
 }
 /* CHANGELOG 结构：{v:版本号, items:[[tag, text], ...]}
    tag：new 新增 / fix 修复 / bal 平衡；v1.92 起累计补齐重构阶段日志。 */
-var CHANGELOG=[ {v:'v2.50',items:[ ['new','决战方源时，每轮改为正常抽我方的出手次数盘与杀招轮；方源的招式逐式落在盘面上，看得见他是怎么出手的。'], ['bal','删掉 7 条内容偏薄的升仙后游历事件，池子更干净。'], ['new','重做 4 条低质升仙后游历事件：超级蛊阵争夺战、琅琊派·炼炉护阵、龙鲸乐土·悔哭海、光阴长河探索，都补上具体人物、势力、分支路线与明确产出。'], ['fix','王庭福地回到凡人期的事件盘，不再出现在升仙后；其中对手等级按该阶段重新搭配，八十八角真阳楼的前置条件同步放宽，不会因此被锁死。'], ['new','凡人期补上修为成长：若干区域游历与王庭福地可以稳定推进修为，不再只靠偶尔撞上。'], ['new','东方长凡夺舍大幅扩写：夺舍过程有对抗、反搜法门、取资源清册三条走向，失败有实在代价。'], ['fix','版本号从 v2.49 递增至 v2.50；游戏显示、分享游戏文件、分享战报与更新日志统一读取 APP_VER。'] ]}, {v:'v2.49',items:[
+var CHANGELOG=[ {v:'v2.51',items:[
+    ['bal','战斗权重改成「转数给底＋原著分量加成」：四转 24、五转 40、六转 52，普通知名字号 ×1.2、有战绩的重要人物 ×1.4、方源与书中大反派 ×1.6；剧情压场的场次单独抬高，本来就强的主角级对手不再按标注转数下压。'],
+    ['fix','修掉运行中的卡顿：界面磨砂层在频繁改文本时反复重算背景模糊导致掉帧，现在明显掉帧会自动关掉磨砂；播报的语音列表改为只查询一次并缓存。'],
+    ['fix','版本号从 v2.50 递增至 v2.51；游戏显示、分享游戏文件、分享战报与更新日志统一读取 APP_VER。']
+   ]}, {v:'v2.50',items:[ ['new','决战方源时，每轮改为正常抽我方的出手次数盘与杀招轮；方源的招式逐式落在盘面上，看得见他是怎么出手的。'], ['bal','删掉 7 条内容偏薄的升仙后游历事件，池子更干净。'], ['new','重做 4 条低质升仙后游历事件：超级蛊阵争夺战、琅琊派·炼炉护阵、龙鲸乐土·悔哭海、光阴长河探索，都补上具体人物、势力、分支路线与明确产出。'], ['fix','王庭福地回到凡人期的事件盘，不再出现在升仙后；其中对手等级按该阶段重新搭配，八十八角真阳楼的前置条件同步放宽，不会因此被锁死。'], ['new','凡人期补上修为成长：若干区域游历与王庭福地可以稳定推进修为，不再只靠偶尔撞上。'], ['new','东方长凡夺舍大幅扩写：夺舍过程有对抗、反搜法门、取资源清册三条走向，失败有实在代价。'], ['fix','版本号从 v2.49 递增至 v2.50；游戏显示、分享游戏文件、分享战报与更新日志统一读取 APP_VER。'] ]}, {v:'v2.49',items:[
     ['new','凡人经历盘固定为3次；炼天第二世经历结束后加入「是否参与原著事件」50/50转盘，选参与后从「白骨山百家传 / 商家竞技场」两事件盘抽取一条；5转且未完成三叉山大战时，事件盘追加「三叉山大战」。'],
     ['fix','原著事件盘只结算玩家个人经历与当前世资源，不改变方源主线；定仙游等仙蛊不会被凡人或低转数直接取得。'],
     ['new','青茅山覆灭移出原著事件盘，改为炼天第二世青茅山出身（熊家/白家/古月）必触发的一次性剧情：外敌入侵期（天鹤上人御鹤降临）→族内屠戮期（古月一代血幕天华蛊与血颅蛊）→你的决定（帮助古月一代/联手天鹤上人/保护自己逃离死神）→山体毁灭终局（白凝冰北冥冰魄体自爆）→疆域远遁期（白骨山/隐姓/追方源足迹）。含具名对手、原著招式、失败代价与不同标记。'],
@@ -5401,7 +5405,7 @@ async function rollW(p,name){
    浏览器 TTS 队列：盘面结果 / 终局 / 特殊仙道杀招；操作栏「播报」开关，记忆于 guVoice。
    队列过长（AUTO/FAST 连转）时丢弃新播报，避免声音严重滞后于画面。 */
 var VOICE=(function(){
- var ON=true,QUEUE=[],BUSY=false,MAXQ=3,SEQ=0;
+ var ON=true,QUEUE=[],BUSY=false,MAXQ=3,SEQ=0,VCACHE=null,VTRIES=0;
  function supported(){try{return !!(window.speechSynthesis&&window.SpeechSynthesisUtterance);}catch(e){return false;}}
  function load(){try{var v=localStorage.getItem('guVoice');if(v!=null)ON=(v!=='0');}catch(e){}}
  function persist(){try{localStorage.setItem('guVoice',ON?'1':'0');}catch(e){}}
@@ -5428,7 +5432,7 @@ var VOICE=(function(){
    try{
     var u=new SpeechSynthesisUtterance(it.t),done=false,started=false;
     u.lang='zh-CN';u.rate=it.rate||1.05;u.pitch=it.pitch||1.0;u.volume=it.vol||0.6;
-    var v=pickVoice();if(v)u.voice=v;
+    if(!VCACHE&&VTRIES<4){VTRIES++;VCACHE=pickVoice();} if(VCACHE)u.voice=VCACHE; /* v2.51：语音列表只解析一次，避免每条播报都同步 getVoices() 占主线程 */
     function fin(){
      if(done||id!==SEQ)return;done=true;BUSY=false;setTimeout(next,80);
     }
@@ -5463,7 +5467,7 @@ var VOICE=(function(){
  }
  function clear(){SEQ++;QUEUE=[];try{window.speechSynthesis.cancel();}catch(e){}BUSY=false;}
  function toggle(){ON=!ON;persist();if(!ON)clear();return ON;}
- function boot(){load();try{window.speechSynthesis.onvoiceschanged=function(){pickVoice();};}catch(e){}}
+ function boot(){load();try{window.speechSynthesis.onvoiceschanged=function(){VCACHE=null;VTRIES=0;pickVoice();};}catch(e){}}
  return {boot:boot,say:say,toggle:toggle,clear:clear,on:function(){return ON;},supported:supported};
 })();
 
@@ -5741,7 +5745,7 @@ var ERA_ZUN={
   intro:'元始仙尊以气道开辟修行新途，并以奴道统御万灵。你若能在天地人三气中走出自己的道路，争的便是气道尊位，而非复刻初代仙尊。',
   need:function(){return (S.flags.ysQi||0)>=3||rlm('气道')>=5||rlm('奴道')>=5||(hasMove('三气归来')&&hasMark('元始残火'));},
   bonus:function(){return (S.flags.ysQi||0)*3+(hasMove('三气归来')?8:0);},
-  trial:async function(){return !!(await backRound(Math.max(160,Math.round(anchor()*1.05)),'争尊·三气天劫',async function(){await say('三气归一，气机稳固。','gold');},{noFlee:true}));},
+  trial:async function(){return !!(await backRound(Math.max(200,Math.round(anchor()*1.05)),'争尊·三气天劫',async function(){await say('三气归一，气机稳固。','gold');},{noFlee:true}));},
   onWin:async function(X){var c=await optW('元始成尊',[['以气定尊',40],['以奴辅世',35],['三气归一',25]]);if(c===0)await ending('元始世·气道成尊','你以'+X+'道称尊。气道谱系上，元始之外又多了一笔。');if(c===1)await ending('元始世·奴道辅世','你以奴道统御万灵，却不以奴役为终点。');await ending('元始世·三气尊','你将天地人三气融会贯通，留下自己的道统。')}},
  xx:{eraName:'星宿',title:'星宿之世·争星轨尊',
   intro:'星轨如棋。星宿仙尊未必要你臣服——但若你能在棋盘上落下自己的「尊」字，天庭也得改谱。',
@@ -5753,13 +5757,13 @@ var ERA_ZUN={
   intro:'无极魔尊以「无」开道。你若能在「无」里立住自己的「有」，便是与魔尊并行的另一种尊。',
   need:function(){return hasMark('无极真传')||rlm('律道')>=5||(hasMark('无极门徒')&&hasMove('无中生有'));},
   bonus:function(){return (hasMark('无极真传')?12:0)+(rlm('律道')>=5?8:0);},
-  trial:async function(){return !!(await backRound(Math.max(170,Math.round(anchor()*1.08)),'争尊·无中生有劫',async function(){await say('「有」立住了。','gold');},{noFlee:true}));},
+  trial:async function(){return !!(await backRound(Math.max(210,Math.round(anchor()*1.08)),'争尊·无中生有劫',async function(){await say('「有」立住了。','gold');},{noFlee:true}));},
   onWin:async function(X){var c=await optW('无极成尊',[['以律定尊',40],['无中生有',35],['不居尊名',25]]);if(c===0)await ending('无极世·律道成尊','你以'+X+'道称尊。规则开始绕着你的名字走。');if(c===1)await ending('无极世·无中尊','你从空无里抽出尊位。');await ending('无极世·无名尊','你成了尊，却不让人称呼。这本身就是一条律。');}},
  km:{eraName:'狂蛮',title:'狂蛮之世·争力变之尊',
   intro:'狂蛮魔尊以力与变化压服荒原。兽潮之上，仍能立住人形与兽形的人，才配称尊。',
   need:function(){return rlm('力道')>=5||rlm('变化道')>=5||(hasMark('狂蛮真传')&&(S.flags.kmBeast||0)>=2)||hasMark('血皮传承');},
   bonus:function(){return (S.flags.kmBeast||0)*3+(hasMark('狂蛮真传')?10:0)+(hasMove('自由残缺变')?8:0);},
-  trial:async function(){return !!(await backRound(Math.max(165,Math.round(anchor()*1.06)),'争尊·兽潮天劫',async function(){await say('潮头为你分开。','gold');},{noFlee:true}));},
+  trial:async function(){return !!(await backRound(Math.max(205,Math.round(anchor()*1.06)),'争尊·兽潮天劫',async function(){await say('潮头为你分开。','gold');},{noFlee:true}));},
   onWin:async function(X){var c=await optW('狂蛮成尊',[['力压五域',40],['万形之尊',35],['与兽同名',25]]);if(c===0)await ending('狂蛮世·力道成尊','你以'+X+'道称尊。荒原角力场从此先空出你的位置。');if(c===1)await ending('狂蛮世·变化成尊','你以万形称尊。没有人能画准你的脸。');await ending('狂蛮世·半兽尊','人与兽都向你低头。');}},
  hl:{eraName:'红莲',title:'红莲之世·争宙道尊',
   intro:'红莲魔尊折光阴为刃。若你能在乱流里固定自己的「此刻」，便是与红莲并行的尊。',
@@ -5777,7 +5781,7 @@ var ERA_ZUN={
   intro:'幽魂魔尊以万魂为食。在被吃之前先成为「尊」，是这个时代最狂的活法——也是最险的。',
   need:function(){return rlm('魂道')>=5||hasMove('阎帝')||hasMove('魂爆')||(hasMark('幽魂真传')&&hyAttention()>=40);},
   bonus:function(){return (hasMark('幽魂真传')?10:0)+(hasMove('阎帝')?6:0)+(hasMove('魂爆')?6:0);},
-  trial:async function(){S.flags.hyAtt=(S.flags.hyAtt||0)+25;return !!(await backRound(Math.max(180,Math.round(anchor()*1.1)),'争尊·万魂天劫',async function(){await say('魂潮在你脚下跪了一息。','gold');},{noFlee:true}));},
+  trial:async function(){S.flags.hyAtt=(S.flags.hyAtt||0)+25;return !!(await backRound(Math.max(225,Math.round(anchor()*1.1)),'争尊·万魂天劫',async function(){await say('魂潮在你脚下跪了一息。','gold');},{noFlee:true}));},
   onFail:async function(){await say('关注度因争尊而暴涨。有什么东西在更远的地方转过头来。','bad');},
   onWin:async function(X){var c=await optW('幽魂成尊',[['与魔尊分食',30],['立魂道新尊',40],['以尊换命',30]]);if(c===0)await ending('幽魂世·分食之尊','你以'+X+'道称尊，并与万魂之主达成默契：各吃各的。');if(c===1)await ending('幽魂世·魂道成尊','你在白骨上立尊名。亡魂路过会慢半步。');await ending('幽魂世·换命尊','你把尊位当盾。幽魂看了你一眼，没有下嘴。');}},
  yl:{eraName:'元莲',title:'元莲之世·争画木之尊',intro:'元莲仙尊以画道与木道留名。你要争的不是复刻青莲，而是让自己的生机与画意成为天地新篇。',need:function(){return rlm('画道')>=5||rlm('木道')>=5||((S.flags.ylLotus||0)>=2&&hasMark('元莲画意'));},bonus:function(){return (S.flags.ylLotus||0)*4+Math.max(rlm('画道'),rlm('木道'))*2+(hasMark('元莲画意')?8:0);},trial:async function(){return await rollW(Math.min(78,40+(S.flags.ylLotus||0)*7+Math.max(rlm('画道'),rlm('木道'))*4),'争尊·青莲画境盘');},onWin:async function(X){var c=await optW('元莲成尊',[['画天地新篇',40],['木道生生不息',35],['留白归隐',25]]);if(c===0)await ending('元莲世·画道成尊','你以'+X+'道落笔，天地成画而你不在画外。');if(c===1)await ending('元莲世·生机尊','你的道统如古木抽枝，万年不断。');await ending('元莲世·留白尊','你在最重要的一笔前停手，后世却都记得那片留白。');}},
@@ -8239,7 +8243,10 @@ function enemyMoveSpec(m){
  if(Object.prototype.toString.call(m)==='[object Array]'){var ae=specEntry(m[0]);return {name:m[0],val:Number(m[1])||0,weight:m.length>2?Math.max(0,Number(m[2])||0):(Number(m[1])||0),dir:m.length>3?(m[3]||((ae&&ae.dir)||'攻')):((ae&&ae.dir)||'攻')};}
  m=m||{};var se=specEntry(m.name);return {name:m.name||'无名杀招',val:Number(m.val)||0,weight:m.weight==null?(Number(m.val)||0):Math.max(0,Number(m.weight)||0),dir:m.dir||(se&&se.dir)||'攻'};
 }
-function enemyMoveVal(eT){return eT>=280?140:eT>=240?120:eT>=200?105:eT>=180?90:eT>=130?65:eT>=95?48:eT>=80?40:eT>=55?28:eT>=35?18:eT>=20?10:5;}
+function enemyMoveVal(eT){return eT>=280?140:eT>=240?120:eT>=200?105:eT>=180?90:eT>=130?65:eT>=100?52:eT>=95?48:eT>=80?40:eT>=60?40:eT>=45?24:eT>=35?18:eT>=20?10:5;} /* v2.51 修订：转数只给底——四转24／五转40／六转52（不再与相邻转数同档）；原著分量另按 foeCoef 加成 */
+var FOE_COEF_BOSS=['方源','古月方源','常山阴','古月一代','幽魂魔尊','影无邪','巨阳意志','犬帝','霸皇','监天塔主','星宿'];
+var FOE_COEF_KEY=['天鹤上人','铁若男','铁木白','白凝冰','黑楼兰','凤九歌','太白云生','吴鬼','吴神通','肖芒','枯魔','莫无天','孔日天','龙青天','易冲','马英杰','商睚眦','洛伯君','武庸','池曲由','星轨真人','星辉真君','冯天宇','炼九生','商鬼才','血袍护法','万海龙流','白骨客'];
+function foeCoef(label,base){ if(base>100)return 1; /* 剧情压场/决战自有数值，不套普通基准 */ var t=String(label||''),i; for(i=0;i<FOE_COEF_BOSS.length;i++)if(t.indexOf(FOE_COEF_BOSS[i])>=0)return 1.6; for(i=0;i<FOE_COEF_KEY.length;i++)if(t.indexOf(FOE_COEF_KEY[i])>=0)return 1.4; return t.indexOf('对手：')>=0?1.2:1; }
 
 
 /* ══ 11 EVENT · 随机奇遇系统（v1.4.8） ═══════════════════════════════
@@ -11171,7 +11178,7 @@ async function duel(eT,label,opts){
  /* v2.50：只剩基础攻击（无杀招可出，或河内封禁杀招只剩肘击）时不再逐式落盘，整场自动结算。 */
  S.flags.autoBattle=((opts.playerElbow!=null)||onlyBasicFight())?1:0;
  if(S.flags.autoBattle)await say('此战你只有基础攻击可用——不再逐式落盘，直接自动结算。','battle');
- var enLv=lvOfAnchor(eT);
+ var enLv=lvOfAnchor(eT); var nf=(opts.playerElbow!=null)?1:foeCoef(label,eT); /* v2.51：原著分量加成（转数基准之上） */
  var cn=CNT_W[S.tIdx];
  var pn=await bw('我方出手次数盘',label+String.fromCharCode(183)+'按才情取盘',cn.map(function(x){return [x[0]+'式',x[1]];}) ,(cn.length>4?{small:true}:{}) );
  var nP=cn[pn][0];
@@ -11274,7 +11281,7 @@ async function duel(eT,label,opts){
   var enemyWheelName=(opts.playerElbow!=null?'敌方肘击轮·第':'敌方杀招轮·第');
   var enemyWheelTail=(opts.playerElbow!=null?'':'·'+((opts.enemySchool||'')+''));
   if(opts.enemyMoves&&opts.enemyMoves.length){
-   var enemySpecs=opts.enemyMoves.map(enemyMoveSpec);
+   var enemySpecs=opts.enemyMoves.map(enemyMoveSpec); if(nf!==1)enemySpecs=enemySpecs.map(function(m){m.val=Math.round(m.val*nf);m.weight=Math.round(m.weight*nf);return m;}); /* v2.51：原著分量加成 */
    /* 逆流河封禁杀招：敌方无论配置什么，河内一律只以肘击出手。 */
    if(opts.playerElbow!=null)enemySpecs=enemySpecs.map(function(m){return {name:'肘击',val:m.val,dir:'攻'};});
    emi=await bw(enemyWheelName+(j2+1)+'式'+enemyWheelTail,label,enemySpecs.map(function(m,j){return [combatMoveLabel(m),m.weight];}),{small:true});
@@ -11282,11 +11289,11 @@ async function duel(eT,label,opts){
   }else if(S.lv<6){ /* v2.10：凡人期按敌方流派显示具名招式；未标流派时回退旧通用池 */
    var mortalPool=genericEnemyMoves(opts.enemySchool,false);
    emi=await bw('通用杀招盘二·第'+(j2+1)+'式',label,mortalPool.map(function(m,j){return [combatMoveLabel({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)}),1];}),{small:true});
-   efx={name:mortalPool[emi],val:Math.round(opts.perMove||enemyMoveVal(eT)),dir:genericEnemyMoveDir(mortalPool[emi],emi,opts.enemySchool)};
+   efx={name:mortalPool[emi],val:Math.round((opts.perMove||enemyMoveVal(eT))*nf),dir:genericEnemyMoveDir(mortalPool[emi],emi,opts.enemySchool)};
   }else{
    var immortalPool=genericEnemyMoves(opts.enemySchool,true);
    emi=await bw('敌方杀招轮·第'+(j2+1)+'式',label,immortalPool.map(function(m,j){return [combatMoveLabel({name:m,dir:genericEnemyMoveDir(m,j,opts.enemySchool)}),1];}),{small:true});
-   efx={name:immortalPool[emi],val:Math.round(opts.perMove||enemyMoveVal(eT)),dir:genericEnemyMoveDir(immortalPool[emi],emi,opts.enemySchool)};
+   efx={name:immortalPool[emi],val:Math.round((opts.perMove||enemyMoveVal(eT))*nf),dir:genericEnemyMoveDir(immortalPool[emi],emi,opts.enemySchool)};
   }
   if(efx.name==='打爽了，再抽两次'){ /* v1.2.6：凤九歌专属——命中追加两次抽取（每场限一次·防链） */
    if(!opts._redrawDone){opts._redrawDone=true;nE+=2;j2--;await say('凤九歌打得兴起——『打爽了，再抽两次』！','gold');}
@@ -16089,7 +16096,7 @@ async function doKeyTrial(n,force){
   await say('你踏上山巅时，正魔两道已经撞在一起。铁木白一人压住孔日天、龙青天、吴神通、易冲四人的余部；另一边，枯魔与吴鬼的犬群、骨翼正把铁家阵线撕开。','sys');
   var campOpts=[['随正道联军，先清魔道',34],['随魔道散修，趁乱夺宝',33],['独行，谁挡路就打谁',33]];
   var camp=await optW('三叉山·山巅阵营',campOpts);
-  var e3=camp===0?185:(camp===1?180:175);
+  var e3=camp===0?205:(camp===1?200:195);
   var ev3=enemyMoveVal(e3);
   if(camp===0){
    await say('你站到铁家一侧。铁木白没有道谢，只把金袍一振，化金蛊的金光铺满山脊——他要你先证明自己挡得住。','sys');
@@ -20138,6 +20145,21 @@ VOICE.boot();
 try{
  var _dm=(navigator.deviceMemory||8),_hc=(navigator.hardwareConcurrency||8);
  if(_dm<=4&&_hc<=4)document.documentElement.classList.add('perf-low');
+}catch(e){}
+/* v2.51：帧耗监视——观察窗口内长帧过多时自动打开 perf-low（关磨砂，优先跟手），最多观察 900 帧 */
+try{
+ (function(){
+  var slow=0,frames=0,last=0,cap=900;
+  function loop(){
+   if(frames>=cap)return;
+   var t=performance.now();
+   if(last){var d=t-last;if(d>48)slow++;}
+   last=t;frames++;
+   if(frames%90===0){ if(slow>=18){document.documentElement.classList.add('perf-low');return;} slow=0; }
+   requestAnimationFrame(loop);
+  }
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(loop);
+ })();
 }catch(e){}
 try{starThemeInit();}catch(e){}
 /* v1.19 更新日志：点版本号可看；首次进入本版自动弹一次 */
